@@ -67,18 +67,18 @@
    ```
 5. any
 
-### 5. 联合类型 
+### 5. 联合类型
 ### 6. 接口
 ### 7. 数组类型
-1. 内置对象
-   - `JavaScript`中有很多内置对象，它们可以直接在`TypeScript`中当做定义好了的类型。
-   - 内置对象是指根据标准在全局作用域（Global）上存在的对象。这里的标准是指 ECMAScript 和其他环境（比如 DOM）的标准。
-   - ECMA提供的标准对象包括：Boolean、Number、Date、String等。详细的内容可以查看MDN：[Standard built-in objects](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects)
-   -DOM提供的标准对象主要有：Document、HTMLElement、Event、NodeList等。也就是DOM interfaces。详细的内容可以查看MDN：[Document Object Model (DOM)](https://developer.mozilla.org/en-US/docs/Web/API/Document_Object_Model)
-   - BOM提供的标准对象主要有：Window（最顶层的对象）、location、history等。
-   - ECMAScript、DOM、BOM提供的标准对象都在 [TypeScript 核心库的定义文件](https://github.com/Microsoft/TypeScript/tree/master/src/lib) 中。
-   - 注意：**Node.js 不是内置对象的一部分**，如果想用`TypeScript`写 Node.js，则需要引入第三方声明文件：`npm install @types/node --save-dev`
-### 8. 函数类型
+### 8. 内置对象
+1. `JavaScript`中有很多内置对象，它们可以直接在`TypeScript`中当做定义好了的类型。
+2. 内置对象是指根据标准在全局作用域（Global）上存在的对象。这里的标准是指 ECMAScript 和其他环境（比如 DOM）的标准。
+3. ECMA提供的标准对象包括：Boolean、Number、Date、String等。详细的内容可以查看MDN：[Standard built-in objects](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects)
+4. DOM提供的标准对象主要有：Document、HTMLElement、Event、NodeList等。也就是DOM interfaces。详细的内容可以查看MDN：[Document Object Model (DOM)](https://developer.mozilla.org/en-US/docs/Web/API/Document_Object_Model)
+5. BOM提供的标准对象主要有：Window（最顶层的对象）、location、history等。
+6. ECMAScript、DOM、BOM提供的标准对象都在 [TypeScript 核心库的定义文件](https://github.com/Microsoft/TypeScript/tree/master/src/lib) 中。
+7. 注意：**Node.js 不是内置对象的一部分**，如果想用`TypeScript`写 Node.js，则需要引入第三方声明文件：`npm install @types/node --save-dev`
+### 9. 函数类型
 1. 函数有两种定义方式：函数声明（declaration）和函数表达式（expression），在`TypeScript`中，这两种规定类型的方式有所不同。
 2. 函数声明（declaration）
    - 函数有输入，有输出，都要进行约束，如果是函数声明的方式，约束起来比较简单。实例代码：
@@ -227,7 +227,7 @@
         }
      ```
    - 不能定义多个函数体，只能最后定义一个包含前面所有输入类型和输出类型的同名函数以及函数体。
-### 9. 类型断言
+### 10. 类型断言
 1. 语法
    - 语法1：`值 as 类型`
    - 语法2：`<类型> 值`
@@ -332,15 +332,15 @@
    - 类型断言不是类型转换，只影响编译时的类型，类型断言的结果在编译完成后，就会被删除。因此类型断言并不能完成真正的类型转换，不会影响变量的类型，要实现真正的类型转换，直接调用类型转换的方法，如`Number()`、`Boolean()`等。
    - 优先使用类型声明和泛型。与类型断言相比较。类型声明更加严格。同时使用泛型，在使用时指定具体的类型效果上比断言好。
 
-9. 声明文件
-   - 当使用第三方库时，我们需要引用它的声明文件，才能获得对应的代码补全、接口提示等功能。
-   - 所谓的声明文件，我的理解就是将这个第三方库中需要对外暴露出来的方法和变量进行声明，这样我们就可以直接引用这些方法和变量。
-   - 通常我们会把声明语句放到一个单独的文件中，以jQuery为例，声明文件的名称是：`jQuery.d.ts`，**声明文件必须以`.d.ts`为后缀**。内容如下：
-     ```TypeScript
+### 11. 声明文件
+1. 当使用第三方库时，我们需要引用它的声明文件，才能获得对应的代码补全、接口提示等功能。
+2. 所谓的声明文件，我的理解就是将这个第三方库中需要对外暴露出来的方法和变量进行声明，这样我们就可以直接引用这些方法和变量。
+3. 通常我们会把声明语句放到一个单独的文件中，以jQuery为例，声明文件的名称是：`jQuery.d.ts`，**声明文件必须以`.d.ts`为后缀**。内容如下：
+   ```TypeScript
        // src/jQuery.d.ts
        declare var jQuery: (selector: string) => any;
-     ```
-   - 一般来说，ts 会解析项目中所有的 *.ts 文件，当然也包含以 .d.ts 结尾的文件。所以当我们将 jQuery.d.ts 放到项目中时，其他所有 *.ts 文件就都可以获得 jQuery 的类型定义了:
+   ```
+4. 一般来说，ts 会解析项目中所有的 *.ts 文件，当然也包含以 .d.ts 结尾的文件。所以当我们将 jQuery.d.ts 放到项目中时，其他所有 *.ts 文件就都可以获得 jQuery 的类型定义了:
      ```
         /path/to/project
         ├── src
@@ -348,33 +348,33 @@
         |  └── jQuery.d.ts
         └── tsconfig.json
      ```
-   - 对于第三方的声明文件，推荐使用 `@types` 统一管理第三方库的声明文件。`@types` 的使用方式很简单，直接用 `npm` 安装对应的声明模块即可，以 `jQuery` 举例：`npm install @types/jquery --save-dev`
-   - 搜索第三方声明文件的地址：https://microsoft.github.io/TypeSearch/
-   - 涉及到的新语法如下表所示：
+5. 对于第三方的声明文件，推荐使用 `@types` 统一管理第三方库的声明文件。`@types` 的使用方式很简单，直接用 `npm` 安装对应的声明模块即可，以 `jQuery` 举例：`npm install @types/jquery --save-dev`
+6. 搜索第三方声明文件的地址：https://microsoft.github.io/TypeSearch/
+7. 涉及到的新语法如下表所示：
     
-     语法|说明
-     :---:|:---:
-     `declare var` | 声明全局变量
-     `declare function` | 声明全局方法
-     `declare class` | 声明全局类
-     `declare enum` | 声明全局枚举类型
-     `declare namespace` | 声明（含有子属性的）全局对象
-     `interface 和 type` | 声明全局类型
-     `export` | 导出变量
-     `export namespace` | 导出（含有子属性的）对象
-     `export default` | ES6 默认导出
-     `export =` | commonjs 导出模块
-     `export as namespace` | UMD 库声明全局变量
-     `declare global` | 扩展全局变量
-     `declare module` | 扩展模块
-     `/// <reference />` | 三斜线指令
-10. 书写声明文件
-    - 当我们使用的第三方库没有提供声明文件的时候，需要我们自己去写声明文件。声明文件的内容和使用方式在不同的应用场景下有所不同。主要有以下几种情况：
-      - `全局变量`：通过` <script> `标签引入第三方库，注入全局变量
-      - `npm 包`：通过 `import foo from 'foo'` 导入，符合 ES6 模块规范
-      - `UMD 库`：既可以通过 `<script>` 标签引入，又可以通过 import 导入
-      - `直接扩展全局变量`：通过 `<script>` 标签引入后，改变一个全局变量的结构
-      - `在 npm 包或 UMD 库中扩展全局变量`：引用 npm 包或 UMD 库后，改变一个全局变量的结构
-      - `模块插件`：通过 `<script>` 或 `import` 导入后，改变另一个模块的结构
-    - 每一种场景下的声明方式等到需要的时候在学。^_^
+   语法|说明
+   :---:|:---:
+   `declare var` | 声明全局变量
+   `declare function` | 声明全局方法
+   `declare class` | 声明全局类
+   `declare enum` | 声明全局枚举类型
+   `declare namespace` | 声明（含有子属性的）全局对象
+   `interface 和 type` | 声明全局类型
+   `export` | 导出变量
+   `export namespace` | 导出（含有子属性的）对象
+   `export default` | ES6 默认导出
+   `export =` | commonjs 导出模块
+   `export as namespace` | UMD 库声明全局变量
+   `declare global` | 扩展全局变量
+   `declare module` | 扩展模块
+   `/// <reference />` | 三斜线指令
+### 12. 书写声明文件
+1. 当我们使用的第三方库没有提供声明文件的时候，需要我们自己去写声明文件。声明文件的内容和使用方式在不同的应用场景下有所不同。主要有以下几种情况：
+    - `全局变量`：通过` <script> `标签引入第三方库，注入全局变量
+    - `npm 包`：通过 `import foo from 'foo'` 导入，符合 ES6 模块规范
+    - `UMD 库`：既可以通过 `<script>` 标签引入，又可以通过 import 导入
+    - `直接扩展全局变量`：通过 `<script>` 标签引入后，改变一个全局变量的结构
+    - `在 npm 包或 UMD 库中扩展全局变量`：引用 npm 包或 UMD 库后，改变一个全局变量的结构
+    - `模块插件`：通过 `<script>` 或 `import` 导入后，改变另一个模块的结构
+2. 每一种场景下的声明方式等到需要的时候在学。^_^
     
