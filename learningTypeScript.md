@@ -237,6 +237,97 @@
 4. 断言作用3：将一个类型断言为any （**慎用**）
 5. 断言作用4：将any断言为具体类型
 6. 类型断言的限制
-7. 使用类型断言的注意事项
+   - TypeScript时结构类型系统，类型之间的比较只会比较它们最终的结构，而忽略定义时的关系。我们定义下面的结构：
+     ```typescript
+        interface Animal {
+            name: string
+        }
+        
+        interface Cat {
+            name: string
+            run(): void
+        
+        }
+        
+        let tom: Cat = {
+            name: 'Tom',
+            run: () => {
+                console.log('run') ;
+            }
+        }
+        let animal: Animal = tom ;
+     ```
+   - Cat 包含了 Animal 中的所有属性，除此之外，它还有一个额外的方法 run。TypeScript 并不关心 Cat 和 Animal 之间定义时是什么关系，而只会看它们最终的结构有什么关系——所以它与 Cat extends Animal 是等价的。在继承的情况下，子类的实例可以赋值给类型为父类的变量，所以上面的tom可以赋值给类型为Animal的变量。示例代码如下：
+     ```typescript
+        interface Animal {
+            name: string
+        }
+        
+        interface Cat extends Animal{
+            run(): void
+        }
+     ```
+   - 当 Animal 兼容 Cat 时，它们就可以互相进行类型断言了，示例代码如下：
+     ```typescript
+        interface Animal {
+            name: string
+        }     
+        interface Cat {
+            name: string
+            run(): void
+        }    
+        function testAnimal(animal: Animal) {     
+            return (animal as Cat) ;
+        }     
+        function testCat(cat: Cat) {     
+            return (cat as Animal) ;
+        }
+     ```
+   - 总结：
+     - 笼统的说，就是A能兼容B，那么 A 能够被断言为 B，B 也能被断言为 A。
+     - 如果B能兼容A，那么 B 能够被断言为 A，A 也能被断言为 B。
+     - 所谓的兼容，我的理解是，A兼容B，指的是B具有A所有的属性和方法。这个案例中，`Cat`具有`Animal`所有属性，所以，`Animal`是兼容`Cat`的。
+     
+7. 类型断言与类型声明的区别
+   - 先看一段代码：
+     ```typescript
+        interface Animal {
+            name: string
+        }    
+        interface Cat {
+            name: string
+            run(): void
+        } 
+        let tom: Cat = {
+            name: 'tom',
+            run: () => {
+                console.log('run') ;
+            }
+        }
+        let animal: Animal = tom ;
+     ```
+   - 在上例中，因为Animal兼容Cat，所以可以将tom直接赋值给animal。
+   - 将 animal 断言为 Cat 赋值给 jack，也是可以的：
+     ```typescript
+        let an: Animal = {
+            name: 'Jack'
+        }
+        
+        // an可以被断言成Cat类型，也是因为Animal兼容Cat
+        let jack = an as Cat ;
+        let animal2 = tom as Animal ;
+     ```
+   - 如果直接将Animal类型的变量赋值给Cat类型的变量，则会报错：
+     ```typescript
+        // error TS2741: Property 'run' is missing in type 'Animal' but required in type 'Cat'.
+        let jack2: Cat = an ;
+     ```
+   - 想要将animal类型的anl赋值给类型为Cat的jack2，Cat必须兼容Animal，也就是说，Cat有的，Animal都得有。但是，Animal不具备这样的特性，所以无法赋值给jack2。换一种说法，Animal 可以看作是 Cat 的父类，当然不能将父类的实例赋值给类型为子类的变量。
+   - 总结：
+     - A能断言为B，只需满足A兼容B或者B兼容A就可以。
+     - A赋值给B，则B必须兼容A。
+     
+8. 使用类型断言的注意事项
    - 不能使用双重断言，即不能这样写：`as any as Foo`，这种不加限制的将一个类型转换为另外一个类型，极有可能在运行时报错。
    - 类型断言不是类型转换，只影响编译时的类型，类型断言的结果在编译完成后，就会被删除。因此类型断言并不能完成真正的类型转换，不会影响变量的类型，要实现真正的类型转换，直接调用类型转换的方法，如`Number()`、`Boolean()`等。
+   - 优先使用类型声明和泛型。与类型断言相比较。类型声明更加严格。同时使用泛型，在使用时指定具体的类型效果上比断言好。
