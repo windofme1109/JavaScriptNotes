@@ -1,4 +1,5 @@
-## 学习TypeScript
+# 学习TypeScript
+## 一、基础
 ### 1. TypeScript是什么
 1. TypeScript官网：https://www.typescriptlang.org/
 
@@ -377,4 +378,55 @@
     - `在 npm 包或 UMD 库中扩展全局变量`：引用 npm 包或 UMD 库后，改变一个全局变量的结构
     - `模块插件`：通过 `<script>` 或 `import` 导入后，改变另一个模块的结构
 2. 每一种场景下的声明方式等到需要的时候在学。^_^
-    
+
+## 二、进阶
+### 1. 类型别名
+- 用法：使用 type 创建类型别名
+- 作用：类型别名常用于联合类型
+- 我的理解：类型别名的作用主要是增加语义性，实际上，新的名字是对类型的一个引用，约束还是原来的类型起作用。示例代码：
+  ```typescript
+      // 将string类型取另外一个名字——name，接下来我们就可以使用Name代替string，语义性更强
+      type Name = string ;
+      // 将一个函数取一个别名——NameResolve，等号右侧是TypeScript中的函数的定义，=>左侧表示输入类型，右侧表示输出类型
+      type NameResolve = () => string ;
+      
+      type NameOrResolve = Name | NameResolve ;
+      
+      function getName(n: NameOrResolve): Name {
+          if (typeof n === 'string') {
+              return n ;
+          } else {
+              return n() ;
+          }
+      }
+      
+      console.log(getName('tom')) ;
+      console.log(getName(() => 'jack')) ;
+
+  ```
+### 2. 字符串字面量类型
+- 符串字面量类型用来约束取值只能是某几个字符串中的一个。
+- 也是使用`type`关键字进行定义。使用`|`用来分隔可选的几个字符串。示例代码如下：
+  ```typescript
+     // 使用type定义一个字符串字面量类型，取值只能是red、green、blue这三个字符串之一
+     type colors = 'red' | 'green' | 'blue' ;
+     
+     function chooseColor(color: colors): string {
+         return `The color I choose is ${color}` ;
+     }
+     
+     console.log(chooseColor('red')) ;
+     console.log(chooseColor('green')) ;
+     console.log(chooseColor('blue')) ;
+     
+     // yellow不在取值colors约定的取值范围内，所以传入yellow会报错
+     // error TS2345: Argument of type '"yellow"' is not assignable to parameter of type 'colors'.
+     // console.log(chooseColor('yellow')) ;
+  ```
+### 3. 元组（Tuple）
+- 元组（Tuple）的概念：合并了不同类型的对象，而数组（Array）则是用来合并同种类型的对象
+- 注意与python中的元组的概念进行区分，在python中，元组与列表类似，都是线性表，主要区别是元内容不可变
+- 元组有以下几个特点：
+  - 内容可变。但是类型不可变（除非设置了可选类型）
+  - 初始化可以不用赋值。赋值的时候，数量和对应的数据类型必须对应正确。
+ - 可以使用push()和pop()方法。
