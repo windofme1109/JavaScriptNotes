@@ -1,3 +1,28 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [学习TypeScript](#%E5%AD%A6%E4%B9%A0typescript)
+  - [一、基础](#%E4%B8%80%E5%9F%BA%E7%A1%80)
+    - [1. TypeScript是什么](#1-typescript%E6%98%AF%E4%BB%80%E4%B9%88)
+    - [2. 第一个ts程序](#2-%E7%AC%AC%E4%B8%80%E4%B8%AAts%E7%A8%8B%E5%BA%8F)
+    - [3. tsconfig.json配置详解](#3-tsconfigjson%E9%85%8D%E7%BD%AE%E8%AF%A6%E8%A7%A3)
+    - [4. TypeScript中的数据类型](#4-typescript%E4%B8%AD%E7%9A%84%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B)
+    - [5. 联合类型](#5-%E8%81%94%E5%90%88%E7%B1%BB%E5%9E%8B)
+    - [6. 接口](#6-%E6%8E%A5%E5%8F%A3)
+    - [7. 数组类型](#7-%E6%95%B0%E7%BB%84%E7%B1%BB%E5%9E%8B)
+    - [8. 内置对象](#8-%E5%86%85%E7%BD%AE%E5%AF%B9%E8%B1%A1)
+    - [9. 函数类型](#9-%E5%87%BD%E6%95%B0%E7%B1%BB%E5%9E%8B)
+    - [10. 类型断言](#10-%E7%B1%BB%E5%9E%8B%E6%96%AD%E8%A8%80)
+    - [11. 声明文件](#11-%E5%A3%B0%E6%98%8E%E6%96%87%E4%BB%B6)
+    - [12. 书写声明文件](#12-%E4%B9%A6%E5%86%99%E5%A3%B0%E6%98%8E%E6%96%87%E4%BB%B6)
+  - [二、进阶](#%E4%BA%8C%E8%BF%9B%E9%98%B6)
+    - [1. 类型别名](#1-%E7%B1%BB%E5%9E%8B%E5%88%AB%E5%90%8D)
+    - [2. 字符串字面量类型](#2-%E5%AD%97%E7%AC%A6%E4%B8%B2%E5%AD%97%E9%9D%A2%E9%87%8F%E7%B1%BB%E5%9E%8B)
+    - [3. 元组（Tuple）](#3-%E5%85%83%E7%BB%84tuple)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # 学习TypeScript
 ## 一、基础
 ### 1. TypeScript是什么
