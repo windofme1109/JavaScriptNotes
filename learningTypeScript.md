@@ -405,9 +405,9 @@
 
   ```
 ### 2. 字符串字面量类型
-- 符串字面量类型用来约束取值只能是某几个字符串中的一个。
-- 也是使用`type`关键字进行定义。使用`|`用来分隔可选的几个字符串。示例代码如下：
-  ```typescript
+1. 符串字面量类型用来约束取值只能是某几个字符串中的一个。
+2. 也是使用`type`关键字进行定义。使用`|`用来分隔可选的几个字符串。示例代码如下：
+   ```typescript
      // 使用type定义一个字符串字面量类型，取值只能是red、green、blue这三个字符串之一
      type colors = 'red' | 'green' | 'blue' ;
      
@@ -422,11 +422,142 @@
      // yellow不在取值colors约定的取值范围内，所以传入yellow会报错
      // error TS2345: Argument of type '"yellow"' is not assignable to parameter of type 'colors'.
      // console.log(chooseColor('yellow')) ;
-  ```
+   ```
 ### 3. 元组（Tuple）
-- 元组（Tuple）的概念：合并了不同类型的对象，而数组（Array）则是用来合并同种类型的对象
-- 注意与python中的元组的概念进行区分，在python中，元组与列表类似，都是线性表，主要区别是元内容不可变
-- 元组有以下几个特点：
-  - 内容可变。但是类型不可变（除非设置了可选类型）
-  - 初始化可以不用赋值。赋值的时候，数量和对应的数据类型必须对应正确。
- - 可以使用push()和pop()方法。
+1. 元组（Tuple）的概念：合并了不同类型的对象，而数组（Array）则是用来合并同种类型的对象
+2. 注意与python中的元组的概念进行区分，在python中，元组与列表类似，都是线性表，主要区别是元内容不可变
+3. 元组有以下几个特点：
+   - 内容可变，但是类型不可变。
+   - 初始化可以不用赋值。赋值的时候，数量和对应的数据类型必须对应正确。
+   - 可以使用push()和pop()方法。
+4. 元组的定义方式
+   - 定义时就赋值
+     ```typescript
+        // 定义一对值分别为 string 和 number 的元组
+        let tom: [string, number] = ['tom', 25];
+        console.log(tom[0]);
+        console.log(tom[1]);
+        
+        // 在TypeScript中，元组的内容可以修改
+        tom[0] = 'jack';
+        console.log(tom[0]);
+     ```
+   - 先定义后赋值，注意，赋值时，如果元组的类型中没有可选类型，则定义了多少个类型，就必须赋值多少个。
+     ```typescript
+        // 先定义，后赋值
+        let smith: [string, number];
+        // 赋值的时候，必须按照指定的类型进行赋值，否则就会报错
+        smith = ['Smith', 30];
+        // error TS2322: Type 'string' is not assignable to type 'number'.
+        // smith = [30, 'Smith'];
+     ```
+5. 通过索引的方式进行赋值，编译过程不会出错，但是在执行js文件就会出错。 我觉得原因可能是元组在js中表现为数组，有一段TS代码，如下所示，先定义类型，后通过索引的方式进行赋值：
+   ```typescript
+      let rose: [string, number];
+      rose[0] = 'rose';
+      rose[1] = 20;
+   ```  
+   上面的ts代码编译为js代码后，是这样：
+   ```javascript
+      var rose;
+      rose[0] = 'rose';
+      rose[1] = 20;
+   ```  
+   我们并没有将rose定义为数组，所以运行会报错。
+6. 元组可以使用解构操作。
+   ```typescript
+      let smith: [string, number];
+      // 赋值的时候，必须按照指定的类型进行赋值，否则就会报错
+      smith = ['Smith', 30];
+      let [a, b] = smith;
+      // Smith
+      console.log('a', a);
+      // 30
+      console.log('b', b);
+   ```
+7. 元组也可以设置可选元素，用?表示
+   ```typescript
+      // 元组也可以设置可选元素，用?表示
+      let phone: [string, number?];
+      phone = ['apple', 5500];
+      // the name is apple, and the price is 5500
+      console.log(`the name is ${phone[0]}, and the price is ${phone[1]}`);
+      // 因为元组的第二个元素是可选的，所以，可以不用定义第二个元素
+      phone = ['vivo'];
+      // the name is vivo
+      console.log(`the name is ${phone[0]}`);
+   ```  
+   元组设置可选元素的目的是：有一些场景我们需要的元素数量不确定，比如说坐标，可以是一维坐标，二维坐标，还可以是三维坐标，我们不需要定义三个元组，使用可选元素，定义一个即可。示例代码如下：
+   ```typescript
+      type point = [number, number?, number?];
+      const one: point = [1];
+      const two: point = [1, 2];
+      const three: point = [1, 2, 3];
+      console.log('length is', one.length);
+      console.log('length is', two.length);
+      console.log('length is', three.length);
+   ```
+8. 元组类型的剩余元素。元组的最后一个元素，可以是剩余参数，这样可以不用限制剩余元素的个数。
+   ```typescript
+      type multiColors = [number, ...string[]];
+      
+      let zeroColor: multiColors = [0];
+      let oneColor: multiColors = [1, 'red'];
+      let twoColors: multiColors = [2, 'red', 'blue'];
+      // [ 0 ]
+      console.log(zeroColor);
+      // [ 1, 'red' ]
+      console.log(oneColor);
+      // [ 2, 'red', 'blue' ]
+      console.log(twoColors);
+   ```
+9. 在定义函数时我们也可以使用剩余参数语法
+   ```typescript
+      // 函数传入的参数是一个元组，我们限制其元素的类型为[string, string, number]
+      // 同时使用了剩余参数语法
+      function useTupleAsRest(...args: [string, string, number]): void {
+          let [arg1, arg2, arg3] = args;
+            
+          console.log('first', arg1);
+          console.log('second', arg2);
+          console.log('third', arg3);
+      }
+      // first aa
+      // second bb
+      // third 25
+      useTupleAsRest('aa', 'bb', 25);
+   ```
+10. 元组类型的展开表达式。若最后一个参数是元组类型的展开表达式，那么这个展开表达式相当于元组元素类型的离散参数序列。因此可以使用展开表达式语法（...）。
+    ```typescript
+       type Point3D = [number, number, number];
+       let p1: Point3D = [2, 5, 8];
+       let p2: Point3D = [...p1];
+       console.log(p1);
+       console.log(p2);
+       
+       /**
+        * 使用剩余参数，接收离散参数序列
+        * @param args
+        */
+       const drawPoints = (...args: Point3D) => {
+           console.log('Points', args);
+       
+       } 
+       drawPoints(10, 20, 30);
+       // 使用索引的方式访问元组中的元素
+       drawPoints(p1[0], p1[1], p1[2]);    
+       // 这里使用元组的展开表达式，将其展开为离散形式的参数列表
+       // 在drawPoints()使用剩余参数，进行接收
+       drawPoints(...p1);
+    ```
+11. 给元组设置只读类型。可以为任何元组类型加上 readonly 关键字前缀，以使其成为只读元组。
+    ```typescript
+       // 使用readonly关键字设置Fruits这个元组为只读属性
+       type Fruits= readonly [string, string];
+       const apple: Fruits = ['apple', 'red'];
+       console.log(apple[0], apple[1]);
+       
+       // 设置了只读属性后，修改某个元素就会报错
+       // error TS2540: Cannot assign to '0' because it is a read-only property.
+       // apple[0] = 'banana';
+    ```
