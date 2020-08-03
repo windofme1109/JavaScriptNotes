@@ -23,6 +23,8 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
+------
+
 # 学习TypeScript
 ## 一、基础
 ### 1. TypeScript是什么
@@ -613,3 +615,6 @@
        console.log(student);
     ```
     
+### 4. 枚举（Enum）
+
+### 5. 类（class）
