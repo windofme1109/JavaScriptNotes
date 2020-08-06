@@ -4,11 +4,11 @@
 
 - [1. 使用git过程中遇到的问题以及解决方式](#1-%E4%BD%BF%E7%94%A8git%E8%BF%87%E7%A8%8B%E4%B8%AD%E9%81%87%E5%88%B0%E7%9A%84%E9%97%AE%E9%A2%98%E4%BB%A5%E5%8F%8A%E8%A7%A3%E5%86%B3%E6%96%B9%E5%BC%8F)
   - [1.1 在使用`git pull`过程中，提示：错误 Please commit your changes or stash them before you merge.](#11-%E5%9C%A8%E4%BD%BF%E7%94%A8git-pull%E8%BF%87%E7%A8%8B%E4%B8%AD%E6%8F%90%E7%A4%BA%E9%94%99%E8%AF%AF-please-commit-your-changes-or-stash-them-before-you-merge)
-  - [1.2 从远端仓库拉取代码到本地仓库（非master分支）](#12-%E4%BB%8E%E8%BF%9C%E7%AB%AF%E4%BB%93%E5%BA%93%E6%8B%89%E5%8F%96%E4%BB%A3%E7%A0%81%E5%88%B0%E6%9C%AC%E5%9C%B0%E4%BB%93%E5%BA%93%E9%9D%9Emaster%E5%88%86%E6%94%AF)
-  - [1.3 从远端仓库拉取代码到本地仓库（master分支）](#13-%E4%BB%8E%E8%BF%9C%E7%AB%AF%E4%BB%93%E5%BA%93%E6%8B%89%E5%8F%96%E4%BB%A3%E7%A0%81%E5%88%B0%E6%9C%AC%E5%9C%B0%E4%BB%93%E5%BA%93master%E5%88%86%E6%94%AF)
-  - [1.4 同时使用github和gitlab](#14-%E5%90%8C%E6%97%B6%E4%BD%BF%E7%94%A8github%E5%92%8Cgitlab)
 - [2. git知识积累](#2-git%E7%9F%A5%E8%AF%86%E7%A7%AF%E7%B4%AF)
-  - [1. git fetch和git pull的用法以及区别](#1-git-fetch%E5%92%8Cgit-pull%E7%9A%84%E7%94%A8%E6%B3%95%E4%BB%A5%E5%8F%8A%E5%8C%BA%E5%88%AB)
+  - [2.1 git fetch和git pull的用法以及区别](#21-git-fetch%E5%92%8Cgit-pull%E7%9A%84%E7%94%A8%E6%B3%95%E4%BB%A5%E5%8F%8A%E5%8C%BA%E5%88%AB)
+  - [2.2 从远端仓库拉取代码到本地仓库（非master分支）](#22-%E4%BB%8E%E8%BF%9C%E7%AB%AF%E4%BB%93%E5%BA%93%E6%8B%89%E5%8F%96%E4%BB%A3%E7%A0%81%E5%88%B0%E6%9C%AC%E5%9C%B0%E4%BB%93%E5%BA%93%E9%9D%9Emaster%E5%88%86%E6%94%AF)
+  - [2.3 从远端仓库拉取代码到本地仓库（master分支）](#23-%E4%BB%8E%E8%BF%9C%E7%AB%AF%E4%BB%93%E5%BA%93%E6%8B%89%E5%8F%96%E4%BB%A3%E7%A0%81%E5%88%B0%E6%9C%AC%E5%9C%B0%E4%BB%93%E5%BA%93master%E5%88%86%E6%94%AF)
+  - [2.4 同时使用github和gitlab](#24-%E5%90%8C%E6%97%B6%E4%BD%BF%E7%94%A8github%E5%92%8Cgitlab)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -29,8 +29,39 @@
       git pull
      ```
 - 使用第二种方法，在使用之前，先将本地写好的代码备份，然后直接从远端的仓库拉过来，将本地代码覆盖，然后再将备份的代码写到文件中去。
-
-### 1.2 从远端仓库拉取代码到本地仓库（非master分支）
+     
+## 2. git知识积累
+### 2.1 git fetch和git pull的用法以及区别
+1. 参考资料：[git fetch & pull详解](https://www.cnblogs.com/runnerjack/p/9342362.html)
+2. 一张图展示git fetch和git pull的概念：
+   - 图示：
+   
+     ![git-fetch&pull](https://github.com/windofme1109/JavaScriptNotes/blob/master/img/git-fetch%26pull.jpg)
+     
+     ![](img/git-fetch&pull.jpg)
+     
+3. `git fetch`
+   - 命令的基本格式1：`git fetch <remote> <branch>`，`<remote>`表示远端的主机名，`<branch>`表示远端的分支名称。例如，分支为master，则可以这样写：`git fetch origin master`，如果是其他分支，如develop，可以这样写：`git fetch origin develop`。
+   - 命令的基本格式2：` git fetch <remote>`，这个命令将某个远程主机的更新全部取回本地，例如：`git fetch origin`。
+   - 作用：git fetch将远端分支的最新内容拉到本地，用户再检查了内容以后，在决定是否与本地分支进行合并。
+   - 取回更新后，会返回一个FETCH_HEAD，指的是某个branch在服务器上的最新状态，我们可以在本地通过它查看刚取回的更新信息：`git log -p FETCH_HEAD`，如图所示：
+   
+     ![git-log-p](https://github.com/windofme1109/JavaScriptNotes/blob/master/img/git-log-p.png)
+     
+      ![](img/git-log-p.png)
+   - 返回的信息包括更新的文件名，更新的作者和时间，以及更新的代码（**红色**部分表示删除，**绿色**部分表示新增）。通过这些信息来判断是否产生冲突，以确定是否将更新merge到当前分支。 
+4. `git pull`
+   - 命令的基本格式1：`git pull <remote> <branch>`，`<remote>`表示远端的主机名，`<branch>`表示远端的分支名称。例如，分支为master，则可以这样写：`git pull origin master`，如果是其他分支，如develop，可以这样写：`git pull origin develop`。
+   - 命令的基本格式2：` git pull`，从远端仓库下载到本地仓库（从哪个分支下，就从远端仓库的那个分支下载）。
+   - 作用：将远端分支的最新内容拉取到本地，并进行合并。有可能会出现冲突，需要手动解决。
+   - git pull等同于：
+     ```
+        git fetch origin master
+        git merge FETCH_HEAD
+     ```
+   - 第一条命令的作用是将远端仓库的master分支的最新内容拉取到本地。
+   - 第二条命令的作用是将拉取到的最新内容合并到当前所处的本地分支中。
+### 2.2 从远端仓库拉取代码到本地仓库（非master分支）
 1. 初始化： `git init`
 
 2. 与远端仓库建类连接：`git remote add origin git@github.com:XXXX/nothing2.git`
@@ -41,7 +72,7 @@
 
 5. 把某个分支上的内容都拉取到本地：`git pull origin dev`，dev为远端仓库的名称
 
-### 1.3 从远端仓库拉取代码到本地仓库（master分支）
+### 2.3 从远端仓库拉取代码到本地仓库（master分支）
 1. 初始化： `git init`
 
 2. 与远端仓库建类连接：`git remote add origin git@github.com:XXXX/nothing2.git`
@@ -50,7 +81,7 @@
 
 4. 把某个分支上的内容都拉取到本地：`git pull origin master`
 
-### 1.4 同时使用github和gitlab
+### 2.4 同时使用github和gitlab
 1. 背景：在公司的电脑上需要同时使用github和gitlab，因此需要进行配置。
 
 2. 首先配置全局的用户名和邮箱，这个设置为gitlab的用户名和邮箱，保证在任何项目下都可以连接到gitlab。
@@ -93,35 +124,3 @@
         Hi windofme1109! You've successfully authenticated, but GitHub does not provide shell access.
    ```
    - 表示连接成功了。
-     
-## 2. git知识积累
-### 1. git fetch和git pull的用法以及区别
-1. 参考资料：[git fetch & pull详解](https://www.cnblogs.com/runnerjack/p/9342362.html)
-2. 一张图展示git fetch和git pull的概念：
-   - 图示：
-   
-     ![git-fetch&pull](https://github.com/windofme1109/JavaScriptNotes/blob/master/img/git-fetch%26pull.jpg)
-     
-     ![](img/git-fetch&pull.jpg)
-     
-3. `git fetch`
-   - 命令的基本格式1：`git fetch <remote> <branch>`，`<remote>`表示远端的主机名，`<branch>`表示远端的分支名称。例如，分支为master，则可以这样写：`git fetch origin master`，如果是其他分支，如develop，可以这样写：`git fetch origin develop`。
-   - 命令的基本格式2：` git fetch <remote>`，这个命令将某个远程主机的更新全部取回本地，例如：`git fetch origin`。
-   - 作用：git fetch将远端分支的最新内容拉到本地，用户再检查了内容以后，在决定是否与本地分支进行合并。
-   - 取回更新后，会返回一个FETCH_HEAD，指的是某个branch在服务器上的最新状态，我们可以在本地通过它查看刚取回的更新信息：`git log -p FETCH_HEAD`，如图所示：
-   
-     ![git-log-p](https://github.com/windofme1109/JavaScriptNotes/blob/master/img/git-log-p.png)
-     
-      ![](img/git-log-p.png)
-   - 返回的信息包括更新的文件名，更新的作者和时间，以及更新的代码（**红色**部分表示删除，**绿色**部分表示新增）。通过这些信息来判断是否产生冲突，以确定是否将更新merge到当前分支。 
-4. `git pull`
-   - 命令的基本格式1：`git pull <remote> <branch>`，`<remote>`表示远端的主机名，`<branch>`表示远端的分支名称。例如，分支为master，则可以这样写：`git pull origin master`，如果是其他分支，如develop，可以这样写：`git pull origin develop`。
-   - 命令的基本格式2：` git pull`，从远端仓库下载到本地仓库（从哪个分支下，就从远端仓库的那个分支下载）。
-   - 作用：将远端分支的最新内容拉取到本地，并进行合并。有可能会出现冲突，需要手动解决。
-   - git pull等同于：
-     ```
-        git fetch origin master
-        git merge FETCH_HEAD
-     ```
-   - 第一条命令的作用是将远端仓库的master分支的最新内容拉取到本地。
-   - 第二条命令的作用是将拉取到的最新内容合并到当前所处的本地分支中。
