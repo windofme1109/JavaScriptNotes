@@ -9,7 +9,7 @@
     - [3. tsconfig.json配置详解](#3-tsconfigjson%E9%85%8D%E7%BD%AE%E8%AF%A6%E8%A7%A3)
     - [4. TypeScript中的数据类型](#4-typescript%E4%B8%AD%E7%9A%84%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B)
     - [5. 联合类型](#5-%E8%81%94%E5%90%88%E7%B1%BB%E5%9E%8B)
-    - [6. 接口](#6-%E6%8E%A5%E5%8F%A3)
+    - [6. 接口（interface）](#6-%E6%8E%A5%E5%8F%A3interface)
     - [7. 数组类型](#7-%E6%95%B0%E7%BB%84%E7%B1%BB%E5%9E%8B)
     - [8. 内置对象](#8-%E5%86%85%E7%BD%AE%E5%AF%B9%E8%B1%A1)
     - [9. 函数类型](#9-%E5%87%BD%E6%95%B0%E7%B1%BB%E5%9E%8B)
@@ -37,6 +37,7 @@
 
 2. TypeScript教程：[TypeScript入门教程](https://ts.xcatliu.com/introduction/hello-typescript.html)
 3. TypeScript资料汇总：[awesome-typescript](https://github.com/semlinker/awesome-typescript)
+
 ### 2. 第一个ts程序
 1. ts文件时以`ts`为后缀的文件。`TypeScript`是`JavaScript`的超集，可以被编译为`js`文件。`TypeScript`添加了数据类型的定义。在变量后使用`:`指定变量的类型，`:`的前后有没有空格都可以。示例代码如下：
    ```typescript
@@ -67,6 +68,7 @@
 4. 这是因为因为`TypeScript`只会在编译时对类型进行静态检查，如果发现有错误，编译的时候就会报错。而在运行时，与普通的`JavaScript`文件一样，不会对类型进行检查。
 
 5. 如果要在报错的时候终止`js`文件的生成，可以在`tsconfig.json` 中配置`noEmitOnError`即可。
+
 ### 3. tsconfig.json配置详解
 - 参考文献：[详解TypeScript项目中的tsconfig.json配置](https://www.jianshu.com/p/0383bbd61a6b)
 - 作用：
@@ -136,6 +138,7 @@
        }
      }
   ```
+  
 ### 4. TypeScript中的数据类型
 1. 基本数据类型
    - `string`， 声明一个字符串类型的变量： `let str: string = 'aa' ;`
@@ -169,8 +172,262 @@
 5. any
 
 ### 5. 联合类型
-### 6. 接口
+1. 联合类型（Unoin Types）。指的是表示取值可以为多种类型中的一种。
+2. 联合类型使用|分隔不同的类型。示例代码：
+   ```typescript
+      let myLuckyNumber: string | number ;
+      myLuckyNumber = 'six' ;
+      myLuckyNumber = 6 ;
+      console.log(myLuckyNumber) ;
+   ```
+   `myLuckyNumber`的取值只能是`string`或`number`二者之一。赋值其他类型会报错。
+   ```typescript
+      // error TS2322: Type 'true' is not assignable to type 'string | number'.
+      // myLuckyNumber = true ;
+   ```
+3. 当 TypeScript 不确定一个联合类型的变量到底是哪个类型的时候，我们只能访问此联合类型的所有类型里共有的属性或方法。
+   ```typescript
+      // function getLength(something: string|number): number {
+      // 报错 error TS2339: Property 'length' does not exist on type 'string | number'.
+      // length属性并不是string和number共有的属性
+      //     return something.length ;
+      // }
+   ```  
+   length属性并不是string和number共有的属性，所以会报错。
+   ```typescript
+      function getString(something: string | number): string {
+          // toString()是string和number类型共有的方法，所以不会报错
+          return something.toString() ;
+      }
+      
+      console.log(getString('abcdefg')) ;
+      console.log(getString(135789)) ;
+   ```  
+   `toString()`是`number`和`string`共有的方法，所以不会报错。
+4. 联合类型的变量在被赋值的时候，会根据类型推论的规则推断出一个类型。
+   ```typescript
+      let mln: string | number ;
+      mln = 'seven' ;
+      console.log(mln.length) ;
+      mln = 7 ;
+      // mln被赋值为7，TypeScript推断其类型为number，但是number并没有length这个属性，所以会报错
+      // error TS2339: Property 'length' does not exist on type 'number'.
+      // console.log(mln.length) ;
+      // 7
+      console.log(mln.toString()) ;
+   ```
+
+### 6. 接口（interface）
+1. 使用接口来定义对象的类型。
+   - 接口是对行为的抽象，而具体如何行动需要由类（classes）去实现（implement）。
+   - 在TypeScript中，接口常常用来对对象的形状（shape）进行约束。
+2. 定义一个接口，并使用其来约束对象的形状：
+   ```typescript
+      interface Person {
+          name: string,
+          age: number
+      }
+      // 定义一个对象，其类型为Person，tom这个对象的形状必须和Person一样
+      // 赋值时，对象的变量的形状必须和接口一致
+      let tom: Person = {
+          name: 'Tom',
+          age: 25
+      } ;
+      console.log('name', tom.name) ;
+   ``` 
+3. 对象中的属性的个数和类型必须同接口保持一致，多或者少都不行，属性不一致也不行。
+   ```typescript
+      // 对应的变量多于接口定义的属性，会报错：
+      //  error TS2322: Type '{ name: string; age: number; gender: string; }' is not assignable to type 'Person'.
+      //   Object literal may only specify known properties, and 'gender' does not exist in type 'Person'.
+       let jack: Person = {
+           name: 'Jack',
+           age: 25,
+           gender: 'male'
+       }
+      
+      // 定义的变量比接口少了一些属性是不允许的
+      // 对应的变量多余接口定义的属性，同样会报错：
+      // error TS2741: Property 'age' is missing in type '{ name: string; }' but required in type 'Person'.
+       let jack2: Person = {
+           name: 'Jack'
+       }
+   ```
+4. 可选属性，使用`?`定义一个可选属性，这个属性可以在对象中出现，也可以不出现。
+   ```typescript
+      interface Student {
+          name: string,
+          age: number,
+          // 使用一个?表示，这是一个可选的属性，表示这个属性可以存在，也可以不存在
+          phone?: number
+      }
+      
+      // 可选属性的含义是该属性可以不存在
+      let s1: Student = {
+          name: '张三',
+          age: 20,
+      }
+   
+      let s2: Student = {
+          name: '李四',
+          age: 25,
+          phone: 12345678
+      }
+      
+      console.log(s2.phone) ;
+   ```
+5. 任意属性。如果希望接口拥有任意属性，那么我们可以使用`[]`定义属性名。如下所示：
+   ```typescript
+      interface Teacher {
+          name: string,
+          age?: number,
+          // 定义属性名取string类型的值
+          // 属性值则是any类型
+          [propName: string]: any
+      }
+      
+      let t1: Teacher = {
+          name: 'smith',
+          gender: 'male'
+      }
+      
+      let t2: Teacher = {
+          name: 'rose',
+          school: 'bupt',
+          age: 25
+      }
+   ``` 
+    任意属性的定义类似与我们在使用对象的时候，如果属性名称是变量，那么就需要通过`[]`方式获取。
+6. 一旦定义了任意属性，那么确定属性和可选属性的类型都必须是它的类型的子集。
+   ```typescript
+      /**
+       * 
+       * Property 'price' of type 'number' is not assignable to string index type 'string'.
+       */
+      interface Fruits {
+          name: string,
+          price?: number,
+          [propName: string]: string
+      }
+      
+      let apple: Fruits = {
+          name: 'apple',
+          price: 10,
+          size: 'large'
+      
+      }
+   ```  
+   如上例所示，任意属性定义为string类型，那么name和price也必须时string类型的子集（在我看来，就都得是string），而price的类型时number，并不是string的子集，在编译过程中，会报错。
+7. 一个接口中只能定义一个任意属性。如果接口中有多个类型的属性，则可以在任意属性中使用联合类型。  
+   当时在学习的时候有一个问题：接口中有多个类型的属性，为什么不适用any定义呢？  
+   我觉得原因是，精确地限定属性的数据类型。如果是any的话，那么对于我们不需要或者说不允许的类型，起不到限制的作用。
+   ```typescript
+      interface Fruits {
+          name: string,
+          price?: number,
+          // 接口中只能定义一个任意属性，如果接口中有多个类型的属性（如name为string，price为number），则可以使用联合类型，定义为：string|number
+          [propName: string]: string | number
+      }
+      
+      let apple: Fruits = {
+          name: 'apple',
+          price: 25,
+          size: 'large',
+          color: 'red'
+      }
+      
+      let orange: Fruits = {
+          name: 'orange',
+          price: 10,
+          size: 'small',
+          series: 188
+      }
+      console.log(orange.series) ;
+   ```  
+   **注意**：我们在接口中只能定义一个任意属性，但是在对象中，我们就可定义多个属性，只要属性名和属性值同任意属性的定义相同即可。
+8. 只读属性。希望对象中的一些字段只能在创建的时候被赋值，那么可以用 `readonly` 定义只读属性。
+   ```typescript
+      interface Workers {
+          // 使用readonly定义一个只读属性，该属性在变量创建时赋值，然后就只读，不能修改
+          readonly id: number,
+          name: string,
+          age?: number,
+          [propName: string]: any
+      }  
+      // 在定义时，给只读属性赋值
+      let w1: Workers = {
+          id: 10578,
+          name: '张三',
+          gender: 'male'
+      }
+      // 只读属性只能在创建变量时赋值时，当试图修改时，就会报错
+      // error TS2540: Cannot assign to 'id' because it is a read-only property.
+      w1.id = 18942 ;
+      // 创建变量时，如果没有给只读属性id赋值，那么会报错：
+      // error TS2741: Property 'id' is missing in type '{ name: string; gender: string; }' but required in type 'Workers'.
+      let w2: Workers = {
+          name: '李四',
+          gender: 'female'
+      }
+   ```
+   **注意**：只读的约束存在于第一次给对象赋值的时候，而不是第一次给只读属性赋值的时候。创建变量时，如果没有给只读属性id赋值，那么会报错。
+
 ### 7. 数组类型
+1. 数组类型。用来约束数组的成员的类型。
+2. 定义方式：
+   1. 类型+方括号
+      ```typescript
+         let arr1: number[] = [1, 1, 2, 3, 5] ;
+         // 定义后，数组不允许出现其他类型
+         // error TS2322: Type 'string' is not assignable to type 'number'.
+         // let arr2: number[] = [1, 2, '3', 5] ;
+         // 数组的方法也会对传入的数据进行检查，不符合类型约束的，就会报错
+         // error TS2345: Argument of type '"6"' is not assignable to parameter of type 'number'.
+         // arr1.push('6') ;
+      ```  
+      对数组元素的类型进行约束以后，是不能赋值其他类型的，同时如果使用数组方法向数组添加元素，TypeScript也会对传入的数据类型进行检查，一旦是其他类型，就会报错。
+   2. 数组泛型（Array Generic）
+      ```typescript
+         let arr2: Array<number> = [1, 1, 2, 3, 5] ;
+      ```
+   3. 接口定义
+      ```typescript
+         interface NumberArray {
+            // 规定，索引是数字时，值必须也是数字
+            [index: number]: number
+         }
+         let arr3: NumberArray = [1, 1, 2, 3, 5] ;
+      ```
+      **注意：通常我们不使用接口的方式定义数组，因为比较复杂。**
+3. 类数组。类数组指的是具有数组的length属性，以及索引特性（索引是数字），但是不具备数组的操作方法，如pop，push等的对象。如函数中的`arguments`就是一个类数组对象。
+4. 通常使用接口来定义一个类数组对象。
+   ```typescript
+      // 对于类数组对象，我们必须使用接口进行定义
+      function add(): void {
+          // 在这个接口中，我们规定索引为数字时，属性值也必须为数字，同时还规定了length和callee属性，
+          // 同arguments这个类数组对象所具有的属性是一致的
+          let args: {
+              [index: number]: number,
+              length: number,
+              callee: Function
+          } = arguments ;
+      
+      }
+   ```  
+   我们使用接口约束arguments这个类数组对象时，接口所定义的属性必须同arguments这个类数组对象所具有的属性是一致的。如果不一致，就会报错。
+5. 事实上常用的类数组都有自己的接口定义，如 IArguments, NodeList, HTMLCollection 等。
+   ```typescript
+      function sub(): void {
+          // IArguments就是TypeScript定义好的类型
+          let args: IArguments = arguments ;
+      }
+   ```
+6. 我们也可以将数组中元素的类型定义为any，表示允许出现任何类型。
+   ```typescript
+      let arr4: any[] = [1, '2', 3, {name: "apple"}, true] ;
+      console.log(arr4[3]) ;
+   ```           
+
 ### 8. 内置对象
 1. `JavaScript`中有很多内置对象，它们可以直接在`TypeScript`中当做定义好了的类型。
 2. 内置对象是指根据标准在全局作用域（Global）上存在的对象。这里的标准是指 ECMAScript 和其他环境（比如 DOM）的标准。
@@ -179,6 +436,7 @@
 5. BOM提供的标准对象主要有：Window（最顶层的对象）、location、history等。
 6. ECMAScript、DOM、BOM提供的标准对象都在 [TypeScript 核心库的定义文件](https://github.com/Microsoft/TypeScript/tree/master/src/lib) 中。
 7. 注意：**Node.js 不是内置对象的一部分**，如果想用`TypeScript`写 Node.js，则需要引入第三方声明文件：`npm install @types/node --save-dev`
+
 ### 9. 函数类型
 1. 函数有两种定义方式：函数声明（declaration）和函数表达式（expression），在`TypeScript`中，这两种规定类型的方式有所不同。
 2. 函数声明（declaration）
@@ -328,6 +586,7 @@
         }
      ```
    - 不能定义多个函数体，只能最后定义一个包含前面所有输入类型和输出类型的同名函数以及函数体。
+   
 ### 10. 类型断言
 1. 语法
    - 语法1：`值 as 类型`
@@ -469,6 +728,7 @@
    `declare global` | 扩展全局变量
    `declare module` | 扩展模块
    `/// <reference />` | 三斜线指令
+   
 ### 12. 书写声明文件
 1. 当我们使用的第三方库没有提供声明文件的时候，需要我们自己去写声明文件。声明文件的内容和使用方式在不同的应用场景下有所不同。主要有以下几种情况：
     - `全局变量`：通过` <script> `标签引入第三方库，注入全局变量
@@ -504,6 +764,8 @@
       console.log(getName(() => 'jack')) ;
 
   ```
+  
+  
 ### 2. 字符串字面量类型
 1. 符串字面量类型用来约束取值只能是某几个字符串中的一个。
 2. 也是使用`type`关键字进行定义。使用`|`用来分隔可选的几个字符串。示例代码如下：
@@ -523,6 +785,7 @@
      // error TS2345: Argument of type '"yellow"' is not assignable to parameter of type 'colors'.
      // console.log(chooseColor('yellow')) ;
    ```
+   
 ### 3. 元组（Tuple）
 1. 元组（Tuple）的概念：合并了不同类型的对象，而数组（Array）则是用来合并同种类型的对象
 2. 注意与python中的元组的概念进行区分，在python中，元组与列表类似，都是线性表，主要区别是元内容不可变
@@ -688,6 +951,7 @@
        console.log(student);
     ```
     
+    
 ### 4. 枚举（Enum）
 1. 作用：枚举类型用于取值被限定在一定范围内的场景，比如一周只能有七天，颜色限定为红绿蓝等。
 2. 枚举使用enum关键字定义。
@@ -787,6 +1051,7 @@
       // 0
       console.log(dir3[0]) ;
    ``` 
+   
 ### 5. 类（Class）
 1. ES6中的类。传统的JavaScript存在类的概念，我们通过构造函数来模拟一个类，并使用原型继承的方式实现继承。  
    在ES6中，引入和class关键字和extends关键字。  
@@ -1143,6 +1408,7 @@
    - 修饰符：public、protected和private，用来修饰属性和方法。
    - 只读属性readonly，只能读，不能修改，与修饰符一起使用，放在修饰符后面。
    - 抽象类：abstract，是供其他类继承的基类，抽象类不允许被实例化。抽象类中的抽象方法必须在子类中被实现，抽象类中的方法也必须使用abstract定义。
+   
 ### 6. 类与接口
 1. 接口（Interfaces）的作用：
    - 用于对「对象的形状（Shape）」进行描述。
@@ -1325,6 +1591,7 @@
         console.log(ps2.y);
         ps2.printPoint();
      ```
+     
 ### 7. 泛型
 1. 泛型的作用。泛型指在定义函数、接口或类的时候，不预先指定具体的类型，而在使用的时候再指定类型的一种特性。
 2. 泛型的基本使用
