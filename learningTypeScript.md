@@ -1099,7 +1099,7 @@
      ```typescript
         class School {
         
-            public _name: string;
+            private _name: string;
             constructor(name) {
                 this.name = name;
             }
@@ -1139,7 +1139,8 @@
      ```   
      总结：
        - getter和setter定义的方法，名称必须要同属性名相同。对this.name进行操作就会调用setter/getter，也就是说setter/getter是hook函数，而真实的存储变量是_name。
-       - 如果我们没有声明`public _name`，而是直接使用`this。name`，如下所示：
+       - 以下划线（_）开头的变量，我们一般默认为是私有属性。在ES7中统一规定，以#开头的变量为私有属性。
+       - 如果我们没有声明`private _name`，而是直接使用`this.name`，如下所示：
          ```typescript
             class School {
                      constructor(name) {
@@ -1166,7 +1167,7 @@
          let sch = new School('SSF');
          ```  
          会报错：栈溢出。这是因为我们在构造函数中调用`this.name = name`，会去调用set name，在set name方法中，我们又执行this.name = name，进行无限递归，最后导致栈溢出。  
-         所以，我们必须使用另外一个变量接收和存储name。也就是前面she声明的`public _name: string`。
+         所以，我们必须使用另外一个变量接收和存储name。也就是前面she声明的`private _name: string`。
    - 静态方法，使用static关键字定义，通过类调用，不能通过实例调用。
      ```typescript
         class Students {
