@@ -61,6 +61,7 @@
      ```
    - 第一条命令的作用是将远端仓库的master分支的最新内容拉取到本地。
    - 第二条命令的作用是将拉取到的最新内容合并到当前所处的本地分支中。
+   
 ### 2.2 从远端仓库拉取代码到本地仓库（非master分支）
 1. 初始化： `git init`
 
@@ -124,3 +125,23 @@
         Hi windofme1109! You've successfully authenticated, but GitHub does not provide shell access.
    ```
    - 表示连接成功了。
+
+### 2.5 如何在某个分支下建立自己的分支
+1. 强调一个概念，比如说我们在A分支下建立B分支，指的是B分支使用了当前状态下，A分支的最新的代码，而不是A/B这种层级结构。
+2. 我想在非主分支dev下新建一个分支：0831-dev，那么我们可以这样建立：
+   1. 创建分支  
+      - `git checkout -b 0831-dev`    创建并切换到新的的分支：0831-dev
+   2. 定位分支  
+      - `git checkout dev` 切换到dev下面，选择dev分支的状态内容  
+      - `git pull origin dev`  拉取目标分支dev内容到本地分支
+   3. 提交分支
+      - `git checkout 0831-dev` 切换到0831-dev分支
+      - `git add`
+      - `git push -u origin 0831-dev` 将远端的0831-dev分支设置为本地分支0831-dev的上游。
+3. 还可以在gitlab或者时github上基于某个分支建立自己的分支，然后将这个分支拉到本地。github或者gitlab上新建分支，都是基于某个分支建立的。
+
+4. 实际上还有一种方法，就是直接在某个分支下，比如说是dev分支下，执行：`git checkout -b 0831-dev`，那么0831-dev就是基于dev这个分支建立的。  
+   然后我们修改内容提交后，执行：`git push -u origin 0831-dev`，就能将当前的自己的分支推送到远端仓库。  
+   如果我们需要将两个分支合并，使用`git merge`或者在webStorm中进行合并。
+  
+     
