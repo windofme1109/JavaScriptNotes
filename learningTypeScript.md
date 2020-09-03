@@ -26,6 +26,7 @@
     - [7. 泛型](#7-%E6%B3%9B%E5%9E%8B)
     - [8. 声明合并](#8-%E5%A3%B0%E6%98%8E%E5%90%88%E5%B9%B6)
     - [9. 交叉类型](#9-%E4%BA%A4%E5%8F%89%E7%B1%BB%E5%9E%8B)
+    - [10. 类型映射 —— Partial](#10-%E7%B1%BB%E5%9E%8B%E6%98%A0%E5%B0%84--partial)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -1843,6 +1844,7 @@
       
 
 ### 9. 交叉类型
+
 1. 交叉类型是将多个类型合并为一个类型。也就是求并集。
 
 2. 使用`&`连接不同的类型。
@@ -1889,3 +1891,35 @@
 
 5. 更多关于交叉类型的内容：[TypeScript 交叉类型](http://semlinker.com/ts-intersection-types/)
 
+### 10. 类型映射 —— Partial
+
+1. 将一个接口中的所有属性变为可选属性。
+
+2. 用法
+   - 语法：  
+     `type newOptionalType = Partial<Type>`
+   - `Type`是我们需要转换的类型，返回值`newOptionalType`是一个新的类型，这个类型的属性与Type完全一样，只不过都是可选的（加了?）。
+   
+3. 这是一个工具类型，我们可以全局使用。
+
+4. 示例代码：
+   ```ts
+      /**
+       *
+       * 类型转换 —— Partial
+       * 将一个接口中的所有属性变为可选的
+       */
+      
+      interface Apple {
+        name: string;
+        weight: number;
+        color: string;
+      }
+      
+      type OptionalApple = Partial<Apple>;
+      
+      // 经过Partial的转化，Apple中的属性现在都是可选的
+      const a1: OptionalApple = {
+        name: "红富士",
+      };
+   ```
