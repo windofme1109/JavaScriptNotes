@@ -25,6 +25,7 @@
     - [6. 类与接口](#6-%E7%B1%BB%E4%B8%8E%E6%8E%A5%E5%8F%A3)
     - [7. 泛型](#7-%E6%B3%9B%E5%9E%8B)
     - [8. 声明合并](#8-%E5%A3%B0%E6%98%8E%E5%90%88%E5%B9%B6)
+    - [9. 交叉类型](#9-%E4%BA%A4%E5%8F%89%E7%B1%BB%E5%9E%8B)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -1840,3 +1841,51 @@
      ps：使用联合类型定义重载alert()会报错，不知道为什么。
 
       
+
+### 9. 交叉类型
+1. 交叉类型是将多个类型合并为一个类型。也就是求并集。
+
+2. 使用`&`连接不同的类型。
+
+3. 示例代码：
+   ```ts
+      /**
+       *
+       * 交叉类型
+       * 将多个类型合并为一个类型
+       */
+      
+      interface Person {
+        name: string;
+        age: number;
+      }
+      
+      interface Career {
+        location: string;
+        dept: string;
+        eID: number;
+      }
+      
+      // 使用&连接两个不同的类型
+      // p10就同时拥有Person和Career的属性
+      let p10: Person & Career = {
+        name: "jack",
+        age: 25,
+        location: "Beijing",
+        dept: "销售部",
+        eID: 145789,
+      };
+      
+      // {
+      //   name: 'jack',
+      //   age: 25,
+      //   location: 'Beijing',
+      //   dept: '销售部',
+      //   eID: 145789
+      // }
+      console.log(p10);
+   ```
+4. 交叉类型可以解决代码的复用问题。如果我们想同时使用两个类型，而这两个类型中的属性由很多重合的，比如说html元素，此时，我们就可以使用交叉类型，将这个两个类型合并为一个新的类型。
+
+5. 更多关于交叉类型的内容：[TypeScript 交叉类型](http://semlinker.com/ts-intersection-types/)
+
