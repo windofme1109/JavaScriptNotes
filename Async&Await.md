@@ -138,4 +138,35 @@
     //   doIt: 1506.134ms 
     doItAsync() ;
  ```
-- 使用async/await使得写异步操作就像同步一样。
+
+- 使用 async/await 使得写异步操作就像同步一样。
+
+- async / await 的本质是使用 generator 包装了异步操作，只是语法糖，并没有真正实现同步操作。所以，我们是不能直接将 `await` 等到的异步结果，返回到 `async` 函数外面。举例如下：
+  ```javascript
+
+     const readJson = (path) => {
+         return new Promise((resolve, reject) => {
+             fs.readFile(path, function (err, data) {
+                 if (err) {
+                     return reject(err);
+                 }
+                 resolve(data);
+             })
+         })
+     }
+  
+     async function getJson(path) {
+         const ret = await readJson(path);
+     
+         return ret;
+     }
+  ```
+  `readJson()` 是一个异步获取文件内容的函数。我们这里使用 async / await 获取文件内容，然后将这个内容返回。接下来我们开始调用并打印结果：
+   ```javascript
+      let result = getJson('./a.json');
+      // 输出 Promise { <pending> }
+      console.log(result);
+   ```  
+  输出是 `Promise { <pending> }`，居然不是我们想要的文件内容。这就说明，async / await 并没有将异步操作转换为同步操作， getJson() 还是异步操作，所以我们调用 getJson() 时，会立即返回一个 Promise 对象，状态是 pending，表示正在等待异步操作的结果。  
+  
+  总结：要使用 await 获取的异步操作结果，必须在 async 函数内部使用，在 async 函数外部，依旧无法获取异步操作的结果。
