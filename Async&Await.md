@@ -170,3 +170,16 @@
   输出是 `Promise { <pending> }`，居然不是我们想要的文件内容。这就说明，async / await 并没有将异步操作转换为同步操作， getJson() 还是异步操作，所以我们调用 getJson() 时，会立即返回一个 Promise 对象，状态是 pending，表示正在等待异步操作的结果。  
   
   总结：要使用 await 获取的异步操作结果，必须在 async 函数内部使用，在 async 函数外部，依旧无法获取异步操作的结果。
+  
+- 从 Node 的v10版本里增加了 Promise 模块，从而我们可以通过Promise的方式来处理异步操作读取文件的API。获取的 Promise 模块的方式是：`require('fs').promises` 或者是：`require('fs/promises')`。使用 Promise 的方式进行异步操作：
+  ```javascript
+     const promises = require('fs').promises;
+     // 或者使用解构
+     // const {promises} = require('fs');
+     const {readFile, writeFile} = promises;
+     // 以Promise的方式进行异步操作，必须指定文件的编码方式
+     readFile('./a.json', 'utf-8').then((ret) => {
+         console.log(ret);
+     })
+  ```
+  
