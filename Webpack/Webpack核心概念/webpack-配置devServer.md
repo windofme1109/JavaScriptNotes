@@ -221,3 +221,26 @@
 
 2. webpack 可以在 Node 环境下使用，因为 webpack 提供了一系列在 Node 环境下使用的 API。参考文档：[Node Api](https://v4.webpack.js.org/api/node/#installation)
 
+## 5. webpack v5 的变化
+
+1. `devServer` 的变化：
+   ```javascript
+      module.exports = {
+          devServer: {
+             contentBase: path.join(__dirname, 'dist'),
+             open: true,
+             port: 8080
+    },
+      }
+   ```
+   - `contentBase` 必须配置绝对路径
+
+2. 启动命令的变化
+   ```json
+      {
+         "scripts": {
+             "start:dev": "webpack serve"
+         }
+      }
+   ```
+   - 执行的命令是：`"webpack serve"`，而不是 `"webpack-dev-server"`。
