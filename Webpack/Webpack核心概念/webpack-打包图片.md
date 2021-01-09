@@ -50,8 +50,46 @@
    ```
 2. 背景图片的引入方式是通过相对路径的方式引入的。因此 webpack 能识别 css 中的通过相对路径引入的静态资源，然后将这些图片打包，并根据图片的相对路径，在打包生成的文件中，生成新的相对路径。
 
-3. 如果我们配置了 `output.publicPath`，那么打包后的 css 文件中，通过相对路径引用的资源都会被配置的路径所替换，即在相对路径的前面拼接 `output.publicPath` 指定的路径。该属性的好处在于当你配置了图片 CDN 的地址，本地开发时引用本地的图片资源，上线打包时就将资源全部指向 CDN 了。
+4. `MiniCssExtractPlugin.loader` 中 options 中的 `publicPath` 作用说明
+   - 在使用 mini-css-extract-plugin 这个插件后，需要将 css 单独打包，插件的配置如下：
+     ```javascript
+        module.exports = {
+        
+            plugins: [
+                new MiniCssExtractPlugin({
+                    filename: 'styles/[name].css',
+                    chunkFilename: '[name].chunk.css',
+                    })
+            ]
+        }
+     ``` 
+     `filename` 指定了存放路径，就是 dist 目录下的 styles 文件夹下。
+   - 在 打包 css 或者 sass 或者 less 中，使用 `MiniCssExtractPlugin.loader` 替换 `style-loader`。
+   - 这样就带来一个问题，就是如果在 css 中引入图片，如下所示：
+     ```css
+        body {
+            background: url("../public/pics/background-image.jpg");
+        }    
+     ```
+   - 就会出现打包后引用图片的相对路径的问题，说明如下：
+     - 首先，打包后的图片的都放在 dist 下的 images 中
+     - webpack 能够识别 css 中图片的相对路径中的图片的存放目录，如打包前，图片存放在 pics 下
+     - 打包后，webapck 就会将存放目录替换为 images
+     - 路劲转换是这样的：`"../public/pics/background-image.jpg"  --> "styles/images/background-image.jpg"`
+     - 但是，webpack 默认地认为 images 是与 css 文件同级地，即都在 styles 目录下
+     - 所以需要 `publicPath` 来解决路径的问题
+   - 解决办法就是设置 `publicPath`。
+     - 设置了 `publicPath`，会将 `publicPath` 与 `/images/xxx` 进行拼接，`/images/xxx` 就是存放图片的目录。
+     - 如 `publicPath` 设置为：`./images`
+     - 拼接：`/styles/images/images/background-image_2f852098701a67fc5e60c7e299d15685.jpg`
+     - `publicPath` 设置为：`./`
+     - 拼接：`/styles/images/background-image_2f852098701a67fc5e60c7e299d15685.jpg`
+     - 所以设置 `publicPath` 为：`../`，表示 styles 的上级目录，即 dist
+     - 最终的路径：`images/background-image_2f852098701a67fc5e60c7e299d15685.jpg`
+   
+5. `publicPath` 是将其指定的路径与打包后直接存放图片的路径进行拼接。
 
+6. 解决 webpack v5 在使用 devServer 提示 `Automatic publicPath is not supported in this browser`：则需要配置 `publicPath`。
 
 ## 5. html 中引入
 

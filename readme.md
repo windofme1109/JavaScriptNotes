@@ -1,4 +1,4 @@
-### 记录自己复习JavaScript与学习新的JavaScript知识的过程
+### 记录自己复习 JavaScript 与学习新的 JavaScript 知识的过程
 #### ES6
 #### git
 #### Webpack
