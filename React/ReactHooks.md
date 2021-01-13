@@ -16,37 +16,50 @@
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ### 1. 什么是Hook？
-引用自官网：
+
+1. 引用自官网：
 > Hooks let you use state and other React features without writing a class.
 
 ### 2. 参考资料
+
 1. [react hooks 使用](https://segmentfault.com/a/1190000019513907)
-2. [React Hooks](https://blog.csdn.net/sinat_17775997/article/details/84794837)
+
+2. [React Hooks完全上手指南](https://zhuanlan.zhihu.com/p/92211533)
+
 3. [React Hooks 深入不浅出](https://segmentfault.com/a/1190000017182184)
-4. 介绍了很多有用的第三方hooks：[useHooks](https://usehooks.com/)
-5. 中文文档：[Hook API 索引](https://react.docschina.org/docs/hooks-reference.html)
-6. 英文文档：[Hooks API Reference](https://reactjs.org/docs/hooks-reference.html)
+
+4. [React Hooks](https://www.jianshu.com/p/76901410645a)
+
+5. 介绍了很多有用的第三方hooks：[useHooks](https://usehooks.com/)
+
+6. 中文文档：[Hook API 索引](https://react.docschina.org/docs/hooks-reference.html)
+
+7. 英文文档：[Hooks API Reference](https://reactjs.org/docs/hooks-reference.html)
+
 ### 3. 类组件的缺点
-- 状态逻辑复用难
-  - 缺少复用机制
-  - 渲染属性和高阶组件导致层级冗余
-- 趋向复杂难以维护
-  - 生命周期函数混杂不相干
-  - 相干逻辑分散在不同的生命周期
-- this指向困扰
-  - 内联函数过度创建新句柄
-  - 类成员函数不能保证this
+
+1. 状态逻辑复用难
+   - 缺少复用机制
+   - 渲染属性和高阶组件导致层级冗余
+
+2. 趋向复杂难以维护
+   - 生命周期函数混杂不相干
+   - 相干逻辑分散在不同的生命周期
+3. this 指向困扰
+   - 内联函数过度创建新句柄
+   - 类成员函数不能保证 this
   
 ### 4. Hooks优势
-优化类组件的三大问题
-  - 函数组件无this问题
-  - 自定义Hooks方便复用状态逻辑
-  - 副作用的关注点分离
+1. 优化类组件的三大问题
+   - 函数组件无this问题
+   - 自定义Hooks方便复用状态逻辑
+   - 副作用的关注点分离
   
 ### 5. Hook规则
 
-1. 只在最顶层调用hook函数，不能再for、if、 try等内部使用。
-2. 只在React函数中调用hook函数，不能再普通的JavaScript函数中调用hook。
+1. 只在最顶层调用hook函数，不能再 for、if、 try 等内部使用。
+
+2. 只在 React 函数中调用hook函数，不能再普通的 JavaScript 函数中调用 hook。
 
 ### 6. useState
 
@@ -110,16 +123,16 @@
    2. Update之后
    3. Unmount之前
    
-3. useEffect调用时机  
-useEffect在render之后调用，在不同的render时刻，就相当于使用componentDidMount、componentDidUpdate这些回调函数。  
-useEffect还会返回一个回调函数，这个回调函数的执行时机很重要。同useEffect的调用时机是挂钩的。这个回调函数在组件渲染前调用。严格来说，在前一次的渲染视图被清除之前。相当于componentWillUnmount。
+3. useEffect 调用时机  
+useEffect 在 render 之后调用，在不同的 render 时刻，就相当于使用 componentDidMount、componentDidUpdate 这些回调函数。  
+useEffect 还会返回一个回调函数，这个回调函数的执行时机很重要。同 useEffect 的调用时机是挂钩的。这个回调函数在组件渲染前调用。严格来说，在前一次的渲染视图被清除之前。相当于 componentWillUnmount。
 
 4. 用法
    - 语法  
      `useEffect(effect, deps)`
-   - 说明：effect是一个函数，每次渲染之后执行，可以在函数编写更新DOM、添加订阅等。
-   - effect函数的返回值可以空值（void）或者是一个函数（clean-up function），如果是函数，则这个返回值函数会在组件卸载前执行(每次渲染都会执行)，需要清除上次订阅的内容可以再这里面写。
-   - deps是一个可选参数，值是一个数组，数组的元素数量可以有多个。只有数组中任何一个元素的值发生变化才会调用useEffect()。如果只想在第一次挂载和卸载组件的时候调用，只需要传一个空数组。
+   - 说明：effect 是一个函数，每次渲染之后执行，可以在函数编写更新 DOM、添加订阅等。
+   - effect 函数的返回值可以空值（void）或者是一个函数（clean-up function），如果是函数，则这个返回值函数会在组件卸载前执行(每次渲染都会执行)，需要清除上次订阅的内容可以再这里面写。
+   - deps 是一个可选参数，值是一个数组，数组的元素数量可以有多个。只有数组中任何一个元素的值发生变化才会调用useEffect()。如果只想在第一次挂载和卸载组件的时候调用，只需要传一个空数组。
 
 5. 示例代码：
    - useEffect()的基本使用
@@ -170,8 +183,12 @@ useEffect还会返回一个回调函数，这个回调函数的执行时机很�
                 document.title = `点击了${count}次`;
         }, [count]);
      ```
-     通过count来控制useEffect()的调用时机。
-     
+     通过 count 来控制 useEffect() 的调用时机。
+
+6. react 首次渲染和之后的每次渲染都会调用一遍传给 useEffect 的函数。而之前我们要用两个声明周期函数来分别表示首次渲染（componentDidMount()），和之后的更新导致的重新渲染（componentDidUpdate()）。
+7. useEffect() 中定义的副作用函数的执行不会阻碍浏览器更新视图，也就是说这些函数是异步执行的，而之前的componentDidMount() 或 componentDidUpdate() 中的代码则是同步执行的。这种安排对大多数副作用说都是合理的，但有的情况除外，比如我们有时候需要先根据 DOM 计算出某个元素的尺寸再重新渲染，这时候我们希望这次重新渲染是同步发生的，也就是说它会在浏览器真的去绘制这个页面前发生。
+
+
 ### 8. 自定义hooks
 
 1. 自定义的hooks以`use`开头。
