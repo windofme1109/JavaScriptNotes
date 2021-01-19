@@ -1,3 +1,17 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [FontAwesome 的使用说明](#fontawesome-%E7%9A%84%E4%BD%BF%E7%94%A8%E8%AF%B4%E6%98%8E)
+    - [1. 基本说明](#1-%E5%9F%BA%E6%9C%AC%E8%AF%B4%E6%98%8E)
+    - [2. 安装](#2-%E5%AE%89%E8%A3%85)
+    - [3. 使用](#3-%E4%BD%BF%E7%94%A8)
+      - [1. 单独使用](#1-%E5%8D%95%E7%8B%AC%E4%BD%BF%E7%94%A8)
+      - [2. 全局使用](#2-%E5%85%A8%E5%B1%80%E4%BD%BF%E7%94%A8)
+      - [3. 图标属性](#3-%E5%9B%BE%E6%A0%87%E5%B1%9E%E6%80%A7)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # FontAwesome 的使用说明
 
 ### 1. 基本说明
