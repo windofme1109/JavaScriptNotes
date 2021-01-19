@@ -472,7 +472,68 @@
      ```
      - 我想选出div中第一个span元素，如果这样写：`div span:nth-child(1) {}`，是选不出任何元素的，因为这个选择选择的是div中的第一个子元素span，而实际上第一个子元素是p。
      - 所以，可以这样写：`div span:nth-of-type(1) {}`，表示选择div中第一个类型是span的子元素。
-     
+
+
+### 3. `:not()` 选择器
+
+1. `:not()` 接收一个选择器，然后将这个选择器选中的元素排除。
+
+2. `:not()` 接收的选择器不能是 `:not()` 本身。即不能嵌套使用。
+
+3. 示例：
+   - css 代码：
+   ```css
+      .sibcont{
+          background:#f1f1f1;
+          border:1px solid #bababa;
+          margin:20px;
+          padding:20px;
+      }
+      .sibcont ul{
+          margin:0;
+          padding:0;
+          list-style:none;
+      }
+      .sibcont ul li{
+          color:#C91010;
+          font-size:13px;
+          line-height:26px;
+      }
+      //not选择器
+      .sibcont ul li:not(:first-child){
+          color:#0C58A7;
+      }
+   ```
+   - html 结构：
+     ```
+       <div class="sibcont">
+           <ul>
+              <li>妹子前端</li>
+              <li>妹纸前端</li>
+              <li>mooshine前端</li>
+              <li>not()选择器</li>
+           </ul>
+       </div>
+     ```
+   - 不选择第一个 li 元素，其余 li 元素设置文字颜色。
+
+
+4. `:not()` 不可用嵌套使用，但是可以并列使用。
+   - css 代码：
+   ```css
+      .sibcont ul li{
+          color:#C91010;
+          font-size:13px;
+          line-height:26px;
+      }
+      .sibcont ul li:not(:first-child):not(:last-child){
+          color:#0C58A7;
+      }
+   ```
+   - 即不选择第一个 li 元素，也不选择最后一个 li 元素，对其余的 li 元素设置文字颜色。
+
+5. 参考资料：[css :not()函数多个条件使用](http://www.webfront-js.com/articaldetail/62.html)
+
 ## 7. 伪元素
 
 1. 伪元素可以用于定位文档中包含的文本，但是无法再文档树中定位。就是说不会生成一个真正的元素，因此称为伪元素。伪元素一般反应无法z在 CSS 中轻松或可靠的检测到某个元素属性或状态，另一方面，伪元素表示 DOM 外部的某种文档结构。
