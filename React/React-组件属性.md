@@ -1,3 +1,17 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [React 组件的属性](#react-%E7%BB%84%E4%BB%B6%E7%9A%84%E5%B1%9E%E6%80%A7)
+  - [1. 基本说明](#1-%E5%9F%BA%E6%9C%AC%E8%AF%B4%E6%98%8E)
+  - [2. 属性](#2-%E5%B1%9E%E6%80%A7)
+    - [1. state](#1-state)
+    - [2. props](#2-props)
+    - [3. defaultProps](#3-defaultprops)
+    - [4. displayName](#4-displayname)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # React 组件的属性
 
 ## 1. 基本说明

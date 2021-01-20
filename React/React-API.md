@@ -1,3 +1,15 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [React API](#react-api)
+  - [1. 基本说明](#1-%E5%9F%BA%E6%9C%AC%E8%AF%B4%E6%98%8E)
+  - [2. API 参考](#2-api-%E5%8F%82%E8%80%83)
+    - [1. React.Children.map](#1-reactchildrenmap)
+    - [2. React.cloneElement](#2-reactcloneelement)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # React API
 
 ## 1. 基本说明
