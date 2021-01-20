@@ -27,6 +27,7 @@
     - [8. 声明合并](#8-%E5%A3%B0%E6%98%8E%E5%90%88%E5%B9%B6)
     - [9. 交叉类型](#9-%E4%BA%A4%E5%8F%89%E7%B1%BB%E5%9E%8B)
     - [10. 类型映射 —— Partial](#10-%E7%B1%BB%E5%9E%8B%E6%98%A0%E5%B0%84--partial)
+    - [11. 属性移除 —— Omit](#11-%E5%B1%9E%E6%80%A7%E7%A7%BB%E9%99%A4--omit)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -1922,4 +1923,30 @@
       const a1: OptionalApple = {
         name: "红富士",
       };
+   ```
+
+### 11. 属性移除 —— Omit
+
+1. 语法：`Omit<Type, Keys>`
+
+2. 接收一个类型（type），然后选择忽略这个类型中的一个属性（Keys），返回忽略这个属性的类型（type）。
+
+3. 这是一个工具类型，我们可以全局使用。
+
+4. 示例：
+   ```ts
+      interface Todo {
+          title: string;
+          description: string;
+          completed: boolean;
+      }
+      // 从 Todo 中移除了 description 属性
+      // 得到了一个不包含 description 的新类型
+      type TodoPreview = Omit<Todo, "description">;
+      // 
+      const todo: TodoPreview = {
+          title: "Clean room",
+          completed: false,
+      }; 
+
    ```
