@@ -7,6 +7,7 @@
   - [2. API 参考](#2-api-%E5%8F%82%E8%80%83)
     - [1. React.Children.map](#1-reactchildrenmap)
     - [2. React.cloneElement](#2-reactcloneelement)
+    - [3. ReactDOM.createPortal](#3-reactdomcreateportal)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -48,3 +49,24 @@
    - props 需要添加到拷贝后的元素的 props 属性
    - children 向被拷贝的元素添加 children 子节点
 3. 作用：以 element 元素为样板克隆并返回新的 React 元素。返回元素的 props 是将新的 props 与原始元素的 props 浅层合并后的结果。新的子元素将取代现有的子元素，而来自原始元素的 key 和 ref 将被保留
+
+### 3. ReactDOM.createPortal
+
+1. 调用形式：`ReactDOM.createPortal(child, container)`
+
+2. 参数说明：
+   - child 要渲染的子元素
+   - container 容器元素，任何一个有效的 DOM 节点都可以作为 child 的容器
+
+3. 这个函数的主要作用是实现将子节点渲染到父组件DOM层次结构之外的DOM节点。
+
+4. 对于 portal 的一个典型用例是当父组件有 `overflow: hidden` 或 `z-index` 样式，但你需要子组件能够在视觉上 “跳出(break out)” 所在的容器。例如，对话框、hovercards 以及提示框。所以一般 react 组件里的模态框，就是这样实现的，都会使用 createPortal() 将其挂载到 body 元素下层。
+
+5. 使用 createPortal() 可以保留节点的原来的上下文信息。虽然节点的渲染位置变了，但是节点原有的父节点等上下文信息不变。
+
+6. 事件冒泡和普通 react 子节点一样，是因为portal仍然存在于React tree 中，而不用考虑其在真是DOM tree中的位置。
+
+7. 参考资料：
+   - [react portal](https://www.jianshu.com/p/0771f1643aa3)
+   - [react 插槽(Portals)](https://www.cnblogs.com/yadiblogs/p/10121538.html)
+   - [Portals](https://reactjs.org/docs/portals.html)
