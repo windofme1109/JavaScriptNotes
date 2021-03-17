@@ -3,7 +3,8 @@
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [toString 与 valueOf 的用法总结](#tostring-%E4%B8%8E-valueof-%E7%9A%84%E7%94%A8%E6%B3%95%E6%80%BB%E7%BB%93)
-  - [1. toString](#1-tostring)
+  - [1. 参考资料](#1-%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99)
+  - [2. toString](#2-tostring)
     - [1. 基本说明](#1-%E5%9F%BA%E6%9C%AC%E8%AF%B4%E6%98%8E)
     - [2. boolean](#2-boolean)
     - [3. number](#3-number)
@@ -13,10 +14,10 @@
     - [7. date](#7-date)
     - [8. RegExp](#8-regexp)
     - [9. Error类型](#9-error%E7%B1%BB%E5%9E%8B)
-  - [2. valueOf](#2-valueof)
+  - [3. valueOf](#3-valueof)
     - [1. 基本说明](#1-%E5%9F%BA%E6%9C%AC%E8%AF%B4%E6%98%8E-1)
     - [2. 不同类型的对象调用 valueOf()](#2-%E4%B8%8D%E5%90%8C%E7%B1%BB%E5%9E%8B%E7%9A%84%E5%AF%B9%E8%B1%A1%E8%B0%83%E7%94%A8-valueof)
-  - [3. toString() 与 valueOf() 的调用时机](#3-tostring-%E4%B8%8E-valueof-%E7%9A%84%E8%B0%83%E7%94%A8%E6%97%B6%E6%9C%BA)
+  - [4. toString() 与 valueOf() 的调用时机](#4-tostring-%E4%B8%8E-valueof-%E7%9A%84%E8%B0%83%E7%94%A8%E6%97%B6%E6%9C%BA)
     - [1. 应用场景](#1-%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF)
     - [2. 字符串转换](#2-%E5%AD%97%E7%AC%A6%E4%B8%B2%E8%BD%AC%E6%8D%A2)
     - [3. 数值转换](#3-%E6%95%B0%E5%80%BC%E8%BD%AC%E6%8D%A2)
@@ -26,7 +27,13 @@
 
 # toString 与 valueOf 的用法总结
 
-## 1. toString
+## 1. 参考资料
+
+1. [Object to primitive conversion](https://javascript.info/object-toprimitive)
+2. [javaScript valueOf和toString方法在不同场景被调用进行数据转换](https://blog.csdn.net/JQuery_QQ/article/details/51457177/)
+3. [toString()方法](https://www.cnblogs.com/xiaohuochai/p/5557387.html)
+
+## 2. toString
 
 ### 1. 基本说明
 
@@ -225,7 +232,7 @@
    ```
 
 
-## 2. valueOf
+## 3. valueOf
 
 ### 1. 基本说明
 
@@ -285,7 +292,7 @@
    ```
 8. Math 和 Error 对象每 valueOf() 方法。
 
-## 3. toString() 与 valueOf() 的调用时机
+## 4. toString() 与 valueOf() 的调用时机
 
 ### 1. 应用场景
 
@@ -299,8 +306,8 @@
 1. 当需要一个对象的字符串形式表示时，就会发生字符串转换。如 `alert(obj)`、`console.log(obj)` 等。`String(obj)` 也会做显示转换。 
 
 2. 转换规则：
-   1. 存在 toString() 方法，并且返回基本数据，则使用toString()的返回值（所有的对象都有toString() 方法，也就是说正常情况转换执行到这里就结束了）。
-   2. 如果 valueOf() 存在并且返回基本数据，则使用 valueOf() 返回的值
+   1. 存在 toString() 方法，并且返回基本数据，则使用 toString() 的返回值（所有的对象都有toString() 方法，也就是说正常情况转换执行到这里就结束了）。
+   2. 如果 valueOf() 存在并且返回基本数据，则使用 valueOf() 返回的值。
    3. 否则抛出异常。
 
 ### 3. 数值转换
@@ -313,7 +320,7 @@
 
 2. 转换规则：
    1. 存在 valueOf() 方法并且返回基本数据类型，则使用 valueOf() 的值。
-   2. 不存在 valueOf() 方法，存在 toString() 方法并且返回基本数据类型，则使用 toString() 的值
+   2. 不存在 valueOf() 方法，存在 toString() 方法并且返回基本数据类型，则使用 toString() 的值。
    3. 二者都不存在，则抛出异常。
 
 3. 内置对象中，Date 同时支持数值转换和字符串转换：
