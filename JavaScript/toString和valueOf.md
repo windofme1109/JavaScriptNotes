@@ -347,5 +347,30 @@
    undefined|N/A|undefined
    null|N/A|null
 
+### 4. Symbol.toPrimitive
 
+1. 对象的 `Symbol.toPrimitive` 属性，指向一个方法。该对象被转化为原始类型的值时，会调用这个办法，返回该对象对应的原始类型值。
+
+2. 如果我们重写了 `Symbol.toPrimitive()` 方法，在 `toString()`、`valueOf()` 和 `Symbol.toPrimitive()` 这三个方法中，`Symbol.toPrimitive()` 的优先级最高，最优先调用：
+
+3. 示例代码：
+   ```javascript
+      let a = {
+          n: 1,
+          toString() {
+              return 0;
+          },
+
+          valueOf() {
+              return 1;
+          },
+ 
+          [Symbol.toPrimitive]() {
+               return 2;
+         }
+      } 
+
+      // 3
+      console.log(a + 1);
+   ```
 
