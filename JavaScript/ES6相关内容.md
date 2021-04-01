@@ -135,7 +135,129 @@
    1. then()
    2. catch()
    3. all()
+      - 参考资料
+        - [javascript异步之Promise.all()、Promise.race()、Promise.finally()](https://segmentfault.com/a/1190000017974025?utm_source=tag-newest)
+        - [MDN-Promise.all()](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Promise/all)
+      - all 这个方法，以数组形式接收多个 Promise 对象，只有所有的 Promise 对象都返回成功状态，all 方法才会返回成功状态，只要有一个失败了，all 就会返回失败的状态。
+      - `Promise.all(iterable)`
+        - 参数  iterable
+          - 一个可迭代对象，如 Array 或 String。
+        - 返回值
+          - 如果传入的参数是一个空的可迭代对象，则返回一个已完成（already resolved）状态的 Promise。
+          - 如果传入的参数不包含任何 promise，则返回一个异步完成（asynchronously resolved） Promise。注意：Google Chrome 58 在这种情况下返回一个已完成（already resolved）状态的 Promise。
+          - 其它情况下返回一个处理中（pending）的 Promise。这个返回的 promise 之后会在所有的 promise 都完成或有一个 promise 失败时异步地变为完成或失败。
+      - 此方法在集合多个 promise 的返回结果时很有用。
+      - 说明：
+        - 完成（Fulfillment）：
+          - 如果传入的可迭代对象为空，Promise.all 会同步地返回一个已完成（resolved）状态的promise。
+          - 如果所有传入的 promise 都变为完成状态，或者传入的可迭代对象内没有 promise，Promise.all 返回的 promise 异步地变为完成。
+          - 在任何情况下，Promise.all 返回的 promise 的完成状态的结果都是一个数组，它包含所有的传入迭代参数对象的值（也包括非 promise 值）。
+
+        - 失败/拒绝（Rejection）：
+          - 如果传入的 promise 中有一个失败（rejected），Promise.all 异步地将失败的那个结果给失败状态的回调函数，而不管其它 promise 是否完成。
+      - 示例：
+        - 全部成功：
+          ```javascript
+             const p1 = Promise.resolve(50);
+             const p2 = 12345;
+             const p3 = new Promise((resolve) => {
+                 setTimeout(() => {
+                     resolve(100);
+                 }, 2000);
+             });
+             // 等到最后一个 Promise 成功即 p3 成功后，，all 返回一个成功的 Promise
+
+             Promise.all([p1, p2, p3]).then(data => {
+                 // [ 50, 12345, 100 ]
+                 console.log(data);
+             });
+          ```
+        - 有一个失败：
+          ```javascript
+             const p1 = new Promise((resolve, reject) => {
+                 setTimeout(resolve, 1000, 'one');
+             });
+             const p2 = new Promise((resolve, reject) => {
+                 setTimeout(resolve, 2000, 'two');
+             });
+             const p3 = new Promise((resolve, reject) => {
+                 setTimeout(resolve, 3000, 'three');
+             });
+             const p4 = new Promise((resolve, reject) => {
+                 setTimeout(resolve, 4000, 'four');
+             });
+
+
+             const p5 = new Promise((resolve, reject) => {
+                 reject('reject');
+             });
+
+             Promise.all([p1, p2, p3, p4, p5]).then(res => {
+                 console.log('成功', res);
+             }, err => {
+                 // 只要有一个 Promise 失败，all 就会返回一个失败的 Promise
+                 // 失败 reject
+                 console.log('失败', err);
+             });
+
+             Promise.all([p1, p2, p3, p4, p5]).then(res => {
+                 console.log('成功', res);
+             }).catch(reason => {
+                 // 失败 reject
+                 console.log('失败', reason);
+             })
+          ```
    4. race()
+      - 参考资料
+        - [javascript异步之Promise.all()、Promise.race()、Promise.finally()](https://segmentfault.com/a/1190000017974025?utm_source=tag-newest)
+        - [MDN-Promise.race()](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Promise/race) 
+      - race 方法返回一个 Promise，一旦迭代器中的某个 Promise 成功或失败，返回的 Promise 就会成功或失败。
+      - 从 race 这个方法的名称我们就可以看出，这个方法的结果取决于最快地那个 Promise 的结果。
+      - `Promise.race(iterable)`
+        - 参数  iterable
+          - 可迭代对象，类似 Array。详见 iterable。
+        - 返回值
+          - 一个待定的 Promise 只要给定的迭代中的一个 Promise 解决或拒绝，就采用第一个 Promise 的值作为它的值，从而异步地解析或拒绝（一旦堆栈为空）。
+      - 示例：
+        - 成功示例
+          ```JavaScript
+             const p1 = new Promise((resolve, reject) => {
+                setTimeout(() => {
+                    resolve('p1');
+                }, 2000);
+             });
+
+            const p2 = new Promise((resolve, reject) => {
+                setTimeout(() => {
+                    resolve('p2');
+                }, 1000);
+            });
+
+            Promise.race([p1, p2]).then((res) => {
+               // p2 最先完成，因此输出 p2
+               console.log(res);
+            });  
+          ```
+        - 失败示例：
+          ```javascript
+             const p5 = new Promise(function(resolve, reject) {
+                 setTimeout(resolve, 500, "five");
+             });
+             const p6 = new Promise(function(resolve, reject) {
+                 setTimeout(reject, 100, "six");
+             });
+
+             Promise.race([p5, p6]).then(function(value) {
+                 // 未被调用
+             }, function(reason) {
+                  console.log(reason); // "six"
+                  // p6 更快，所以它失败了
+             });
+          ```
+
+如果传的迭代是空的，则返回的 promise 将永远等待。
+
+如果迭代包含一个或多个非承诺值和/或已解决/拒绝的承诺，则 Promise.race 将解析为迭代中找到的第一个值。
    
 ## 7. Set和Map
 
