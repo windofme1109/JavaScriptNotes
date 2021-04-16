@@ -14,6 +14,7 @@
   - [2.7 版本回退（简单版）](#27-%E7%89%88%E6%9C%AC%E5%9B%9E%E9%80%80%E7%AE%80%E5%8D%95%E7%89%88)
   - [2.8 提交所有文件](#28-%E6%8F%90%E4%BA%A4%E6%89%80%E6%9C%89%E6%96%87%E4%BB%B6)
   - [2.9 删除暂存区的文件](#29-%E5%88%A0%E9%99%A4%E6%9A%82%E5%AD%98%E5%8C%BA%E7%9A%84%E6%96%87%E4%BB%B6)
+  - [2.10 合并某次提交到另外一个分支上](#210-%E5%90%88%E5%B9%B6%E6%9F%90%E6%AC%A1%E6%8F%90%E4%BA%A4%E5%88%B0%E5%8F%A6%E5%A4%96%E4%B8%80%E4%B8%AA%E5%88%86%E6%94%AF%E4%B8%8A)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -216,3 +217,12 @@
    - 如果要移除文件夹下的所有文件，可以进入到文件夹，然后对文件夹执行：`git reset HEAD -- .`
    
 4. 还可以使用 rm 命令：`git rm --cache file`
+
+### 2.10 合并某次提交到另外一个分支上
+
+1. 有时候，我们不需要合并两个分支，而是将某个分支的一个或几个提交（commit）合并到另外一个分支上，这时候就需要 `cherry-pick` 命令了。
+
+2. 合并步骤（以将 develop 某个提交合并到 master 分支为例）：
+   1. 切换到 `develop` 分支，输入 `git log`，查找需要合并的 commit 记录，即 hash 值，如：7fcb3defff。
+   2. 切换到 `master` 分支，使用 `git cherry-pick 7fcb3defff`  命令，就把该条提交记录合并到了 `master` 分支，这只是在本地合并到了 `master` 分支。
+   3. 使用 `git push` 命令，推送到远端仓库。
