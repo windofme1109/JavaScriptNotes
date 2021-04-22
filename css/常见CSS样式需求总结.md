@@ -1,3 +1,15 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [常见 CSS 样式](#%E5%B8%B8%E8%A7%81-css-%E6%A0%B7%E5%BC%8F)
+  - [1. 文本超出长度隐藏，并显示省略号（...）](#1-%E6%96%87%E6%9C%AC%E8%B6%85%E5%87%BA%E9%95%BF%E5%BA%A6%E9%9A%90%E8%97%8F%E5%B9%B6%E6%98%BE%E7%A4%BA%E7%9C%81%E7%95%A5%E5%8F%B7)
+    - [1. 单行文本](#1-%E5%8D%95%E8%A1%8C%E6%96%87%E6%9C%AC)
+    - [2. 多行文本](#2-%E5%A4%9A%E8%A1%8C%E6%96%87%E6%9C%AC)
+  - [2. span 鼠标悬浮显示省略文字](#2-span-%E9%BC%A0%E6%A0%87%E6%82%AC%E6%B5%AE%E6%98%BE%E7%A4%BA%E7%9C%81%E7%95%A5%E6%96%87%E5%AD%97)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # 常见 CSS 样式
 
 ## 1. 文本超出长度隐藏，并显示省略号（...）
@@ -14,7 +26,7 @@
    ```
 2. 为了保证兼容性，最好给元素添加上 `width` 属性。
 
-3. `text-overflow` 对块级元素有效，对行内元素无效，所以要对行内元素如span使用这个属性，需要将其 `display` 设置为 `block` 或者 `inline-block`。
+3. `text-overflow` 对块级元素有效，对行内元素无效，所以要对行内元素如span使用这个属性，需要将其 `display` 设置为 `block` 或者 `inline-block`。然后给这个元素设置 `width` 属性。
 
 
 ### 2. 多行文本
