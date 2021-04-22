@@ -20,8 +20,15 @@
   - [5. 清除浮动](#5-%E6%B8%85%E9%99%A4%E6%B5%AE%E5%8A%A8)
     - [1. clear 属性](#1-clear-%E5%B1%9E%E6%80%A7)
     - [2. overflow 属性](#2-overflow-%E5%B1%9E%E6%80%A7)
+    - [3. 伪元素](#3-%E4%BC%AA%E5%85%83%E7%B4%A0)
   - [6. BFC](#6-bfc)
   - [7. 常用单位](#7-%E5%B8%B8%E7%94%A8%E5%8D%95%E4%BD%8D)
+    - [1. px](#1-px)
+    - [2. em](#2-em)
+    - [3. 百分比](#3-%E7%99%BE%E5%88%86%E6%AF%94)
+    - [4. rem](#4-rem)
+    - [5. vh](#5-vh)
+    - [6. vw](#6-vw)
   - [8. 背景 - background](#8-%E8%83%8C%E6%99%AF---background)
     - [1. background-color](#1-background-color)
     - [2. background-image](#2-background-image)
@@ -40,6 +47,7 @@
     - [1. relative](#1-relative)
     - [2. absolute](#2-absolute)
     - [3. fixed](#3-fixed)
+  - [12. 可继承的属性](#12-%E5%8F%AF%E7%BB%A7%E6%89%BF%E7%9A%84%E5%B1%9E%E6%80%A7)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -235,12 +243,29 @@
 
 ### 1. clear 属性
 
+1. 在最后一个浮动标签后，新加一个标签，设置其 `clear` 属性。
 1. css 样式：`clear: left/right/both;`
 
 ### 2. overflow 属性
 
-2. css样式：`overflow: hidden;`
+1. 给父元素添加 `overflow` 属性。
+1. css 样式：`overflow: hidden;`
 
+### 3. 伪元素
+
+1. 使用伪元素清除浮动。
+
+2. css 样式
+   ```css
+      .clearfix::after{
+           /* 伪元素是行内元素，正常浏览器清除浮动方法 */
+           content: "";
+           dispaly: block;
+           height: 0;
+           clear: both;
+           visibility: hiden;
+      }
+   ```
 ## 6. BFC
 
 ## 7. 常用单位
@@ -684,6 +709,16 @@
 ### 2. absolute
 
 ### 3. fixed
+
+## 12. 可继承的属性
+
+1. 每一个属性在定义中都给出了这个属性是否具有继承性，一个具有继承性的属性会在没有指定值的时候，会使用父元素的同属性的值来作为自己的值。
+
+2. 字体相关的属性，`font-size` 和 `font-weight` 等。
+3. 文本相关的属性，`color` 和 `text-align` 等。
+4. 表格的一些布局属性、列表属性如 `list-style` 等。
+5. 光标属性 `cursor`、元素可见性 `visibility`。
+6. 当一个属性不是继承属性的时候，我们也可以通过将它的值设置为 `inherit`来使它从父元素那获取同名的属性值来继承。
 
 
 
