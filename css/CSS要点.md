@@ -706,10 +706,86 @@
 
 ### 1. relative
 
+1. 基于自身原本出现的位置进行定位。
+
+2. 不脱离文档流。
+
+3. 可以设置 `top`、`bottom`、`left` 和 `right`。
+
 ### 2. absolute
+
+1. 基于父级元素中第一个非 `static` 定位的元素的位置进行定位。
+
+2. 脱离文档流。
+
+3. 如果父级元素都是 `static`，则设置了 `absolute` 的定位的元素是基于 `body` 元素定位。
+
+4. 可以设置 `top`、`bottom`、`left` 和 `right`。
+
+5. 可以用于设置元素的水平垂直居中。
 
 ### 3. fixed
 
+1. 将元素固定在窗口的某个位置。
+
+2. 元素脱离文档流。
+
+3. 基于窗口位置进行定位，
+
+4. 可以设置 `top`、`bottom`、`left` 和 `right`。
+
+5. 不能对设置了 `fix` 定位的元素应用 2D 形变 —— `transform` 属性。
+
+### 4. 使用 absolute 模拟 fixed 定位效果
+
+1. 参考资料
+   - [使用absolute模拟fixed定位，兼容ie6，及ie7 8 9和火狐谷歌等浏览器](https://www.cnblogs.com/k13web/p/4139384.html)
+   - [absolute模拟fixed效果（解决fixed失效问题）](https://blog.csdn.net/longyin0528/article/details/80777809)
+
+2. html 结构：
+   ```html
+      <div class="test-1"></div>
+      <div class="fixed"></div>
+   ```
+
+3. css 样式：
+   ```css
+      html {
+            /*overflow: scroll;*/
+            overflow: hidden;
+            height: 100%;
+        }
+
+        body {
+            overflow: scroll;
+            height: 100%;
+        }
+
+        .test-1 {
+            height: 1000px;
+            background-color: rebeccapurple;
+        }
+
+        .fixed {
+            position: absolute;
+            left: 50px;
+            top: 50px;
+            height: 100px;
+            width: 100px;
+            background-color: greenyellow;
+        }
+   ```
+
+4. 原理：
+   1. 对 html 或 body 其中一个节点设置 `overflow: scroll;`，那么都会会应用到 document 上， 即只出现一个滚动条。
+   2. 对 body 和 html 同时设置 `overflow: scroll;`，那么会出现两个滚动条，其中 html 设置的 `overflow` 属性应用到 document 上，而 body 的 `overflow` 属性应用到自身上。
+   3. 默认 html 和 body 高度随内容而变化，当 html 的 `height` 设置 100%，设置了  `overflow: scroll;` 则超出的部分隐藏。则文档大小只有一屏高度，超出部分不会显示，也没有滚动条。这样就相当于将 body 元素固定了，没有滚动条可以移动 body。
+   4. body 是内容区，将 body 的 `height` 设置为 100%，同时设置了  `overflow: scroll;`则内容超出后自动产生滚动条。这样内容超出后出现的滚动条是 body 的，模拟了默认浏览器出现的滚动条。 
+   5. 对于设置绝对定位的元素而言，其定位的坐标是第一个非 static 定位的父级元素，如果没有这样的父级元素，那么定位就是相对于 body 元素而言。
+   6. 对于 fixed 元素进行绝对定位后是相对于整个浏览器可视区域的 `0 0` 坐标为基准，而内容超出后是以 body 为基准出现滚动条，且 body 高度已经设置成和可视区域高度相同。所以即使拖拽滚动条，进行绝对定位的元素位置也不会变。
+   7. 必须将 html 和 body 的 `padding` 和 `margin` 值清零，否则会出现不能填满浏览器的现象，且 `html` 和 `body` 不能设宽度，即使设置`width: 100%` 也会出问题，ie6 右边会有一部分空白无法填满浏览器。
+ 
+ 5. 总结：设置 html 的 overflow 属性为 hidden，禁止了 body 元素出现滚动。同时让 body 元素充满整个窗口。则相对于 body 元素进行绝对定位的元素就不会移动了。后面即使出现滚动条，也是 body 下的其他元素的。
 ## 12. 可继承的属性
 
 1. 每一个属性在定义中都给出了这个属性是否具有继承性，一个具有继承性的属性会在没有指定值的时候，会使用父元素的同属性的值来作为自己的值。
