@@ -20,8 +20,15 @@
   - [5. 清除浮动](#5-%E6%B8%85%E9%99%A4%E6%B5%AE%E5%8A%A8)
     - [1. clear 属性](#1-clear-%E5%B1%9E%E6%80%A7)
     - [2. overflow 属性](#2-overflow-%E5%B1%9E%E6%80%A7)
+    - [3. 伪元素](#3-%E4%BC%AA%E5%85%83%E7%B4%A0)
   - [6. BFC](#6-bfc)
   - [7. 常用单位](#7-%E5%B8%B8%E7%94%A8%E5%8D%95%E4%BD%8D)
+    - [1. px](#1-px)
+    - [2. em](#2-em)
+    - [3. 百分比](#3-%E7%99%BE%E5%88%86%E6%AF%94)
+    - [4. rem](#4-rem)
+    - [5. vh](#5-vh)
+    - [6. vw](#6-vw)
   - [8. 背景 - background](#8-%E8%83%8C%E6%99%AF---background)
     - [1. background-color](#1-background-color)
     - [2. background-image](#2-background-image)
@@ -40,6 +47,7 @@
     - [1. relative](#1-relative)
     - [2. absolute](#2-absolute)
     - [3. fixed](#3-fixed)
+  - [12. 可继承的属性](#12-%E5%8F%AF%E7%BB%A7%E6%89%BF%E7%9A%84%E5%B1%9E%E6%80%A7)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -235,27 +243,119 @@
 
 ### 1. clear 属性
 
+1. 在最后一个浮动标签后，新加一个标签，设置其 `clear` 属性。
 1. css 样式：`clear: left/right/both;`
 
 ### 2. overflow 属性
 
-2. css样式：`overflow: hidden;`
+1. 给父元素添加 `overflow` 属性。
+1. css 样式：`overflow: hidden;`
 
+### 3. 伪元素
+
+1. 使用伪元素清除浮动。
+
+2. css 样式
+   ```css
+      .clearfix::after{
+           /* 伪元素是行内元素，正常浏览器清除浮动方法 */
+           content: "";
+           dispaly: block;
+           height: 0;
+           clear: both;
+           visibility: hiden;
+      }
+   ```
 ## 6. BFC
 
 ## 7. 常用单位
 
-1. px
+### 1. px
 
-2. em
+1. 参考资料
+   - [设备像素，CSS像素，设备独立像素](https://segmentfault.com/a/1190000015884091)
 
-3. 百分比
+2. css 像素
+   > css像素是 **web编程的概念** ，它是 **抽象的** ，实际上 **不存在** 。用于逻辑上衡量像素的单位。也就是我们做网页时用到的 css 像素单位。 
 
-4. rem
+3. 设备像素（device pixel，DP）
+   > 设备像素又称 **物理像素** ，是设备能控制显示的最小单位，我们可以把它看做显示器上的一个点。我们常说的 1920x1080 像素分辨率就是用的设备像素单位。
+   - 我的理解，物理像素，就是我们常说的某某屏幕的分辨率。就是设备的屏幕上最小的一个发光单元，显示单位。没有固定大小，比如不同尺寸的显示器，不同尺寸的手机，分辨率都可能是 1920 × 1080 的。
 
-5. vh
+4. 设备独立像素（Device Independent Pixel，DIP）
+   > 设备独立像素也叫密度无关像素 ，可以认为是计算机坐标系统中的一个点，这个点表示一个可以由程序使用并控制的虚拟像素，可以由相关系统转换为物理像素。设备独立像素是一个整体概念，包括了 css 像素，比如:css 像素，只是在 android 机中，css像素不叫 “css像素了”，而叫“设备独立像素”。
 
-6. vw
+5. 在不同屏幕上，css 像素呈现的物理尺寸一致，就是一个 css 像素的大小是固定的。在不同设备下，css 像素对应的物理像素具数不同：
+   - 在 PC 端，默认情况下，CSS 像素是和物理像素保持一致的，即：1个单位的CSS像素 = 1个单位的物理像素。
+   - 在移动端，依据设备而定。
+
+6. 设备像素和设备独立像素之间的关系是由 PPI 和 DRP 决定的。
+
+7. PPI 是每英寸的像素数（pixel per inch）的缩写。这里不多说。
+
+8. DRP 是设备像素比（ device pixel ratio）的缩写。设备像素比定义了设备像素和设备独立像素的转换关系(告诉你一个设备像素对应多少个独立设备像素(既css像素))，计算式为： 
+`DPR = 设备像素 / 设备独立像素`
+
+9. 在 javascript 中，可以通过 `window.devicePixelRatio` 获取到当前设备的dpr。在 css 中，可以通过 `-webkit-device-pixel-ratio`，`webkit-min-device-pixel-ratio` 和 `-webkit-max-device-pixel-ratio`进行媒体查询，对不同 dpr 的设备，做一些样式适配(这里只针对webkit内核的浏览器和webview)。
+
+10. 设备像素是固定大小不变的，而设备独立像素是大小可变的。二者并不是严格的1比1关系。
+
+11. 那么对于设备像素，是如何与设备独立像素进行换算呢，这时前面定义的 PPI 和 DPR 就派上用途了。先举个例子：
+    - 以 iphone 6 为例，设备宽高为 375 × 667，可以理解为设备独立像素(或css像素)。DPR为 2，根据上面的计算公式，其物理像素就应该 × 2，为750 × 1334，这个物理像素就是 iphone 6 的分辨率。
+    - 同样的 css 像素，不同的设备，对应的设备像素如下：
+      ![](./img/ppi-dpr.png)
+    - 两个设备的物理像素是不同的，但是设置了同样的 css 像素，在视觉显示上，物理尺寸是一致的。CSS 像素同样是 2 × 2，但是二者对应的物理像素是不一致的，第一个设备的物理像素是 2 × 2，第二个设备的物理像素是 4 × 4。 
+
+12. 我们以 PPI 作为设备像素密度的分界，获得默认缩放比例，即设备像素比。如下图所示：
+     ![](./img/ppi-dpr-2.jfif)
+     
+13. 获得设备像素比后，便可得知设备像素与 CSS 像素之间的比例。当这个比率为1:1时，使用1个设备像素显示1个 CSS 像素。当这个比率为 2:1 时，使用4个设备像素显示 1 个 CSS 像素，当这个比率为 3:1 时，使用 9（3*3）个设备像素显示 1 个 CSS 像素。
+### 2. em
+
+1. 相对单位
+2. 相对于父元素字体的大小
+
+### 3. 百分比
+
+### 4. rem
+
+1. 参考资料
+   - [Rem布局的原理解析](https://zhuanlan.zhihu.com/p/30413803)
+   - [移动端Web页面适配方案（整理版）](https://www.jianshu.com/p/2c33921d5a68)
+   - [第三代移动端布局方案](https://segmentfault.com/a/1190000018850370)
+   - [移动端布局方案浅谈](https://segmentfault.com/a/1190000010412860)
+
+2. rem 是 css3 新增的一个单位，也是一个相对单位，常用于移动端布局。
+
+3. 1rem  = 根元素，即 html 节点的字体大小。这样页面中，元素的大小，就有了一个统一的参考，如果根元素字体的大小发生了变化，那么元素的大小也会发生变化。这样就能根据不同移动设备的宽度对页面进行动态调整。通过 js 获取当前页面的宽度，动态计算根元素字体的大小。
+
+4. 使用 rem 进行移动布局的原理：基于宽度的等比例缩放。
+
+5. 下面的内容引用自  [Rem布局的原理解析](https://zhuanlan.zhihu.com/p/30413803)：
+   > 其实rem布局的本质是等比缩放，一般是基于宽度，试想一下如果UE图能够等比缩放，那该多么美好啊
+     假设我们将屏幕宽度平均分成100份，每一份的宽度用x表示，x = 屏幕宽度 / 100，如果将x作为单位，x前面的数值就代表屏幕宽度的百分比：
+     `p {width: 50x} /* 屏幕宽度的50% */` 
+     如果想要页面元素随着屏幕宽度等比变化，我们需要上面的x单位，不幸的是css中并没有这样的单位，幸运的是在css中有rem，通过rem这个桥梁，可以实现神奇的x。
+   > 通过上面对rem的介绍，可以发现，如果子元素设置rem单位的属性，通过更改html元素的字体大小，就可以让子元素实际大小发生变化 
+   >   ```
+   >    html {font-size: 16px}
+   >    p {width: 2rem} /* 32px*/
+   > 
+   >    html {font-size: 32px}
+   >    p {width: 2rem} /*64px*/
+   >   ```
+   > 如果让html元素字体的大小，恒等于屏幕宽度的1/100，那1rem和1x就等价了。
+   >   ```
+   >      html {fons-size: width / 100}
+   >      p {width: 50rem} /* 50rem = 50x = 屏幕宽度的50% */ 
+   >  ```
+   >如何让html字体大小一直等于屏幕宽度的百分之一呢？ 可以通过js来设置，一般需要在页面dom ready、resize和屏幕旋转中设置：`document.documentElement.style.fontSize = document.documentElement.clientWidth / 100 + 'px'; `
+那么如何把UE图中的获取的像素单位的值，转换为已rem为单位的值呢？公式是元素宽度 / UE图宽度 * 100，让我们举个例子，假设UE图尺寸是640px，UE图中的一个元素宽度是100px，根据公式100/640*100 = 15.62
+`p {width: 15.625rem}`
+
+### 5. vh
+
+### 6. vw
 
 ## 8. 背景 - background
 
@@ -606,9 +706,95 @@
 
 ### 1. relative
 
+1. 基于自身原本出现的位置进行定位。
+
+2. 不脱离文档流。
+
+3. 可以设置 `top`、`bottom`、`left` 和 `right`。
+
 ### 2. absolute
 
+1. 基于父级元素中第一个非 `static` 定位的元素的位置进行定位。
+
+2. 脱离文档流。
+
+3. 如果父级元素都是 `static`，则设置了 `absolute` 的定位的元素是基于 `body` 元素定位。
+
+4. 可以设置 `top`、`bottom`、`left` 和 `right`。
+
+5. 可以用于设置元素的水平垂直居中。
+
 ### 3. fixed
+
+1. 将元素固定在窗口的某个位置。
+
+2. 元素脱离文档流。
+
+3. 基于窗口位置进行定位，
+
+4. 可以设置 `top`、`bottom`、`left` 和 `right`。
+
+5. 不能对设置了 `fix` 定位的元素应用 2D 形变 —— `transform` 属性。
+
+### 4. 使用 absolute 模拟 fixed 定位效果
+
+1. 参考资料
+   - [使用absolute模拟fixed定位，兼容ie6，及ie7 8 9和火狐谷歌等浏览器](https://www.cnblogs.com/k13web/p/4139384.html)
+   - [absolute模拟fixed效果（解决fixed失效问题）](https://blog.csdn.net/longyin0528/article/details/80777809)
+
+2. html 结构：
+   ```html
+      <div class="test-1"></div>
+      <div class="fixed"></div>
+   ```
+
+3. css 样式：
+   ```css
+      html {
+            /*overflow: scroll;*/
+            overflow: hidden;
+            height: 100%;
+        }
+
+        body {
+            overflow: scroll;
+            height: 100%;
+        }
+
+        .test-1 {
+            height: 1000px;
+            background-color: rebeccapurple;
+        }
+
+        .fixed {
+            position: absolute;
+            left: 50px;
+            top: 50px;
+            height: 100px;
+            width: 100px;
+            background-color: greenyellow;
+        }
+   ```
+
+4. 原理：
+   1. 对 html 或 body 其中一个节点设置 `overflow: scroll;`，那么都会会应用到 document 上， 即只出现一个滚动条。
+   2. 对 body 和 html 同时设置 `overflow: scroll;`，那么会出现两个滚动条，其中 html 设置的 `overflow` 属性应用到 document 上，而 body 的 `overflow` 属性应用到自身上。
+   3. 默认 html 和 body 高度随内容而变化，当 html 的 `height` 设置 100%，设置了  `overflow: scroll;` 则超出的部分隐藏。则文档大小只有一屏高度，超出部分不会显示，也没有滚动条。这样就相当于将 body 元素固定了，没有滚动条可以移动 body。
+   4. body 是内容区，将 body 的 `height` 设置为 100%，同时设置了  `overflow: scroll;`则内容超出后自动产生滚动条。这样内容超出后出现的滚动条是 body 的，模拟了默认浏览器出现的滚动条。 
+   5. 对于设置绝对定位的元素而言，其定位的坐标是第一个非 static 定位的父级元素，如果没有这样的父级元素，那么定位就是相对于 body 元素而言。
+   6. 对于 fixed 元素进行绝对定位后是相对于整个浏览器可视区域的 `0 0` 坐标为基准，而内容超出后是以 body 为基准出现滚动条，且 body 高度已经设置成和可视区域高度相同。所以即使拖拽滚动条，进行绝对定位的元素位置也不会变。
+   7. 必须将 html 和 body 的 `padding` 和 `margin` 值清零，否则会出现不能填满浏览器的现象，且 `html` 和 `body` 不能设宽度，即使设置`width: 100%` 也会出问题，ie6 右边会有一部分空白无法填满浏览器。
+ 
+ 5. 总结：设置 html 的 overflow 属性为 hidden，禁止了 body 元素出现滚动。同时让 body 元素充满整个窗口。则相对于 body 元素进行绝对定位的元素就不会移动了。后面即使出现滚动条，也是 body 下的其他元素的。
+## 12. 可继承的属性
+
+1. 每一个属性在定义中都给出了这个属性是否具有继承性，一个具有继承性的属性会在没有指定值的时候，会使用父元素的同属性的值来作为自己的值。
+
+2. 字体相关的属性，`font-size` 和 `font-weight` 等。
+3. 文本相关的属性，`color` 和 `text-align` 等。
+4. 表格的一些布局属性、列表属性如 `list-style` 等。
+5. 光标属性 `cursor`、元素可见性 `visibility`。
+6. 当一个属性不是继承属性的时候，我们也可以通过将它的值设置为 `inherit`来使它从父元素那获取同名的属性值来继承。
 
 
 
