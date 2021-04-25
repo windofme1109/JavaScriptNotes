@@ -4,7 +4,8 @@
 
 - [Flex 布局](#flex-%E5%B8%83%E5%B1%80)
   - [1. flex布局的基本说明](#1-flex%E5%B8%83%E5%B1%80%E7%9A%84%E5%9F%BA%E6%9C%AC%E8%AF%B4%E6%98%8E)
-  - [2. flex布局语法](#2-flex%E5%B8%83%E5%B1%80%E8%AF%AD%E6%B3%95)
+  - [2. Flex 布局语法](#2-flex-%E5%B8%83%E5%B1%80%E8%AF%AD%E6%B3%95)
+  - [3. 基本概念](#3-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5)
   - [4. 容器属性](#4-%E5%AE%B9%E5%99%A8%E5%B1%9E%E6%80%A7)
   - [5. 项目属性](#5-%E9%A1%B9%E7%9B%AE%E5%B1%9E%E6%80%A7)
 
@@ -12,23 +13,25 @@
 
 # Flex 布局
 
-## 1. flex布局的基本说明
+## 1. Flex 布局的基本说明
 
-1. flex 是 flexbox 的简称，是 CSS 的一种布局方案。可以实现响应式地实现各种布局。
+1. Flex 是 Flexbox 的简称，是 CSS 的一种布局方案。可以实现响应式地实现各种布局。
 
-2. 使用 flex 布局，我们只需要声明是哪种形式，剩下的就是浏览器根据空间的大小实现具体的布局。这就是 flex 布局灵活之处。不需要我们手动去计算。
+2. 使用 Flex 布局，我们只需要声明是哪种形式，剩下的就是浏览器根据空间的大小实现具体的布局。这就是 Flex 布局灵活之处。不需要我们手动去计算。
 
-## 2. flex布局语法
+3. Flex 布局具有等高的特性。在一列中，如果没有指定每一个项目的具体高度，以内容撑开高度。则所有的项目的高度是以最高的元素的的高度为标准的，即自动实现每一列高度均相等。
 
-1. 任何一个容器都可以指定为 flex 布局：`div.box {display: flex;}`
+## 2. Flex 布局语法
 
-2. 行元素也可以指定为 flex 布局：`a.local-nav {display: inline-flex;}`
+1. 任何一个容器都可以指定为 Flex 布局：`div.box {display: Flex;}`
+
+2. 行元素也可以指定为 Flex 布局：`a.local-nav {display: inline-flex;}`
 
 3. 设为 Flex 布局以后，子元素的 float、clear 和 vertical-align 属性将失效。
 
-##、 3. 基本概念
+## 3. 基本概念
 
-1. 采用 Flex 布局的元素，称为 Flex 容器（flex container），简称"容器"。它的所有子元素自动成为容器成员，称为 Flex 项目（flex item），简称"项目"。  
+1. 采用 Flex 布局的元素，称为 Flex 容器（Flex container），简称"容器"。它的所有子元素自动成为容器成员，称为 Flex 项目（Flex item），简称"项目"。  
 ![](img/flex布局说明.png)  
 
 2. 容器默认存在两个轴线，水平方向的轴线和垂直方的轴线。默认情况下，水平方向的轴线被称为主轴（main axis），从左向右，垂直方向的轴线叫做侧轴（cross axis），从上到下。主轴的起始位置被称为main start，结束位置被称为 main end。侧轴起始位置被称为 cross start，结束位置被称为 cross end。
@@ -36,6 +39,7 @@
 3. 项目默认沿主轴排列。单个项目占据的主轴空间叫做 main size，占据的交叉轴空间叫做 cross size。
 
 ## 4. 容器属性
+
 1. 容器属性一共有 6 个，分别是：
    - flex-direction
    - flex-wrap
