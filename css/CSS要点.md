@@ -21,6 +21,7 @@
     - [1. clear 属性](#1-clear-%E5%B1%9E%E6%80%A7)
     - [2. overflow 属性](#2-overflow-%E5%B1%9E%E6%80%A7)
     - [3. 伪元素](#3-%E4%BC%AA%E5%85%83%E7%B4%A0)
+    - [4. 设置元素浮动后，该元素的 display 值是多少？](#4-%E8%AE%BE%E7%BD%AE%E5%85%83%E7%B4%A0%E6%B5%AE%E5%8A%A8%E5%90%8E%E8%AF%A5%E5%85%83%E7%B4%A0%E7%9A%84-display-%E5%80%BC%E6%98%AF%E5%A4%9A%E5%B0%91)
   - [6. BFC](#6-bfc)
   - [7. 常用单位](#7-%E5%B8%B8%E7%94%A8%E5%8D%95%E4%BD%8D)
     - [1. px](#1-px)
@@ -47,7 +48,26 @@
     - [1. relative](#1-relative)
     - [2. absolute](#2-absolute)
     - [3. fixed](#3-fixed)
-  - [12. 可继承的属性](#12-%E5%8F%AF%E7%BB%A7%E6%89%BF%E7%9A%84%E5%B1%9E%E6%80%A7)
+    - [4. 使用 absolute 模拟 fixed 定位效果](#4-%E4%BD%BF%E7%94%A8-absolute-%E6%A8%A1%E6%8B%9F-fixed-%E5%AE%9A%E4%BD%8D%E6%95%88%E6%9E%9C)
+  - [12. 行内元素与块级元素](#12-%E8%A1%8C%E5%86%85%E5%85%83%E7%B4%A0%E4%B8%8E%E5%9D%97%E7%BA%A7%E5%85%83%E7%B4%A0)
+  - [13. 元素的显示方式 - display](#13-%E5%85%83%E7%B4%A0%E7%9A%84%E6%98%BE%E7%A4%BA%E6%96%B9%E5%BC%8F---display)
+    - [1. block](#1-block)
+    - [2. inline](#2-inline)
+    - [3. inline-block](#3-inline-block)
+    - [4. flex](#4-flex)
+    - [5. none](#5-none)
+    - [6. `display: none;` 与 `visibility: hidden;` 的区别](#6-display-none-%E4%B8%8E-visibility-hidden-%E7%9A%84%E5%8C%BA%E5%88%AB)
+  - [14. 元素的溢出属性 - overflow](#14-%E5%85%83%E7%B4%A0%E7%9A%84%E6%BA%A2%E5%87%BA%E5%B1%9E%E6%80%A7---overflow)
+    - [1. scroll](#1-scroll)
+    - [2. auto](#2-auto)
+    - [3. visible](#3-visible)
+    - [4. hidden](#4-hidden)
+  - [15. 可继承的属性](#15-%E5%8F%AF%E7%BB%A7%E6%89%BF%E7%9A%84%E5%B1%9E%E6%80%A7)
+  - [16. CSS 实现一个三角形](#16-css-%E5%AE%9E%E7%8E%B0%E4%B8%80%E4%B8%AA%E4%B8%89%E8%A7%92%E5%BD%A2)
+  - [17. 使用 padding 与 margin 的时机](#17-%E4%BD%BF%E7%94%A8-padding-%E4%B8%8E-margin-%E7%9A%84%E6%97%B6%E6%9C%BA)
+  - [18. 浏览器是怎样解析 CSS 选择器的？](#18-%E6%B5%8F%E8%A7%88%E5%99%A8%E6%98%AF%E6%80%8E%E6%A0%B7%E8%A7%A3%E6%9E%90-css-%E9%80%89%E6%8B%A9%E5%99%A8%E7%9A%84)
+  - [19. 如果需要手动写动画，你认为最小时间间隔是多久，为什么？](#19-%E5%A6%82%E6%9E%9C%E9%9C%80%E8%A6%81%E6%89%8B%E5%8A%A8%E5%86%99%E5%8A%A8%E7%94%BB%E4%BD%A0%E8%AE%A4%E4%B8%BA%E6%9C%80%E5%B0%8F%E6%97%B6%E9%97%B4%E9%97%B4%E9%9A%94%E6%98%AF%E5%A4%9A%E4%B9%85%E4%B8%BA%E4%BB%80%E4%B9%88)
+  - [20. CSS 引入的方式有哪些？使用 `Link` 和 `@import` 有什么区别](#20-css-%E5%BC%95%E5%85%A5%E7%9A%84%E6%96%B9%E5%BC%8F%E6%9C%89%E5%93%AA%E4%BA%9B%E4%BD%BF%E7%94%A8-link-%E5%92%8C-import-%E6%9C%89%E4%BB%80%E4%B9%88%E5%8C%BA%E5%88%AB)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -266,6 +286,12 @@
            visibility: hiden;
       }
    ```
+   clearfix 是包含浮动元素的的父元素。
+
+### 4. 设置元素浮动后，该元素的 display 值是多少？
+
+1. 自动变成 `display:block;`
+
 ## 6. BFC
 
 ## 7. 常用单位
@@ -786,20 +812,204 @@
    7. 必须将 html 和 body 的 `padding` 和 `margin` 值清零，否则会出现不能填满浏览器的现象，且 `html` 和 `body` 不能设宽度，即使设置`width: 100%` 也会出问题，ie6 右边会有一部分空白无法填满浏览器。
  
  5. 总结：设置 html 的 overflow 属性为 hidden，禁止了 body 元素出现滚动。同时让 body 元素充满整个窗口。则相对于 body 元素进行绝对定位的元素就不会移动了。后面即使出现滚动条，也是 body 下的其他元素的。
-## 12. 可继承的属性
+
+## 12. 行内元素与块级元素
+
+1. 块级元素的 display 属性为 block，具备如下特性：
+   - 可以设置宽高
+   - 文档流中独占一行
+   - 外边距设置生效
+
+2. 常见的块级元素：
+   - 网页、框架等基本结构块：html、body、iframe
+   - 网页标题块：title
+   - 表单结构块：form、fieldset、legend
+   - 布局结构块：div
+   - 标题段落结构块：h1~h6、p
+   - 列表结构块：dl、dt、dd、ul、ol
+   - 结构装饰块：hr
+
+3. 行内元素的 display 属性为 inline，具备如下特性：
+   - 默认由内容撑开宽高，与其他行元素能够处在同一行
+   - 不能够设置宽高（换句话说，设置宽高也无效）
+   - 纵向外边距失效，横向外边距生效
+
+4. 常见的行内元素：
+   - 行内包含框：span
+   - 超链接：a
+   - 图像：img
+   - 各类文本修饰类标签：abbr、acronym、b、bdo、big、cite、code、del、dfn、em、i、ins、kbn、q、s、samp、small、strike、strong、sub、sup、tt、u、var等
+   - 表单对象包含框：select、button、label、textarea
+   - 可执行对象包含框：object
+
+
+## 13. 元素的显示方式 - display
+
+### 1. block
+
+1. 块级元素的默认属性值。
+
+2. 可以将一个元素设置为块级元素。 
+
+3. 设置这个属性值以后，元素具备块级元素的特性。
+
+### 2. inline
+
+1. 行内元素的默认属性值。
+
+2. 可以将一个元素设置为行内元素。 
+
+3. 设置这个属性值以后，元素具备行内元素的特性。
+
+### 3. inline-block
+
+1. 将元素编程行内的块级元素。
+
+2. 与其他元素能处在同一行。
+
+3. 可以设置元素的宽高。
+
+### 4. flex
+
+1. 将这个元素（容器）设置为 flex 布局，该元素内部的项目按照 flex 布局的方式进行布局。
+
+### 5. none
+
+1. 用于隐藏元素。
+2. 设置了这个属性值以后，元素不会在文档流中出现。
+
+### 6. `display: none;` 与 `visibility: hidden;` 的区别
+
+1. 二者都是用于将元素隐藏。
+
+2. `display: none;` 不仅将元素隐藏，而且在文档流中不会出现这个元素，因此不会占据页面中的位置。
+
+3. `visibility: hidden;` 仅仅是将元素隐藏，在视觉上看不见，但是依然会出现在文档流中。页面中也会保留其占据的位置。
+
+## 14. 元素的溢出属性 - overflow
+
+### 1. scroll
+
+1. 参数是 scroll 时候，必会出现滚动条。
+
+### 2. auto
+
+1. 参数是 auto 时候，子元素内容大于父元素时出现滚动条。
+
+### 3. visible
+
+1. 参数是 visible 时候，溢出的内容出现在父元素之外。
+
+### 4. hidden
+
+1. 参数是 hidden 时候，溢出隐藏。
+
+2. 可以触发元素的 BFC。
+
+## 15. 可继承的属性
 
 1. 每一个属性在定义中都给出了这个属性是否具有继承性，一个具有继承性的属性会在没有指定值的时候，会使用父元素的同属性的值来作为自己的值。
 
 2. 字体相关的属性，`font-size` 和 `font-weight` 等。
+
 3. 文本相关的属性，`color` 和 `text-align` 等。
+
 4. 表格的一些布局属性、列表属性如 `list-style` 等。
+
 5. 光标属性 `cursor`、元素可见性 `visibility`。
+
 6. 当一个属性不是继承属性的时候，我们也可以通过将它的值设置为 `inherit`来使它从父元素那获取同名的属性值来继承。
 
+## 16. CSS 实现一个三角形
+
+1. 原理：相邻的 border 是以 45° 为分隔的，如下图所示：
+   ![](./img/border-triangle.png)
+
+2. 更详细的说明如下图所示：
+   ![](./img/border-ins.png)
+
+3. border 与不同的 width：
+   ![](./img/border-width-height.png)
+
+4. 设置元素的宽高均为 0，然后将 border 设置的宽一些，根据需要，将不同方向的 border 的颜色设置为 transparent（透明）。
+
+5. 示例 - 基础的三角形
+   ```css
+      .content {
+          width: 0px;
+          border-top: 35px transparent solid;
+          border-right: 35px transparent solid;
+          border-bottom: 35px pink solid;
+          border-left: 35px transparent solid;
+      }
+   ```
+   效果：
+   ![](./img/border-triangle-base.png)
+
+6. 示例 - 直角三角形
+   ```css
+      .content {
+          width: 0px;
+          border-top: 35px transparent solid;
+          border-right: 35px transparent solid;
+          border-bottom: 35px pink solid;
+          border-left: 35px pink solid;
+      }
+   ```
+   效果：
+   ![](./img/border-right-triangle.png)
+
+7. 示例 - 等边三角形
+   - 显示部分的宽度 = transparent部分的宽度 * √3
+   - css 代码：
+     ```css
+        .content {
+          width: 0px;
+          border-top: 35px transparent solid;
+          border-right: 35px transparent solid;
+          border-bottom: 35px pink solid;
+          border-left: 35px pink solid;
+      }
+     ```
+   - 效果：
+     ![](./img/border-equilateral-triangle.png)
 
 
+## 17. 使用 padding 与 margin 的时机
+
+1. 何时应当使用margin
+   - 需要在border外侧添加空白时。
+   - 空白处不需要背景（色）时。
+   - 上下相连的两个盒子之间的空白，需要相互抵消时。如 15px + 20px 的margin，将得到 20px 的空白。
+
+2. 何时应当时用padding
+   - 需要在border内测添加空白时。
+   - 空白处需要背景（色）时。
+   - 上下相连的两个盒子之间的空白，希望等于两者之和时。如 15px + 20px 的 padding，将得到 35px 的空白。
 
 
+## 18. 浏览器是怎样解析 CSS 选择器的？
 
+1. CSS选择器的解析是从右向左解析的，为了避免对所有元素进行遍历。若从左向右的匹配，发现不符合规则，需要进行回溯，会损失很多性能。若从右向左匹配，先找到所有的最右节点，对于每一个节点，向上寻找其父节点直到找到根元素或满足条件的匹配规则，则结束这个分支的遍历。两种匹配规则的性能差别很大，是因为从右向左的匹配在第一步就筛选掉了大量的不符合条件的最右节点（叶子节点），而从左向右的匹配规则的性能都浪费在了失败的查找上面。
+
+2. 在 CSS 解析完毕后，需要将解析的结果与 DOM Tree 的内容一起进行分析建立一棵 Render Tree，最终用来进行绘图。在建立 Render Tree 时（WebKit 中的「Attachment」过程），浏览器就要为每个 DOM Tree 中的元素根据 CSS 的解析结果（Style Rules）来确定生成怎样的 Render Tree。
+
+## 19. 如果需要手动写动画，你认为最小时间间隔是多久，为什么？
+
+1. 多数显示器默认频率是 60Hz，即 1 秒刷新 60 次，所以理论上最小间隔为 1/60＊1000ms ＝ 16.7ms。
+
+## 20. CSS 引入的方式有哪些？使用 `Link` 和 `@import` 有什么区别
+
+1. 引入的方式
+   - 内联：标签的 `style` 属性
+   - 内嵌：`<style></style>`
+   - 外链: `<link rel="stylesheet" href="">`
+   - 导入: `@import`
+
+2. `link` 属于 XHTML 标签，除了加载 CSS 外，还能用于定义 RSS，定义 rel 连接属性等作用，无兼容性，支持使用 javascript 改变样式；而 `@import` 是 CSS 提供的，只能用于加载 CSS，不支持使用 javascript 改变样式。
+
+3. 页面被加载的时，`link` 会被同时加载，而 `@import` 引用的 CSS 会等到页面加载完再加载。
+
+4. `@import` 是 CSS2.1 提出的，CSS2.1 以下浏览器不支持，只在IE5以上才能被识别，而 `link` 是 XHTML 标签，无兼容问题。
 
 
