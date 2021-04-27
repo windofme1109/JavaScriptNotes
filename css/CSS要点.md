@@ -1006,10 +1006,11 @@
    - 外链: `<link rel="stylesheet" href="">`
    - 导入: `@import`
 
-2. `link` 属于 XHTML 标签，除了加载 CSS 外，还能用于定义 RSS，定义 rel 连接属性等作用，无兼容性，支持使用 javascript 改变样式；而 `@import` 是 CSS 提供的，只能用于加载 CSS，不支持使用 javascript 改变样式。
+2.  `Link` 和 `@import` 的区别
+    - 作用上：`link` 属于 XHTML 标签，除了加载 CSS 外，还能用于定义 RSS，定义 rel 连接属性等作用，无兼容性，支持使用 javascript 改变样式；而 `@import` 是 CSS 提供的，只能用于加载 CSS，不支持使用 javascript 改变样式。
 
-3. 页面被加载的时，`link` 会被同时加载，而 `@import` 引用的 CSS 会等到页面加载完再加载。
+   - 加载顺序上：页面被加载的时，`link` 会被同时加载，而 `@import` 引用的 CSS 会等到页面加载完再加载。
 
-4. `@import` 是 CSS2.1 提出的，CSS2.1 以下浏览器不支持，只在IE5以上才能被识别，而 `link` 是 XHTML 标签，无兼容问题。
+   - 兼容性上：`@import` 是 CSS2.1 提出的，CSS2.1 以下浏览器不支持，只在IE5以上才能被识别，而 `link` 是 XHTML 标签，无兼容问题。
 
 
