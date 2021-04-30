@@ -76,3 +76,37 @@
 
 3. ctrl+F5 强制刷新
    - 跳过强缓存和协商缓存，直接从服务器拉取资源。浏览器不仅会对本地文件过期，而且不会带上 `If-Modifed-Since`，`If-None-Match`，相当于之前从来没有请求过，返回结果是 200。
+
+## 5. 浏览器设置不缓存
+
+1. 对 `Cache-Control` 进行设置：
+   `Cache-Control: no-cache, no-store, must-revalidate`
+
+2. 不使用 js 、css 等资源的缓存
+   - 在前端工程化的构建过程中，我们给资源名称附加上 MD5，这样资源发生变化，MD5 也跟着发生变化。这样嵌入在 html 页面中资源的名称也会跟着变化。对于浏览器而言，url变了，则需要重新请求资源。这样就实现了浏览器在缓存未过期的情况下请求最新的资源。
+   `<link href="./css/style.4e3far45.css">`
+
+3. 设置html页面不让浏览器缓存
+   ```html
+      <meta http-equiv="pragma" content="no-cache"> 
+      <meta http-equiv="Cache-Control" content="no-cache, must-revalidate"> 
+      <meta http-equiv="expires" content="Wed, 26 Feb 1997 00:00:00 GMT">
+   ```
+## 6. 缓存与状态码
+
+1. 缓存与状态码的关系如下图所示：
+
+   状态码|缓存类型|说明
+   :---:|:---:|:---:
+    200 | from memory cache | 不请求网络资源，资源在内存中，一般脚本、字体、图片会缓存在内存中 
+    200|from disk cache | 不请求网络资源，资源在磁盘中，一般非脚本资源会缓存在磁盘中，如 css
+    200|资源大小数值|从服务器下载最新的资源
+    304|报文大小|请求服务器发现资源没有更新，使用本地缓存
+
+## 7. 浏览器使用缓存的流程
+
+1. 第一次请求资源
+   ![](./img/缓存-1.png)
+
+2. 第二次及后面的请求
+   ![](./img/browser-cache.png)
