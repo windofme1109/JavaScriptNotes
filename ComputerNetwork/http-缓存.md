@@ -1,3 +1,20 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [http - 缓存](#http---%E7%BC%93%E5%AD%98)
+  - [1. 参考资料](#1-%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99)
+  - [2. 与缓存相关的请求头中的参数](#2-%E4%B8%8E%E7%BC%93%E5%AD%98%E7%9B%B8%E5%85%B3%E7%9A%84%E8%AF%B7%E6%B1%82%E5%A4%B4%E4%B8%AD%E7%9A%84%E5%8F%82%E6%95%B0)
+  - [3. 强缓存](#3-%E5%BC%BA%E7%BC%93%E5%AD%98)
+  - [4. 协商缓存](#4-%E5%8D%8F%E5%95%86%E7%BC%93%E5%AD%98)
+  - [5. 浏览器请求缓存过程](#5-%E6%B5%8F%E8%A7%88%E5%99%A8%E8%AF%B7%E6%B1%82%E7%BC%93%E5%AD%98%E8%BF%87%E7%A8%8B)
+  - [6. 用户行为对浏览器缓存的控制](#6-%E7%94%A8%E6%88%B7%E8%A1%8C%E4%B8%BA%E5%AF%B9%E6%B5%8F%E8%A7%88%E5%99%A8%E7%BC%93%E5%AD%98%E7%9A%84%E6%8E%A7%E5%88%B6)
+  - [7. 浏览器设置不缓存](#7-%E6%B5%8F%E8%A7%88%E5%99%A8%E8%AE%BE%E7%BD%AE%E4%B8%8D%E7%BC%93%E5%AD%98)
+  - [8. 缓存与状态码](#8-%E7%BC%93%E5%AD%98%E4%B8%8E%E7%8A%B6%E6%80%81%E7%A0%81)
+  - [9. 浏览器使用缓存的流程](#9-%E6%B5%8F%E8%A7%88%E5%99%A8%E4%BD%BF%E7%94%A8%E7%BC%93%E5%AD%98%E7%9A%84%E6%B5%81%E7%A8%8B)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # http - 缓存
 
 ## 1. 参考资料
@@ -54,7 +71,7 @@
    - 在性能上，`Etag` 要逊于 `Last-Modified`，毕竟 `Last-Modified` 只需要记录时间，而 `Etag` 需要服务器通过算法来计算出一个 hash 值。
    - 在优先级上，服务器校验优先考虑 `Etag`。
 
-## 3. 浏览器请求缓存过程
+## 5. 浏览器请求缓存过程
 
 1. 浏览器第一次加载资源，服务器返回200，浏览器将资源文件从服务器上请求下载下来，并把请求头（包括 `Etag`、`Last-Modified`）及该请求的返回时间(要与 `Cache-Control`和 `Expires` 对比)一并缓存。
 
@@ -66,7 +83,7 @@
 
 5. 如果服务器收到的请求没有 `if-None-Match` 值，则将 `If-Modified-Since` 和被请求文件的最后修改时间做比对，一致则命中协商缓存，返回 304；不一致则返回新的 `last-modified` 和文件并返回 200。
 
-## 4. 用户行为对浏览器缓存的控制
+## 6. 用户行为对浏览器缓存的控制
 
 1. 地址栏访问
    - 链接跳转是正常用户行为，将会触发浏览器缓存机制。浏览器发起请求，按照正常流程，本地检查是否过期，或者服务器检查新鲜度，最后返回内容。
@@ -77,7 +94,7 @@
 3. ctrl+F5 强制刷新
    - 跳过强缓存和协商缓存，直接从服务器拉取资源。浏览器不仅会对本地文件过期，而且不会带上 `If-Modifed-Since`，`If-None-Match`，相当于之前从来没有请求过，返回结果是 200。
 
-## 5. 浏览器设置不缓存
+## 7. 浏览器设置不缓存
 
 1. 对 `Cache-Control` 进行设置：
    `Cache-Control: no-cache, no-store, must-revalidate`
@@ -92,7 +109,8 @@
       <meta http-equiv="Cache-Control" content="no-cache, must-revalidate"> 
       <meta http-equiv="expires" content="Wed, 26 Feb 1997 00:00:00 GMT">
    ```
-## 6. 缓存与状态码
+
+## 8. 缓存与状态码
 
 1. 缓存与状态码的关系如下图所示：
 
@@ -103,7 +121,7 @@
     200|资源大小数值|从服务器下载最新的资源
     304|报文大小|请求服务器发现资源没有更新，使用本地缓存
 
-## 7. 浏览器使用缓存的流程
+## 9. 浏览器使用缓存的流程
 
 1. 第一次请求资源
    ![](./img/缓存-1.png)

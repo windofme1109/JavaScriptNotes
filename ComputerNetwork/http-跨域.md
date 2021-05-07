@@ -1,3 +1,18 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [http - 跨域](#http---%E8%B7%A8%E5%9F%9F)
+  - [1. 基本说明](#1-%E5%9F%BA%E6%9C%AC%E8%AF%B4%E6%98%8E)
+  - [2. jsonp](#2-jsonp)
+  - [2. CORS](#2-cors)
+    - [1. 基本说明](#1-%E5%9F%BA%E6%9C%AC%E8%AF%B4%E6%98%8E-1)
+    - [2. CORS 预请求 - 简单请求](#2-cors-%E9%A2%84%E8%AF%B7%E6%B1%82---%E7%AE%80%E5%8D%95%E8%AF%B7%E6%B1%82)
+    - [3. CORS 预请求 - 非简单请求](#3-cors-%E9%A2%84%E8%AF%B7%E6%B1%82---%E9%9D%9E%E7%AE%80%E5%8D%95%E8%AF%B7%E6%B1%82)
+  - [3. postMessage](#3-postmessage)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # http - 跨域
 
 ## 1. 基本说明
@@ -14,7 +29,7 @@
    - [html5 postMessage解决跨域、跨窗口消息传递](https://www.cnblogs.com/dolphinX/p/3464056.html)
    - []()
     
-## 1. jsonp
+## 2. jsonp
 
 1. jsonp 是 JSON with Padding 的简称。所谓的 Padding，就是将 JSON 格式的数据放到被调用的函数中。形成一段可执行的 js 代码。
 
@@ -52,14 +67,15 @@
 ## 2. CORS
 
 ### 1. 基本说明
+
 1. CORS 是 Cross-Origin Resource Sharing 的缩写，意思是跨域资源共享，定义了必须在访问跨域资源时，浏览器与服务器应该如何沟通。CORS 背后的基本思想就是使用自定义的 HTTP 头部让浏览器与服务器进行沟通，从而决定请求或响应是应该成功还是失败。
 
-2. 浏览器端，在请求头中加入一个origin字段，表示源信息，例如：`Origin: http://localhost:8888`。
+2. 浏览器端，在请求头中加入一个 origin 字段，表示源信息，例如：`Origin: http://localhost:8888`。
 
-3. 服务器端，在响应头中添加 `Access-Control-Allow-Origin` 字段，值或者为 `*`，或者一个源信息。例如：`Access-Control-Allow-Origin: '*'` 或者`Access-Control-Allow-Origin: 'http://localhost:8888'`
+3. 服务器端，在响应头中添加 `Access-Control-Allow-Origin` 字段，值或者为 `*`，或者一个源信息。例如：`Access-Control-Allow-Origin: '*'` 或者 `Access-Control-Allow-Origin: 'http://localhost:8888'`。
 
 4. 浏览器会根据响应头中的 `Access-Control-Allow-Origin` 这个字段来决定是否禁止这次请求：
-   - 如果是*或者和请求头中 `Origin` 字段的源信息相同，则接收这个响应。
+   - 如果是 `*` 或者和请求头中 `Origin` 字段的源信息相同，则接收这个响应。
    - 如果没有这个字段，或者是其他源信息，则禁止这次响应。
 
 ### 2. CORS 预请求 - 简单请求
@@ -69,7 +85,7 @@
       - GET
       - POST
       - HEAD
-   2. HTTP的头信息不超出以下几种字段：
+   2. HTTP 的头信息不超出以下几种字段：
      - Accept
      - Accept-Language
      - Content-Language
@@ -95,7 +111,7 @@
    - Access-Control-Expose-Headers  
      该字段可选。CORS 请求时，XMLHttpRequest 对象的 getResponseHeader() 方法只能拿到 6 个基本字段：Cache-Control、Content-Language、Content-Type、Expires、Last-Modified、Pragma。如果想拿到其他字段，就必须在Access-Control-Expose-Headers 里面指定。上面的例子指定，getResponseHeader('FooBar')可以返回 FooBar 字段的值。
 
-4. CORS请求默认不发送 Cookie 和 HTTP 认证信息。如果要把Cookie发到服务器，一方面要服务器同意，指定 Access-Control-Allow-Credentials 字段。 
+4. CORS 请求默认不发送 Cookie 和 HTTP 认证信息。如果要把Cookie 发到服务器，一方面要服务器同意，指定 Access-Control-Allow-Credentials 字段。 
 `Access-Control-Allow-Credentials: true`。
 
 5. 另一方面，开发者必须在 AJAX 请求中打开 withCredentials 属性。
@@ -109,13 +125,13 @@
 
 7. 需要注意的是，如果要发送 Cookie，Access-Control-Allow-Origin 就不能设为星号，必须指定明确的、与请求网页一致的域名。同时，Cookie 依然遵循同源政策，只有用服务器域名设置的 Cookie 才会上传，其他域名的 Cookie 并不会上传，且（跨源）原网页代码中的 document.cookie 也无法读取服务器域名下的 Cookie。  
  
-### 2. CORS 预请求 - 非简单请求   
+### 3. CORS 预请求 - 非简单请求   
   
-1. 请求信息不满足以上的两个条件，就是非简单请求。非简单请求是那种对服务器有特殊要求的请求，比如请求方法是PUT或DELETE，或者Content-Type字段的类型是application/json。  
+1. 请求信息不满足以上的两个条件，就是非简单请求。非简单请求是那种对服务器有特殊要求的请求，比如请求方法是 PUT 或 DELETE，或者 Content-Type 字段的类型是 application/json。  
 
-2. 非简单请求的CORS请求，会在正式通信之前，增加一次HTTP查询请求，称为"预检"请求（preflight）。  
+2. 非简单请求的CORS请求，会在正式通信之前，增加一次HTTP查询请求，称为“预检”请求（preflight）。  
 
-3. 浏览器先询问服务器，当前网页所在的域名是否在服务器的许可名单之中，以及可以使用哪些HTTP请求方法和头信息字段。只有得到肯定答复，浏览器才会发出正式的XMLHttpRequest请求，否则就报错。例如，使用fetch方法发送一个请求，并自定义头部信息。
+3. 浏览器先询问服务器，当前网页所在的域名是否在服务器的许可名单之中，以及可以使用哪些 HTTP 请求方法和头信息字段。只有得到肯定答复，浏览器才会发出正式的 XMLHttpRequest 请求，否则就报错。例如，使用 fetch 方法发送一个请求，并自定义头部信息。
     ```javascript
          fetch('http://localhost:3000', {
              // 设置请求方法
@@ -140,7 +156,7 @@
 
 5. 这个预请求的方法是 Options，表示这个请求是用来询问的。头信息里面，关键字段是 Origin，表示请求来自哪个源。 除了 Origin 字段，"预检"请求的头信息包括两个特殊字段。
     - Access-Control-Request-Method  
-      该字段是必须的，用来列出浏览器的CORS请求会用到哪些HTTP方法，上例是POST。
+      该字段是必须的，用来列出浏览器的 CORS 请求会用到哪些 HTTP 方法，上例是 POST。
     - Access-Control-Request-Headers  
       该字段是一个逗号分隔的字符串，指定浏览器 CORS 请求会额外发送的头信息字段，上例是 X-Test-Cors。
 
@@ -153,7 +169,7 @@
          Date: Wed, 16 Oct 2019 03:44:05 GMT
          Transfer-Encoding: chunked
     ```
-7. 在上面的响应头中，关键的是Access-Control-Allow-Origin字段，表示http://localhost:8888可以请求数据。该字段也可以设为星号，表示同意任意跨源请求。即`Access-Control-Allow-Origin: *`。服务器回应的其他CORS相关字段如下：
+7. 在上面的响应头中，关键的是 Access-Control-Allow-Origin 字段，表示 http://localhost:8888 可以请求数据。该字段也可以设为星号，表示同意任意跨源请求。即 `Access-Control-Allow-Origin: *`。服务器回应的其他 CORS 相关字段如下：
     ```javascript
         Access-Control-Allow-Headers: X-Test-Cors
         Access-Control-Allow-Methods: PUT, DELETE, DELETE
@@ -164,13 +180,13 @@
    - Access-Control-Allow-Methods   
     该字段必需，它的值是逗号分隔的一个字符串，表明服务器支持的所有跨域请求的方法。注意，返回的是所有支持的方法，而不单是浏览器请求的那个方法。这是为了避免多次"预检"请求。
   - Access-Control-Allow-Headers  
-    如果浏览器请求包括Access-Control-Request-Headers字段，则Access-Control-Allow-Headers字段是必需的。它也是一个逗号分隔的字符串，表明服务器支持的所有头信息字段，不限于浏览器在"预检"中请求的字段。
+    如果浏览器请求包括 Access-Control-Request-Headers 字段，则 Access-Control-Allow-Headers 字段是必需的。它也是一个逗号分隔的字符串，表明服务器支持的所有头信息字段，不限于浏览器在"预检"中请求的字段。
   - Access-Control-Allow-Credentials    
     该字段与简单请求时的含义相同。
   - Access-Control-Allow-Max-Age    
-    该字段可选，用来指定本次预检请求的有效期，单位为秒。上面结果中，有效期是20天（1728000秒），即允许缓存该条回应1728000秒（即20天），在此期间，不用发出另一条预检请求。
+    该字段可选，用来指定本次预检请求的有效期，单位为秒。上面结果中，有效期是 20 天（1728000秒），即允许缓存该条回应 1728000 秒（即20天），在此期间，不用发出另一条预检请求。
 
-8. 一旦服务器通过了"预检"请求，以后每次浏览器正常的CORS请求，就都跟简单请求一样，会有一个Origin头信息字段。服务器的回应，也都会有一个Access-Control-Allow-Origin头信息字段。
+8. 一旦服务器通过了“预检”请求，以后每次浏览器正常的 CORS 请求，就都跟简单请求一样，会有一个 Origin 头信息字段。服务器的回应，也都会有一个 Access-Control-Allow-Origin 头信息字段。
 
 9. 经过“预检”之后，浏览器的正常 CORS 请求如下：
    ```javascript
@@ -180,8 +196,8 @@
        User-Agent: Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.87 Safari/537.36
        X-Test-Cors: 123
    ```
-   上面头信息的Origin字段是浏览器自动添加的。  
-   同预检的请求头相比，没有了Access-Control-Request-Headers、Access-Control-Request-Methods和Access-Control-Allow-Origin。
+   上面头信息的 Origin 字段是浏览器自动添加的。  
+   同预检的请求头相比，没有了 Access-Control-Request-Headers、Access-Control-Request-Methods 和 Access-Control-Allow-Origin。
 
 10. 而服务器的回应是这样的：
     ```javascript
@@ -207,7 +223,7 @@
    - message
      将要发送到其他 window 的数据。它将会被结构化克隆算法序列化。这意味着你可以不受什么限制的将数据对象安全的传送给目标窗口而无需自己序列化。
    - targetOrigin
-     通过窗口的 `origin` 属性来指定哪些窗口能接收到消息事件，其值可以是字符串 `*`（表示无限制）或者一个URI。在发送消息的时候，如果目标窗口的协议、主机地址或端口这三者的任意一项不匹配targetOrigin提供的值，那么消息就不会被发送；只有三者完全匹配，消息才会被发送。这个机制用来控制消息可以发送到哪些窗口；例如，当用 postMessage 传送密码时，这个参数就显得尤为重要，必须保证它的值与这条包含密码的信息的预期接受者的 `origin` 属性完全一致，来防止密码被恶意的第三方截获。如果你明确的知道消息应该发送到哪个窗口，那么请始终提供一个有确切值的targetOrigin，而不是 `*` 。不提供确切的目标将导致数据泄露到任何对数据感兴趣的恶意站点。
+     通过窗口的 `origin` 属性来指定哪些窗口能接收到消息事件，其值可以是字符串 `*`（表示无限制）或者一个 URI。在发送消息的时候，如果目标窗口的协议、主机地址或端口这三者的任意一项不匹配 targetOrigin 提供的值，那么消息就不会被发送；只有三者完全匹配，消息才会被发送。这个机制用来控制消息可以发送到哪些窗口；例如，当用 postMessage 传送密码时，这个参数就显得尤为重要，必须保证它的值与这条包含密码的信息的预期接受者的 `origin` 属性完全一致，来防止密码被恶意的第三方截获。如果你明确的知道消息应该发送到哪个窗口，那么请始终提供一个有确切值的 targetOrigin，而不是 `*` 。不提供确切的目标将导致数据泄露到任何对数据感兴趣的恶意站点。
    - transfer 可选
      是一串和 message 同时传递的 Transferable 对象. 这些对象的所有权将被转移给消息的接收方，而发送一方将不再保有所有权。
 
@@ -224,7 +240,7 @@
    ```
    messageEvent 中比较重要的几个属性有：
    - origin
-     调用 postMessage  时消息发送方窗口的 origin . 这个字符串由 `协议://域名: 端口号` 拼接而成。例如 `https://example.org` (隐含端口 443)、`http://example.net` (隐含端口 80)、`http://example.com:8080`。请注意，这个 `origin` 不能保证是该窗口的当前或未来 `origin`，因为 `postMessage` 被调用后可能被导航到不同的位置。
+     调用 postMessage 时消息发送方窗口的 origin。这个字符串由 `协议://域名: 端口号` 拼接而成。例如 `https://example.org` (隐含端口 443)、`http://example.net` (隐含端口 80)、`http://example.com:8080`。请注意，这个 `origin` 不能保证是该窗口的当前或未来 `origin`，因为 `postMessage` 被调用后可能被导航到不同的位置。
    - data
      从其他 window 中传递过来的数据对象
    - source
