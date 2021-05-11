@@ -67,11 +67,11 @@
 
 3. GET 能被缓存，POST 不能缓存 。
 
-4. GET 编码类型：`application/x-www-form-urlencode`，POST 编码类型`application/x-www-form-urlencoded` 或 `multipart/form-data`。为二进制数据使用多重编码。
+4. GET 编码类型：`application/x-www-form-urlencode`，POST 编码类型：`application/x-www-form-urlencoded` 或 `multipart/form-data`。为二进制数据使用多重编码。
 
 5. GET 历史参数保留在浏览器历史中。POST 参数不会保存在浏览器历史中。
 
-6. GET 对数据长度有限制，当发送数据时，GET 方法向 URL 添加数据；URL 的长度是受限制的（URL 的最大长度是 2048 个字符）。POST 无限制。GET 只允许 ASCII 字符。POST没有限制。也允许二进制数据。与 POST 相比，GET 的安全性较差，因为所发送的数据是 URL 的一部分。在发送密码或其他敏感信息时绝不要使用 GET。
+6. GET 对数据长度有限制，当发送数据时，GET 方法向 URL 添加数据；URL 的长度是受限制的（URL 的最大长度是 2048 个字符，这个长度是浏览器限制的）。POST 无限制。GET 只允许 ASCII 字符。非 ASCII 字符要进行编码转换。POST 没有限制，也允许二进制数据。与 POST 相比，GET 的安全性较差，因为所发送的数据是 URL 的一部分。在发送密码或其他敏感信息时绝不要使用 GET。
 
 7. GET 请求将发送的数据放到 url 中，以 `?` 开头的，使用 `key=value` 的形式表示键值对，多个键值对使用 `&` 连接。例如：`http://www.text.com/index.html?name=curry&age=25`。POST 请求将数据放到请求体中，编码方式多样，如 json，二进制数据等。
 
