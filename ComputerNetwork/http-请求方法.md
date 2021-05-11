@@ -61,23 +61,27 @@
 
 ### 1. 使用上的区别
 
-1. GET 后退按钮/刷新无害，POST 数据会被重新提交（浏览器应该告知用户数据会被重新提交）。
+1. 参数长度
+   - GET 对数据长度有限制，当发送数据时，GET 方法向 URL 添加数据；URL 的长度是受限制的（URL 的最大长度是 2048 个字符，这个长度是浏览器限制的）。
+   -POST 对数据长度无限制。
 
-2. GET 书签可收藏，POST 为书签不可收藏。
+2. 编码类型
+   - GET 只允许 ASCII 字符。非 ASCII 字符要进行编码转换。GET 请求的 content-type 通常是 `application/x-www-form-urlencode`
+   - POST 没有限制，也允许二进制数据。编码类型：`application/x-www-form-urlencoded` 、 `multipart/form-data`、`application/json` 或者 `application/xml`。为二进制数据使用多重编码。
 
-3. GET 能被缓存，POST 不能缓存 。
+3. 数据形式
+   - GET 请求将发送的数据放到 url 中，以 `?` 开头的，使用 `key=value` 的形式表示键值对，多个键值对使用 `&` 连接。例如：`http://www.text.com/index.html?name=curry&age=25`。
+   - POST 请求将数据放到请求体中，编码方式多样，如 json，二进制数据等。
 
-4. GET 编码类型：`application/x-www-form-urlencode`，POST 编码类型：`application/x-www-form-urlencoded` 或 `multipart/form-data`。为二进制数据使用多重编码。
+4. 安全性
+   - POST 比 GET 更安全，因为参数不会被保存在浏览器历史或 web 服务器日志中。GET的数据在 URL 中对所有人都是可见的。POST的数据不会显示在 URL 中。
 
-5. GET 历史参数保留在浏览器历史中。POST 参数不会保存在浏览器历史中。
-
-6. GET 对数据长度有限制，当发送数据时，GET 方法向 URL 添加数据；URL 的长度是受限制的（URL 的最大长度是 2048 个字符，这个长度是浏览器限制的）。POST 无限制。GET 只允许 ASCII 字符。非 ASCII 字符要进行编码转换。POST 没有限制，也允许二进制数据。与 POST 相比，GET 的安全性较差，因为所发送的数据是 URL 的一部分。在发送密码或其他敏感信息时绝不要使用 GET。
-
-7. GET 请求将发送的数据放到 url 中，以 `?` 开头的，使用 `key=value` 的形式表示键值对，多个键值对使用 `&` 连接。例如：`http://www.text.com/index.html?name=curry&age=25`。POST 请求将数据放到请求体中，编码方式多样，如 json，二进制数据等。
-
-8. POST 比 GET 更安全，因为参数不会被保存在浏览器历史或 web 服务器日志中。GET的数据在 URL 中对所有人都是可见的。POST的数据不会显示在 URL 中。
-
-
+5. 其他区别
+   - GET 后退按钮/刷新无害，POST 数据会被重新提交（浏览器应该告知用户数据会被重新提交）。
+   - GET 书签可收藏，POST 为书签不可收藏。
+   - GET 能被缓存，POST 不能缓存。
+   - GET 历史参数保留在浏览器历史中。POST 参数不会保存在浏览器历史中。
+   
 ### 2. 其他区别
 
 1. 根据 http 规范，GET 请求用于信息的获取，同时应该是安全和幂等性的。
