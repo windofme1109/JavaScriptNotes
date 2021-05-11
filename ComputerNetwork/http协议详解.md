@@ -49,7 +49,8 @@
     - [3. Cookie的Domain属性](#3-cookie%E7%9A%84domain%E5%B1%9E%E6%80%A7)
   - [7. http长连接](#7-http%E9%95%BF%E8%BF%9E%E6%8E%A5)
   - [8. 数据协商](#8-%E6%95%B0%E6%8D%AE%E5%8D%8F%E5%95%86)
-  - [9. Redirect（重定向）](#9-redirect%E9%87%8D%E5%AE%9A%E5%90%91)
+  - [9. content-type 详解](#9-content-type-%E8%AF%A6%E8%A7%A3)
+  - [10. Redirect（重定向）](#10-redirect%E9%87%8D%E5%AE%9A%E5%90%91)
     - [1. 301](#1-301)
     - [2. 302](#2-302)
 - [四、https](#%E5%9B%9Bhttps)
@@ -542,6 +543,8 @@ Etag由服务器发送给浏览器。发起请求时，浏览器将Etag的值赋
   浏览器愿意接受的语言类型。
   - User-Agent  
   客户端信息。
+  - Content-Type
+    指 http/https 发送信息至服务器时的内容编码类型，Content-Type用于表明发送数据流的类型，服务器根据编码类型使用特定的解析方式，获取数据流中的数据。
 - 响应  
 响应头中的一些字段，表明服务端返回的数据格式，主要有：  
   - Content-Type  
@@ -552,15 +555,33 @@ Etag由服务器发送给浏览器。发起请求时，浏览器将Etag的值赋
   与Accept-Language对应，具体支持的语言。
   - X-Content-Type-Options  
   一般是nosniff，设置这个头部，表示不允许浏览器猜测返回的数据格式。主要是提升安全性。
-- 表单提交的Content-Type
-  - application/x-www-form-urlencoded  
-  设置了这个值，表示将表单提交的数据格式化，形式是key=value的形式。多个使用&相连。
-  - multipart/form-data  
+
+## 9. content-type 详解
+
+1. content-type 指 http/https 发送信息至服务器时的内容编码类型，content-type 用于表明发送数据流的类型，服务器根据编码类型使用特定的解析方式，获取数据流中的数据。
+
+2. 常见的 content-type
+`text/html`, `text/plain`,` text/css`,` text/javascript`, `image/jpeg`, `image/png`, `image/gif`,
+`application/x-www-form-urlencoded`, `multipart/form-data`, `application/json`, `application/xml`
+   - 其中，`text/html`, `text/plain`,` text/css`,` text/javascript`, `image/jpeg`, `image/png`, `image/gif` 是常见的页面资源类型。
+   - `application/x-www-form-urlencoded`, `multipart/form-data`, `application/json`, `application/xml` 是常见的 ajax 请求的类型。常用设置表单提交或者上传文件的资源类型。
+
+3. 表单提交的 content-type
+  - `application/x-www-form-urlencoded`  
+  设置了这个值，表示将表单提交的数据格式化，形式是 `key=value` 的形式。多个使用 `&` 相连。
+  - `multipart/form-data` 
   代表我们这个请求有多个部分。因为我们有时候上传的是文件，文件不能使用字符串的形式，而是使用二进制的形式。因此，需要将文件分块。  
-  在请求头中，Content-Type的值在multipart/form-data后面，还会添加boundary，值是一个字符串，这个字符的含义是用来分隔文件的。服务器接收到请求后，根据boundary的值，找打分块的边界，从而将文件拼接起来，形成一个完整的文件。
-  
-## 9. Redirect（重定向）
-- 浏览器访问一个url时，真正的资源并不在这个位置，而是在另外一个位置，所以服务器会返回一个状态码（301或302），和一个重定向的链接，浏览器收到这个响应后，跟着状态码和重定向链接，会向新的url发起请求。这个过程就是重定向。
+  在请求头中，Content-Type 的值在 `multipart/form-data` 后面，还会添加 boundary，值是一个字符串，这个字符的含义是用来分隔文件的。服务器接收到请求后，根据 boundary 的值，找打分块的边界，从而将文件拼接起来，形成一个完整的文件。
+
+4. post 请求的 content-type 可以设置 `application/x-www-form-urlencoded`, `multipart/form-data`, `application/json`, `application/xml`。其中 `application/json` 用于向接口传递数据。而 `multipart/form-data` 常用于上传文件。
+
+5. 参考资料
+   - [Content-Type 常用对照表](https://tool.oschina.net/commons?type=5%EF%BC%89)
+   - [HTTP协议：Content-Type](https://www.cnblogs.com/wangyuxing/p/10037470.html)
+
+## 10. Redirect（重定向）
+
+1. 浏览器访问一个 url 时，真正的资源并不在这个位置，而是在另外一个位置，所以服务器会返回一个状态码（301 或 302），和一个重定向的链接，浏览器收到这个响应后，跟着状态码和重定向链接，会向新的 url 发起请求。这个过程就是重定向。
 
 ### 1. 301
 
