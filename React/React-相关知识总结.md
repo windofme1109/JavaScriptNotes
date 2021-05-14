@@ -153,7 +153,7 @@
 9. 从上面的图中可以看出，`getDerivedStateFromProps` 总是在 render 前被调用。因此之前在 `componentWillReceiveProps` 中进行的一些操作可以转移到 `getDerivedStateFromProps` 中进行。
 
 10. `getDerivedStateFromProps` 的用法
-    - static getDerivedStateFromProps(nextProps, prevState)
+    - `static getDerivedStateFromProps(nextProps, prevState)`
     - 这是一个静态（static）方法，因此不能使用 this。
     - 从函数名可以看出，这个函数的目的是：将 props 映射为 state。
     - 通过比较 nextProps（最新的 props）与 prevState（当前的 state），如果有变化，需要更新 state，那么就返回一个对象，这个对象里是需要更新的 state。如果 props 的变化不影响 state，那么需要返回一个 null，表示不对 state 进行任何改变。
@@ -182,6 +182,13 @@
 
         }
       ``` 
+
+11. `getSnapshotBeforeUpdate` 的用法
+    - `getSnapshotBeforeUpdate(prevProps, prevState)`
+    - getSnapshotBeforeUpdate 这个方法在 render 之后，在更新之前（如：更新 DOM 之前）被调用。给了一个机会去获取 DOM 信息，计算得到并返回一个 snapshot，这个 snapshot 会作为 componentDidUpdate 的第三个参数传入。如果你不想要返回值，请返回 null，不写的话控制台会有警告。
+    - getSnapshotBeforeUpdate 通常是与 componentDidUpdate 一起配合使用。
+    - 官方给了一个例子：用 getSnapshotBeforeUpdate 来处理 scroll，并且说明了通常不需要这个函数，只有在重新渲染过程中手动保留滚动位置等情况下非常有用，所以大部分开发者都用不上，也就不要乱用。言外之意就是在开发过程中**不要用。**
+
 ## 2. setState
 
 ### 1. 参考资料
@@ -198,8 +205,49 @@
 
 1. 根据调用 setState 的时机，setState 可以是异步执行，也可以是同步执行。
 
-2. 所谓的异步，指的是如果我们多次调用 setState，React 并不会调用一次 setState，就执行一次 render，而是将多个 setState 的调用合并为一次，然后执行。这样说明，调用了 setState， state 中的数据不会立刻更新。
+2. 所谓的异步，指的是如果我们多次调用 setState，React 并不会调用一次 setState，就执行一次 render，而是将多个 setState 的调用合并为一次，然后执行。这样说明，调用了 setState， state 中的数据不会立刻更新。举例如下：
+   ```jsx
+      class App extends React.Component {
+         state = {
+            num: 0
+         }
 
+         componentDidMount() {
+            this.setState({
+               num: this.state.num + 1
+            });
+
+            this.setState({
+               num: this.state.num + 1
+            });
+
+            this.setState({
+               num: this.state.num + 1
+            });
+
+            console.log('num', this.state.num);
+         }
+
+
+         render() {
+
+            console.log('render-num', this.state.num);
+
+            return (
+                <h1>
+                    Hello world
+                </h1>
+            )
+         }
+      }
+   ```
+   输出：
+   ```js
+      render-num 0
+      num-1 0
+      render-num 1
+   ```
+   从上面的例子中，可以看出，当我们在生命周期函数中多次调用 setState，React 使用的是批量更新方式。即将要更新的 state 放入一个队列中，在合适的时机，执行一次 setState，所以这些新的 state 会被合并然后统一更新。其效果类似于：`Object.assign({}, {num: xx}, {num: yy}, {num: zz})`，所以相同的属性会被合并，后面的属性值会覆盖前面的属性值。所以上例中，`num` 最终结果是 `1` 而不是 `3`。 
 3. 合成事件：React 为了解决跨平台、兼容性问题，自己封装实现了一套事件机制，用来取代原生事件。像 onClick、onChange 等都是合成事件。
 
 4. setState 是异步调用的情况：
@@ -212,14 +260,15 @@
 
 6. setState 本身是同步执行的。只不过在合成事件或者生命周期函数中调用，因为合成事件或者生命周期函数本身处于 React 更新流程中，在完成更新流程之前不会去执行 setState，state 中的值也不会同步更新，因此对外表现就是异步的。
 
-7. setState 的批量更新优化也是建立在“异步”（合成事件、生命周期函数）之上的，在原生事件和setTimeout 中不会批量更新，在“异步”中如果对同一个值进行多次 setState ， setState 的批量更新策略会对其进行覆盖，取最后一次的执行，如果是同时 setState 多个不同的值，在更新时会对其进行合并批量更新。
+7. setState 的批量更新优化也是建立在“异步”（合成事件、生命周期函数）之上的，在原生事件和 setTimeout 中不会批量更新，在 “异步” 中如果对同一个值进行多次 setState ， setState 的批量更新策略会对其进行覆盖，取最后一次的执行，如果是同时 setState 多个不同的值，在更新时会对其进行合并批量更新。
 
 ### 3. setState 参数说明
 
 1. `setState(updater, [callback])`
  
 2. 参数说明
-   - `updater` 可以是一个对象，也可以是一个函数。如果是对象的话，里面存放的是需要更新的属性。如果是函数的话，形式如下：
+   - `updater` 可以是一个对象，也可以是一个函数。如果是对象的话，里面存放的是需要更新的属性。使用对象形式更新 state 需要注意：**多次调用setState，会进行批量更新，同时拿不到最新的 state。**
+     如果是函数的话，形式如下：
       ```js
         (state, props) => stateChange
       ```
@@ -231,7 +280,7 @@
             }
          })
       ```
-      使用回调函数的方式更新 state 更符合函数式编程的思想。
+      使用回调函数的方式更新 state 更符合函数式编程的思想。同时回调函数能为我们提供可靠的 state 和 props，即自动地将我们的状态更新操作添加到队列中并等待前面的更新完毕后传入最新的状态值。
    - `callback` 可选的回调函数，这个回调函数在 setState 执行完，更新完 state 以后，重新渲染组件后执行。我们可以在这个回调函数中拿到最新的 state。React 官方 建议使用 componentDidUpdate() 来获取最新的 state。
       ```js
          this.setState((state, props) => {
@@ -246,7 +295,9 @@
 
 ### 4. setState 的推荐使用方式
 
-1. 第一个参数设置为函数，使用函数的方式更新 state。
+1. 第一个参数设置为函数，使用函数的方式更新 state。这样做的好处有：
+   - 回调中的 state 一定是最新的，这对于基于最新的 state 做一些操作非常有利。
+   - 使用回调函数，可以自动地将我们的状态更新操作添加到队列中并等待前面的更新完毕后传入最新的状态值。即不会合并队列中 state 的相同的属性。
 
 2. 如果想拿到最新的 state，可以使用第二个参数 —— 回调函数，获得最新的 state，也可以使用 componentDidUpdate() 获取最新的 state。
 
