@@ -26,7 +26,11 @@
 ## 2. 属性
 
 ### 1. state
+
+
 ### 2. props
+
+
 ### 3. defaultProps
 
 1. defaultProps 可以为组件添加默认 props。这一般用于 props 未赋值，但又不能为 null 的情况。
