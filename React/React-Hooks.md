@@ -50,30 +50,31 @@
    - 类成员函数不能保证 this
   
 ### 4. Hooks优势
+
 1. 优化类组件的三大问题
-   - 函数组件无this问题
-   - 自定义Hooks方便复用状态逻辑
+   - 函数组件无 this 问题
+   - 自定义 Hooks 方便复用状态逻辑
    - 副作用的关注点分离
   
 ### 5. Hook规则
 
-1. 只在最顶层调用hook函数，不能再 for、if、 try 等内部使用。
+1. 只在最顶层调用 hook 函数，不能再 for、if、 try 等内部使用。
 
-2. 只在 React 函数中调用hook函数，不能再普通的 JavaScript 函数中调用 hook。
+2. 只在 React 函数中调用 hook 函数，不能再普通的 JavaScript 函数中调用 hook。
 
 ### 6. useState
 
 1. state hook 提供了一种可以在 function component 中添加状态的方式。通过 state hook，可以抽取状态逻辑，使组件变得可测试，可重用。开发者可以在不改变组件层次结构的情况下，去重用状态逻辑。更好的实现关注点分离。  
 
-2. state hook的主要作用就是获取需要的 state 和 更新state的方法。
+2. state hook 的主要作用就是获取需要的 state 和 更新 state 的方法。
 
-3. useState用来替换类组件的state。
+3. useState 用来替换类组件的 state。
 
 4. 要点
-   1. 在组件的最顶层按照顺序调用useState。
-   2. 不能动态调用，如在if语句，for循环中等都不可使用useState。
+   1. 在组件的最顶层按照顺序调用 useState。
+   2. 不能动态调用，如在 if 语句，for 循环中等都不可使用 useState。
 
-5. useState可以接收一个函数，延迟初始化，也就是负责逻辑的转换，从而得到一个新的初始值。
+5. useState 可以接收一个函数，延迟初始化，也就是负责逻辑的转换，从而得到一个新的初始值。
 
 6. 一个useState只负责一个状态。
 
