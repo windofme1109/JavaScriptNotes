@@ -52,21 +52,49 @@
 
 ### 3. ReactDOM.createPortal
 
-1. 调用形式：`ReactDOM.createPortal(child, container)`
 
-2. 参数说明：
-   - child 要渲染的子元素
-   - container 容器元素，任何一个有效的 DOM 节点都可以作为 child 的容器
-
-3. 这个函数的主要作用是实现将子节点渲染到父组件DOM层次结构之外的DOM节点。
-
-4. 对于 portal 的一个典型用例是当父组件有 `overflow: hidden` 或 `z-index` 样式，但你需要子组件能够在视觉上 “跳出(break out)” 所在的容器。例如，对话框、hovercards 以及提示框。所以一般 react 组件里的模态框，就是这样实现的，都会使用 createPortal() 将其挂载到 body 元素下层。
-
-5. 使用 createPortal() 可以保留节点的原来的上下文信息。虽然节点的渲染位置变了，但是节点原有的父节点等上下文信息不变。
-
-6. 事件冒泡和普通 react 子节点一样，是因为portal仍然存在于React tree 中，而不用考虑其在真是DOM tree中的位置。
-
-7. 参考资料：
+1. 参考资料：
    - [react portal](https://www.jianshu.com/p/0771f1643aa3)
    - [react 插槽(Portals)](https://www.cnblogs.com/yadiblogs/p/10121538.html)
    - [Portals](https://reactjs.org/docs/portals.html)
+
+2. 调用形式：`ReactDOM.createPortal(child, container)`
+
+3. 参数说明：
+   - child 要渲染的子元素
+   - container 容器元素，任何一个有效的 DOM 节点都可以作为 child 的容器
+
+4. 这个函数的主要作用是实现将子节点渲染到父组件DOM层次结构之外的DOM节点。
+
+5. 对于 portal 的一个典型用例是当父组件有 `overflow: hidden` 或 `z-index` 样式，但你需要子组件能够在视觉上 “跳出(break out)” 所在的容器。例如，对话框、hovercards 以及提示框。所以一般 react 组件里的模态框，就是这样实现的，都会使用 createPortal() 将其挂载到 body 元素下层。
+
+6. 使用 createPortal() 可以保留节点的原来的上下文信息。虽然节点的渲染位置变了，但是节点原有的父节点等上下文信息不变。
+
+7. 事件冒泡和普通 react 子节点一样，是因为 portal 仍然存在于 React tree 中，而不用考虑其在真实的 DOM tree 中的位置。
+
+8. 示例
+   ```jsx
+      import React, {FC, Fragment, Component} from 'react';
+      import ReactDOM from 'react-dom';
+      interface IPortalProps {
+      }
+
+      export default class Portal extends Component<IPortalProps> {
+          private node: HTMLDivElement;
+          constructor(props: IPortalProps) {
+              super(props);
+              this.node = document.createElement('div');
+              document.body.appendChild(this.node);
+          }
+
+          render() {
+              const {children} = this.props;
+
+              return ReactDOM.createPortal(
+                  children,
+                  this.node
+              );
+          }
+      }
+   ```
+
