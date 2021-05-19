@@ -173,7 +173,7 @@
    ```
    1s 后返回处理结果。显然，此时使用 webpack 打包显然会报错。
 
-2. 为了解决异步操作的我们，我们需要引入 `this.async()`，这个函数的作用就是告诉 webpack()，loader 内部有异步操作，webpack 需要等待异步操作结果的返回，再进行下面的操作。
+2. 为了解决异步操作，我们需要引入 `this.async()`，这个函数的作用就是告诉 webpack()，loader 内部有异步操作，webpack 需要等待异步操作结果的返回，再进行下面的操作。
 
 3. `this.async()` 用法
    - `this.async()` 的返回值是 `this.callback()`。
