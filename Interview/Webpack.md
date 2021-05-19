@@ -47,13 +47,13 @@
    与 file-loader 类似，区别是用户可以设置一个阈值，大于阈值会交给 file-loader 处理，小于阈值时返回文件 base64 形式编码 (处理图片和字体)
 
 3. style-loader
-   把 CSS 代码注入到 JavaScript 中，通过 DOM 操作去加载 CSS
+   把 css 代码注入到 JavaScript 中，通过 DOM 操作去加载 css，即创建一个 style 标签，将 css 内容挂载的 html 文件中的 header 的这个 style 标签中。
 
 4. css-loader
-   加载 CSS，支持模块化、压缩、文件导入等特性
+   分析 css 文件之间的相互依赖关系，最终经这些 css 内容合并到一起。支持模块化、压缩、文件导入等特性
 
 5. sass-loader
-   将 SCSS/SASS 代码转换成 CSS
+   将 scss/ 代码转换成 css
 
 6. ts-loader
    将 TypeScript 转换成 JavaScript
@@ -67,7 +67,7 @@
 
 2. 定义 loader **不能使用箭头函数**，因为箭头函数没有 `this` 指向，而 loader 需要 `this` 做一些事，webpack 会改变函数的 `this` 指向，调用挂载到 `this` 上的一些方法。
 
-3. loader 接收的是入口文件的源码，输出的是处理后的源码，因此，loader 必须有返回值，且为处理后的源码
+3. loader 接收的是入口文件的源码，输出的是处理后的源码，因此，loader 必须有返回值，且为处理后的源码。
 
 4. 使用 `loader-utils` 获取 webpack.config.js 中的 `options` 配置项。
 
@@ -99,23 +99,19 @@
 
 2. webpack 提供了很多的 hook，这些 hook 在打包编译过程中的不同时机被触发，类似于 React 中的组件的生命周期函数。
 
-3. 插件是一个构造函数或者类，能够使用 `new` 关键字进行实例化。
-
-4. webpack 提供了很多的 hook，这些 hook 在打包编译过程中的不同时机被触发，类似于 React 中的组件的生命周期函数。
-
-5. 一个 webpack 插件的基本结构:
+3. 一个 webpack 插件的基本结构:
    - 必须是构造方法或者类
    - 类中必须覆写 apply() 方法
 
-6. 在类的constructor 中接收插件的配置项。
+4. 在类的constructor 中接收插件的配置项。
 
-7. apply() 接收的 compiler 和 compilation 对象都是同一个引用，若在一个插件中修改了它们身上的属性，会影响后面的插件
+5. apply() 接收的 compiler 和 compilation 对象都是同一个引用，若在一个插件中修改了它们身上的属性，会影响后面的插件。
 
-8. 找出合适的事件点去完成想要的功能
+6. 找出合适的事件点去完成想要的功能
    - emit 事件发生时，可以读取到最终输出的资源、代码块、模块及其依赖，并进行修改(emit 事件是修改 Webpack 输出资源的最后时机)
    - watch-run 当依赖的文件发生变化时会触发
 
-9. 异步的事件需要在插件处理完任务时调用回调函数通知 Webpack 进入下一个流程，不然会卡住。
+7. 异步的事件需要在插件处理完任务时调用回调函数通知 Webpack 进入下一个流程，不然会卡住。
 
 
 ## 4. loader 与 plugin 的区别
