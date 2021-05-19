@@ -53,7 +53,7 @@
    分析 css 文件之间的相互依赖关系，最终经这些 css 内容合并到一起。支持模块化、压缩、文件导入等特性
 
 5. sass-loader
-   将 scss/ 代码转换成 css
+   将 scss/sass 代码转换成 css
 
 6. ts-loader
    将 TypeScript 转换成 JavaScript
@@ -161,9 +161,9 @@
 
 1. Webpack 的热更新又称热替换（Hot Module Replacement），缩写为 HMR。 这个机制可以做到不用刷新浏览器而将新变更的模块替换掉旧的模块。
 
-2. HMR的核心就是客户端从服务端拉去更新后的文件，准确的说是 chunk diff (chunk 需要更新的部分)，实际上 WDS （webpack-dev-server） 与浏览器之间维护了一个 Websocket，当本地资源发生变化时，WDS 会向浏览器推送更新，并带上构建时的 hash，让客户端与上一次资源进行对比。客户端对比出差异后会向 WDS 发起 Ajax 请求来获取更改内容(文件列表、hash)，这样客户端就可以再借助这些信息继续向 WDS 发起 jsonp 请求获取该 chunk 的增量更新。
+2. HMR 的核心就是客户端从服务端拉去更新后的文件，准确的说是 chunk diff (chunk 需要更新的部分)，实际上 WDS （webpack-dev-server） 与浏览器之间维护了一个 Websocket，当本地资源发生变化时，WDS 会向浏览器推送更新，并带上构建时的 hash，让客户端与上一次资源进行对比。客户端对比出差异后会向 WDS 发起 Ajax 请求来获取更改内容(文件列表、hash)，这样客户端就可以再借助这些信息继续向 WDS 发起 jsonp 请求获取该 chunk 的增量更新。
 
-3. 后续的部分(拿到增量更新之后如何处理？哪些状态该保留？哪些又需要更新？)由 HotModulePlugin 来完成，提供了相关 API 以供开发者针对自身场景进行处理，像react-hot-loader 和 vue-loader 都是借助这些 API 实现 HMR。
+3. 后续的部分(拿到增量更新之后如何处理？哪些状态该保留？哪些又需要更新？)由 HotModulePlugin 来完成，提供了相关 API 以供开发者针对自身场景进行处理，像 react-hot-loader 和 vue-loader 都是借助这些 API 实现 HMR。
 
 4. 图示：
    ![](./img/hot-module-replacement.jpg)
@@ -178,24 +178,24 @@
 
 ## 10. 如何优化 Webpack 的构建速度？
 
-1. 使用高版本的 webpack / node.js
+1. 使用高版本的 webpack / node.js。
 
-2. 多进程/多实例构建
+2. 多进程/多实例构建。
 
-3. 压缩代码
+3. 压缩代码。
 
-4. 图片压缩
+4. 图片压缩。
 
 5. 提取页面公共资源：
-   - 使用 html-webpack-externals-plugin，将基础包通过 CDN 引入，不打入 bundle 中
-   - 使用 SplitChunksPlugin 进行(公共脚本、基础包、页面公共文件)分离(Webpack4内置) ，替代了 CommonsChunkPlugin 插件
+   - 使用 html-webpack-externals-plugin，将基础包通过 CDN 引入，不打入 bundle 中。
+   - 使用 SplitChunksPlugin 进行(公共脚本、基础包、页面公共文件)分离(Webpack4 内置) ，替代了 CommonsChunkPlugin 插件。。
 
 6. Tree shaking
-   - 打包过程中检测工程中没有引用过的模块并进行标记，在资源压缩时将它们从最终的bundle中去掉(只能对ES6 Modlue生效) 开发中尽可能使用ES6 Module的模块，提高tree shaking效率
-   - 禁用 babel-loader 的模块依赖解析，否则 Webpack 接收到的就都是转换过的 CommonJS 形式的模块，无法进行 tree-shaking
+   - 打包过程中检测工程中没有引用过的模块并进行标记，在资源压缩时将它们从最终的 bundle 中去掉(只能对 ES6 Modlue 生效) 开发中尽可能使用 ES6 Module 的模块，提高 tree shaking 效率
+   - 禁用 babel-loader 的模块依赖解析，否则 Webpack 接收到的就都是转换过的 CommonJS 形式的模块，无法进行 tree-shaking。
 
 7. 动态 Polyfill
-   - 建议采用 polyfill-service 只给用户返回需要的polyfill，社区维护。
+   - 建议采用 polyfill-service 只给用户返回需要的 polyfill，社区维护。
    - 合理设置 babel 的配置，设置好项目运行的目标浏览器版本，只引入需要的目标浏览器不支持的特性的 polyfill。
 
 8. 合理使用 sourceMap
