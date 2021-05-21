@@ -161,12 +161,22 @@
 
 1. Webpack 的热更新又称热替换（Hot Module Replacement），缩写为 HMR。 这个机制可以做到不用刷新浏览器而将新变更的模块替换掉旧的模块。
 
-2. HMR 的核心就是客户端从服务端拉去更新后的文件，准确的说是 chunk diff (chunk 需要更新的部分)，实际上 WDS （webpack-dev-server） 与浏览器之间维护了一个 Websocket，当本地资源发生变化时，WDS 会向浏览器推送更新，并带上构建时的 hash，让客户端与上一次资源进行对比。客户端对比出差异后会向 WDS 发起 Ajax 请求来获取更改内容(文件列表、hash)，这样客户端就可以再借助这些信息继续向 WDS 发起 jsonp 请求获取该 chunk 的增量更新。
+2. HMR 的核心就是客户端从服务端拉去更新后的文件，准确的说是 chunk diff (chunk 需要更新的部分)，实际上 WDS （webpack-dev-server）与浏览器之间维护了一个 Websocket，当本地资源发生变化时，WDS 会向浏览器推送更新，并带上构建时的 hash，让客户端与上一次资源进行对比。客户端对比出差异后会向 WDS 发起 Ajax 请求来获取更改内容(文件列表、hash)，这样客户端就可以再借助这些信息继续向 WDS 发起 jsonp 请求获取该 chunk 的增量更新。
 
 3. 后续的部分(拿到增量更新之后如何处理？哪些状态该保留？哪些又需要更新？)由 HotModulePlugin 来完成，提供了相关 API 以供开发者针对自身场景进行处理，像 react-hot-loader 和 vue-loader 都是借助这些 API 实现 HMR。
 
-4. 图示：
+4. 总结：
+   1. Browser 与 WDS 维护一个 websocket 连接。
+   2. 本地资源发生变化，WDS 向浏览器推送更新，并附带构建时的 hash。
+   3. Browser 收到推送后，会比较上一次的资源的 hash 值，对比出差异后，向 WDS 发送 ajax 请求，获得更改的内容（文件列表、hash）
+   4. WDS 会向 Browser 返回更改的内容，Browser 借助这些信息继续向 WDS 发起 JSONP 请求，获得 chunk 的增量更新。
+   5. 通过 HotModulePlugin 完成 UI 无刷新更新。
+
+4. 图示-1：
    ![](./img/hot-module-replacement.jpg)
+
+5. 图示-2：
+   ![](./img/HMR-2.jpg)
 
 ## 9. 文件指纹是什么？怎么用？
 
@@ -191,7 +201,7 @@
    - 使用 SplitChunksPlugin 进行(公共脚本、基础包、页面公共文件)分离(Webpack4 内置) ，替代了 CommonsChunkPlugin 插件。。
 
 6. Tree shaking
-   - 打包过程中检测工程中没有引用过的模块并进行标记，在资源压缩时将它们从最终的 bundle 中去掉(只能对 ES6 Modlue 生效) 开发中尽可能使用 ES6 Module 的模块，提高 tree shaking 效率
+   - 打包的过程中，只将用到的内容打包到输出的文件中，其余未用到的内容不打包到输出的文件中(只能对 ES6 Modlue 生效)。开发中尽可能使用 ES6 Module 的模块，提高 tree shaking 效率
    - 禁用 babel-loader 的模块依赖解析，否则 Webpack 接收到的就都是转换过的 CommonJS 形式的模块，无法进行 tree-shaking。
 
 7. 动态 Polyfill
@@ -213,3 +223,54 @@
 2. chunk 文件是 webpack 在打包过程中的一些 module 的集合。webpack 会对这个 chunk 文件进行一些操作。如果我们有多个入口文件，可能会产出多条打包路径，一条路径就会形成一个chunk。
 
 3. bundle 就是 webpack 打包后的产物。webpack 处理好 chunk 文件后，就会输出 bundle 文件，这个 bundle 文件包含了经过加载和编译的最终源文件，所以它可以直接在浏览器中运行。
+
+
+## 12. webpack 动态加载
+
+1. 有些场景中，你可能希望根据条件导入模块或者按需导入模块，这时你可以使用动态导入代替静态导入。
+
+2. 下面的是你可能会需要动态导入的场景：
+   - 当静态导入的模块很明显的降低了代码的加载速度且被使用的可能性很低，或者并不需要马上使用它。
+   - 当静态导入的模块很明显的占用了大量系统内存且被使用的可能性很低。
+   - 当被导入的模块，在加载时并不存在，需要异步获取。
+   - 当导入模块的说明符，需要动态构建。（静态导入只能使用静态说明符）
+   - 当被导入的模块有副作用（这里说的副作用，可以理解为模块中会直接运行的代码），这些副作用只有在触发了某些条件才被需要时。（原则上来说，模块不能有副作用，但是很多时候，你无法控制你所依赖的模块的内容）
+
+3. 请不要滥用动态导入（只有在必要情况下采用）。静态框架能更好的初始化依赖，而且更有利于静态分析工具和 tree shaking 发挥作用。
+
+4. import() 函数返回一个 Promise 结果，因此可以使用 then() 链式调用。
+
+5. import() 属于较新的语法，因此，我们在使用的时候，需要引入 `@babel/polyfill`，以保证兼容性。
+
+6. 由于 import() 函数返回一个 Promise 结果，所以我们可以使用 async/await，将其改写为同步代码的形式。
+
+7. 被import()的模块，都将打成一个单独的包，放在chunk存储的目录下。在浏览器运行到这一行代码时，就会自动请求这个资源，实现异步加载。
+
+8. 通过配置 chunkFilename，给打包出来的 chunk 文件的命名。
+
+9. 设置 prefetching 或者 preloading 设置代码的预加载。
+   - preload 是与核心需求的 js 文件一起加载，而 prefetch 则是表示核心 js 加载完成以后，等待带宽空闲了再去加载可能用到的其他模块。
+   - 设置为 preload 的模块的优先级为中，并且会被立即下载，而设置为 prefetch 的模块会等到浏览器空闲后再去下载。
+   - 父模块（parent chunk）应立即请求设置为 preload 的模块。而设置为 prefetch 的模块可以在将来的任何时候使用。
+   - prefetch 的浏览器兼容性更好。
+   - 推荐使用 prefetch。
+
+## 13. 如果让你实现 style-loader,你打算怎么做
+
+1. 使用 js 动态创建 style 标签，然后插入 header 中，将 css-loader 处理过的 css 插入style 标签中
+
+## 14. 如何将css内容插入到页面上
+
+1. 使用 style-loader
+
+webpack常用配置
+
+webpack插件写过吗
+
+webpack常用插件
+
+关于webpack你还有什么想分享的吗 (同步加载异步加载的实现)
+
+webpack有哪些优化方案
+
+loader和plugin有写过吗
