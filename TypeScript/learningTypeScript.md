@@ -166,7 +166,7 @@
        console.log('num', num, 'str', str) ;
    ```
    
-4. 而将void类型赋值给number等类型的变量，编译过程会报错。
+4. 而将 void 类型赋值给 number 等类型的变量，编译过程会报错。
    ```typescript
        // 而 void 类型的变量不能赋值给 number 类型的变量
        // error TS2322: Type 'void' is not assignable to type 'string'.
@@ -174,10 +174,37 @@
        let s:string = v ;
    ```
 5. any
+   - 任意值（Any）用来表示允许赋值为任意类型。
+   - 如果是一个普通类型，在赋值过程中改变类型是不被允许的：
+     ```ts
+        let myFavoriteNumber: string = 'seven';
+        myFavoriteNumber = 7;
 
+        // index.ts(2,1): error TS2322: Type 'number' is not assignable to type 'string'.
+     ```
+    - 但如果是 any 类型，则允许被赋值为任意类型。
+      ```ts
+         let myFavoriteNumber: any = 'seven';
+         myFavoriteNumber = 7;
+      ```
+    - 在任意值上访问任何属性都是允许的：
+      ```ts
+         let anyThing: any = 'hello';
+         console.log(anyThing.myName);
+         console.log(anyThing.myName.firstName);
+      ```
+    - 也允许调用任何方法：
+      ```ts
+         let anyThing: any = 'Tom';
+         anyThing.setName('Jerry');
+         anyThing.setName('Jerry').sayHello();
+         anyThing.myName.setFirstName('Cat');
+      ```
+    - 可以认为，声明一个变量为任意值之后，对它的任何操作，返回的内容的类型都是任意值。
+    
 ### 5. 联合类型
 1. 联合类型（Unoin Types）。指的是表示取值可以为多种类型中的一种。
-2. 联合类型使用|分隔不同的类型。示例代码：
+2. 联合类型使用 `|` 分隔不同的类型。示例代码：
    ```typescript
       let myLuckyNumber: string | number ;
       myLuckyNumber = 'six' ;
@@ -197,7 +224,7 @@
       //     return something.length ;
       // }
    ```  
-   length属性并不是string和number共有的属性，所以会报错。
+   length 属性并不是 string 和 number 共有的属性，所以会报错。
    ```typescript
       function getString(something: string | number): string {
           // toString()是string和number类型共有的方法，所以不会报错
@@ -207,7 +234,8 @@
       console.log(getString('abcdefg')) ;
       console.log(getString(135789)) ;
    ```  
-   `toString()`是`number`和`string`共有的方法，所以不会报错。
+   `toString()` 是 `number` 和 `string` 共有的方法，所以不会报错。
+
 4. 联合类型的变量在被赋值的时候，会根据类型推论的规则推断出一个类型。
    ```typescript
       let mln: string | number ;
@@ -222,9 +250,11 @@
    ```
 
 ### 6. 接口（interface）
+
 1. 使用接口来定义对象的类型。
    - 接口是对行为的抽象，而具体如何行动需要由类（classes）去实现（implement）。
-   - 在TypeScript中，接口常常用来对对象的形状（shape）进行约束。
+   - 在 TypeScript 中，接口常常用来对对象的形状（shape）进行约束。
+
 2. 定义一个接口，并使用其来约束对象的形状：
    ```typescript
       interface Person {
@@ -257,7 +287,7 @@
            name: 'Jack'
        }
    ```
-4. 可选属性，使用`?`定义一个可选属性，这个属性可以在对象中出现，也可以不出现。
+4. 可选属性，使用 `?` 定义一个可选属性，这个属性可以在对象中出现，也可以不出现。
    ```typescript
       interface Student {
           name: string,
@@ -280,7 +310,7 @@
       
       console.log(s2.phone) ;
    ```
-5. 任意属性。如果希望接口拥有任意属性，那么我们可以使用`[]`定义属性名。如下所示：
+5. 任意属性。如果希望接口拥有任意属性，那么我们可以使用 `[]` 定义属性名。如下所示：
    ```typescript
       interface Teacher {
           name: string,
@@ -301,7 +331,8 @@
           age: 25
       }
    ``` 
-    任意属性的定义类似与我们在使用对象的时候，如果属性名称是变量，那么就需要通过`[]`方式获取。
+    任意属性的定义类似与我们在使用对象的时候，如果属性名称是变量，那么就需要通过 `[]` 方式获取。
+
 6. 一旦定义了任意属性，那么确定属性和可选属性的类型都必须是它的类型的子集。
    ```typescript
       /**
@@ -321,10 +352,11 @@
       
       }
    ```  
-   如上例所示，任意属性定义为string类型，那么name和price也必须时string类型的子集（在我看来，就都得是string），而price的类型时number，并不是string的子集，在编译过程中，会报错。
+   如上例所示，任意属性定义为 string 类型，那么 name 和price 也必须时 string 类型的子集（在我看来，就都得是string），而 price 的类型时 number，并不是 string 的子集，在编译过程中，会报错。
+
 7. 一个接口中只能定义一个任意属性。如果接口中有多个类型的属性，则可以在任意属性中使用联合类型。  
-   当时在学习的时候有一个问题：接口中有多个类型的属性，为什么不适用any定义呢？  
-   我觉得原因是，精确地限定属性的数据类型。如果是any的话，那么对于我们不需要或者说不允许的类型，起不到限制的作用。
+   当时在学习的时候有一个问题：接口中有多个类型的属性，为什么不适用 any 定义呢？  
+   我觉得原因是，精确地限定属性的数据类型。如果是 any 的话，那么对于我们不需要或者说不允许的类型，起不到限制的作用。
    ```typescript
       interface Fruits {
           name: string,
@@ -349,6 +381,7 @@
       console.log(orange.series) ;
    ```  
    **注意**：我们在接口中只能定义一个任意属性，但是在对象中，我们就可定义多个属性，只要属性名和属性值同任意属性的定义相同即可。
+
 8. 只读属性。希望对象中的一些字段只能在创建的时候被赋值，那么可以用 `readonly` 定义只读属性。
    ```typescript
       interface Workers {
@@ -377,9 +410,11 @@
    **注意**：只读的约束存在于第一次给对象赋值的时候，而不是第一次给只读属性赋值的时候。创建变量时，如果没有给只读属性id赋值，那么会报错。
 
 ### 7. 数组类型
+
 1. 数组类型。用来约束数组的成员的类型。
+
 2. 定义方式：
-   1. 类型+方括号
+   1. 类型 + 方括号
       ```typescript
          let arr1: number[] = [1, 1, 2, 3, 5] ;
          // 定义后，数组不允许出现其他类型
@@ -389,7 +424,8 @@
          // error TS2345: Argument of type '"6"' is not assignable to parameter of type 'number'.
          // arr1.push('6') ;
       ```  
-      对数组元素的类型进行约束以后，是不能赋值其他类型的，同时如果使用数组方法向数组添加元素，TypeScript也会对传入的数据类型进行检查，一旦是其他类型，就会报错。
+      对数组元素的类型进行约束以后，是不能赋值其他类型的，同时如果使用数组方法向数组添加元素，TypeScript 也会对传入的数据类型进行检查，一旦是其他类型，就会报错。
+
    2. 数组泛型（Array Generic）
       ```typescript
          let arr2: Array<number> = [1, 1, 2, 3, 5] ;
@@ -403,7 +439,8 @@
          let arr3: NumberArray = [1, 1, 2, 3, 5] ;
       ```
       **注意：通常我们不使用接口的方式定义数组，因为比较复杂。**
-3. 类数组。类数组指的是具有数组的length属性，以及索引特性（索引是数字），但是不具备数组的操作方法，如pop，push等的对象。如函数中的`arguments`就是一个类数组对象。
+
+3. 类数组。类数组指的是具有数组的 length 属性，以及索引特性（索引是数字），但是不具备数组的操作方法，如 pop，push 等的对象。如函数中的 `arguments` 就是一个类数组对象。
 4. 通常使用接口来定义一个类数组对象。
    ```typescript
       // 对于类数组对象，我们必须使用接口进行定义
@@ -418,7 +455,7 @@
       
       }
    ```  
-   我们使用接口约束arguments这个类数组对象时，接口所定义的属性必须同arguments这个类数组对象所具有的属性是一致的。如果不一致，就会报错。
+   我们使用接口约束 arguments 这个类数组对象时，接口所定义的属性必须同 arguments 这个类数组对象所具有的属性是一致的。如果不一致，就会报错。
 5. 事实上常用的类数组都有自己的接口定义，如 IArguments, NodeList, HTMLCollection 等。
    ```typescript
       function sub(): void {
@@ -426,23 +463,30 @@
           let args: IArguments = arguments ;
       }
    ```
-6. 我们也可以将数组中元素的类型定义为any，表示允许出现任何类型。
+6. 我们也可以将数组中元素的类型定义为 any，表示允许出现任何类型。
    ```typescript
       let arr4: any[] = [1, '2', 3, {name: "apple"}, true] ;
       console.log(arr4[3]) ;
    ```           
 
 ### 8. 内置对象
-1. `JavaScript`中有很多内置对象，它们可以直接在`TypeScript`中当做定义好了的类型。
-2. 内置对象是指根据标准在全局作用域（Global）上存在的对象。这里的标准是指 ECMAScript 和其他环境（比如 DOM）的标准。
+1. `JavaScript` 中有很多内置对象，它们可以直接在 `TypeScript` 中当做定义好了的类型。
+
+2. 内置对象是指根据标准在全局作用域（Global）上存在的对象。这里的标准是指 ECMAScript 和其他环境（比如 DOM）的标准
+。
 3. ECMA提供的标准对象包括：Boolean、Number、Date、String等。详细的内容可以查看MDN：[Standard built-in objects](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects)
-4. DOM提供的标准对象主要有：Document、HTMLElement、Event、NodeList等。也就是DOM interfaces。详细的内容可以查看MDN：[Document Object Model (DOM)](https://developer.mozilla.org/en-US/docs/Web/API/Document_Object_Model)
+
+4. DOM提供的标准对象主要有：Document、HTMLElement、Event、NodeList 等。也就是 DOM interfaces。详细的内容可以查看MDN：[Document Object Model (DOM)](https://developer.mozilla.org/en-US/docs/Web/API/Document_Object_Model)
+
 5. BOM提供的标准对象主要有：Window（最顶层的对象）、location、history等。
+
 6. ECMAScript、DOM、BOM提供的标准对象都在 [TypeScript 核心库的定义文件](https://github.com/Microsoft/TypeScript/tree/master/src/lib) 中。
+
 7. 注意：**Node.js 不是内置对象的一部分**，如果想用`TypeScript`写 Node.js，则需要引入第三方声明文件：`npm install @types/node --save-dev`
 
 ### 9. 函数类型
-1. 函数有两种定义方式：函数声明（declaration）和函数表达式（expression），在`TypeScript`中，这两种规定类型的方式有所不同。
+
+1. 函数有两种定义方式：函数声明（declaration）和函数表达式（expression），在 `TypeScript` 中，这两种规定类型的方式有所不同。
 2. 函数声明（declaration）
    - 函数有输入，有输出，都要进行约束，如果是函数声明的方式，约束起来比较简单。实例代码：
      ```typescript
@@ -451,6 +495,7 @@
       }
      ``` 
    - **注意，输入多余的（或者少于要求的）参数，是不被允许的。**
+
 3. 函数表达式（expression）
    - 函数表达式相当于是将一个匿名函数的指针赋值给一个变量，所以我们在约束的时候，左右两端都要进行约束。即变量这块进行约束，匿名函数那块也要进行约束。实例代码：
      ```typescript
@@ -459,6 +504,7 @@
       }
      ```
    - 注意：在 TypeScript 的类型定义中，`=>` 用来表示函数的定义，左边是输入类型，需要用括号括起来，右边是输出类型。与ES6中的箭头函数（`=>` ）不一样。
+
 4. 用接口定义函数的形状
    - 使用接口的形式，定义一个函数需要的形状（输入类型，返回值类型）。示例代码：
      ```typescript
@@ -474,7 +520,7 @@
         }
      ```
 5. 可选参数
-   - 与接口中的可选属性类似，我们用`?`表示可选的参数。示例代码：
+   - 与接口中的可选属性类似，我们用 `?` 表示可选的参数。示例代码：
      ```typescript
         function buildName(firstName: string, lastName?: string): string {
             if (lastName) {
@@ -505,7 +551,7 @@
         console.log(smith) ;
      ```
 6. 默认参数
-   - ES6中，可以为参数设置默认值，TypeScript 会将添加了默认值的参数识别为可选参数。示例代码：
+   - ES6 中，可以为参数设置默认值，TypeScript 会将添加了默认值的参数识别为可选参数。示例代码：
      ```typescript
         function buildName3(firstName: string, lastName: string = 'Cat'): string {
             return firstName + ' ' + lastName ;
@@ -521,7 +567,7 @@
         }
      ```
 7. 剩余参数
-   - ES6中的剩余参数。示例代码：
+   - ES6 中的剩余参数。示例代码：
      ```typescript
         function allNumSum(first, ...rest) {
             // rest是一个数组
@@ -541,7 +587,7 @@
         console.log(allNumSum(1)) ;
 
      ```
-   - `...rest`是一个数组，所以我们可以用数组的类型来定义rest参数只能是最后一个参数。示例代码如下：
+   - `...rest` 是一个数组，所以我们可以用数组的类型来定义rest参数只能是最后一个参数。示例代码如下：
      ```typescript
         function allNumSum2(first: number, ...rest: number[]): number {
             // rest是一个数组
@@ -561,7 +607,7 @@
         console.log(allNumSum2(1)) ;
      ```
 8. 函数重载
-   - JavaScript是没有重载概念的，定义了多个同名但是参数不同的函数，执行时，只会以最后定义的为主。在TypeScript中，引入了重载。示例代码：
+   - JavaScript 是没有重载概念的，定义了多个同名但是参数不同的函数，执行时，只会以最后定义的为主。在 TypeScript 中，引入了重载。示例代码：
      ```typescript
         function reverse(content: number): number ;
         function reverse(content: string): string ;
@@ -576,8 +622,8 @@
         }
      ```
    - 我们重复定义了多次函数 reverse，前几次都是函数定义，最后一次是函数实现。
-   - TypeScript会从最前面的函数定义开始匹配，如果有多个函数具有包含关系，这里的包含指的是重载，应该把精确的定义写在前面。
-   - 也就是说，TypeScript中，主要是函数同名，但是参数和返回值的类型不同，需要精确定义输入类型和输出类型，最后实现。
+   - TypeScript 会从最前面的函数定义开始匹配，如果有多个函数具有包含关系，这里的包含指的是重载，应该把精确的定义写在前面。
+   - 也就是说，TypeScript 中，主要是函数同名，但是参数和返回值的类型不同，需要精确定义输入类型和输出类型，最后实现。
    - 注意：typescript 的函数重载仅仅是类型重载，不是真正意义上的函数重载。并且真正 implementation 的那个函数需要覆盖你所有类型重载的函数的签名。也就是下面这样定义会报错：
      ```typescript
         // error TS2393: Duplicate function implementation.
@@ -596,13 +642,18 @@
 1. 语法
    - 语法1：`值 as 类型`
    - 语法2：`<类型> 值`
-   - 不推荐第二种写法，因为会与React以及ts中的泛型混淆，所以，我们统一使用第一种语法
-2. 断言作用1：将一个联合类型断言为其中一个类型
-3. 断言作用2：将一个父类断言为更加具体的子类
-4. 断言作用3：将一个类型断言为any （**慎用**）
-5. 断言作用4：将any断言为具体类型
+   - 不推荐第二种写法，因为会与 React 以及 ts 中的泛型混淆，所以，我们统一使用第一种语法。
+
+2. 断言作用 1：将一个联合类型断言为其中一个类型
+
+3. 断言作用 2：将一个父类断言为更加具体的子类
+
+4. 断言作用 3：将一个类型断言为 any （**慎用**）
+
+5. 断言作用 4：将 any 断言为具体类型
+
 6. 类型断言的限制
-   - TypeScript时结构类型系统，类型之间的比较只会比较它们最终的结构，而忽略定义时的关系。我们定义下面的结构：
+   - TypeScript 是结构类型系统，类型之间的比较只会比较它们最终的结构，而忽略定义时的关系。我们定义下面的结构：
      ```typescript
         interface Animal {
             name: string
@@ -622,7 +673,7 @@
         }
         let animal: Animal = tom ;
      ```
-   - Cat 包含了 Animal 中的所有属性，除此之外，它还有一个额外的方法 run。TypeScript 并不关心 Cat 和 Animal 之间定义时是什么关系，而只会看它们最终的结构有什么关系——所以它与 Cat extends Animal 是等价的。在继承的情况下，子类的实例可以赋值给类型为父类的变量，所以上面的tom可以赋值给类型为Animal的变量。示例代码如下：
+   - Cat 包含了 Animal 中的所有属性，除此之外，它还有一个额外的方法 run。TypeScript 并不关心 Cat 和 Animal 之间定义时是什么关系，而只会看它们最终的结构有什么关系——所以它与 Cat extends Animal 是等价的。在继承的情况下，子类的实例可以赋值给类型为父类的变量，所以上面的tom可以赋值给类型为 Animal 的变量。示例代码如下：
      ```typescript
         interface Animal {
             name: string
@@ -649,9 +700,9 @@
         }
      ```
    - 总结：
-     - 笼统的说，就是A能兼容B，那么 A 能够被断言为 B，B 也能被断言为 A。
-     - 如果B能兼容A，那么 B 能够被断言为 A，A 也能被断言为 B。
-     - 所谓的兼容，我的理解是，A兼容B，指的是B具有A所有的属性和方法。这个案例中，`Cat`具有`Animal`所有属性，所以，`Animal`是兼容`Cat`的。
+     - 笼统的说，就是 A 能兼容 B，那么 A 能够被断言为 B，B 也能被断言为 A。
+     - 如果 B 能兼容 A，那么 B 能够被断言为 A，A 也能被断言为 B。
+     - 所谓的兼容，我的理解是，A 兼容 B，指的是 B 具有 A 所有的属性和方法。这个案例中，`Cat` 具有 `Animal` 所有属性，所以，`Animal` 是兼容 `Cat` 的。
      
 7. 类型断言与类型声明的区别
    - 先看一段代码：
@@ -671,7 +722,7 @@
         }
         let animal: Animal = tom ;
      ```
-   - 在上例中，因为Animal兼容Cat，所以可以将tom直接赋值给animal。
+   - 在上例中，因为 Animal 兼容 Cat，所以可以将 tom 直接赋值给 animal。
    - 将 animal 断言为 Cat 赋值给 jack，也是可以的：
      ```typescript
         let an: Animal = {
@@ -682,30 +733,34 @@
         let jack = an as Cat ;
         let animal2 = tom as Animal ;
      ```
-   - 如果直接将Animal类型的变量赋值给Cat类型的变量，则会报错：
+   - 如果直接将 Animal 类型的变量赋值给 Cat 类型的变量，则会报错：
      ```typescript
         // error TS2741: Property 'run' is missing in type 'Animal' but required in type 'Cat'.
         let jack2: Cat = an ;
      ```
-   - 想要将animal类型的anl赋值给类型为Cat的jack2，Cat必须兼容Animal，也就是说，Cat有的，Animal都得有。但是，Animal不具备这样的特性，所以无法赋值给jack2。换一种说法，Animal 可以看作是 Cat 的父类，当然不能将父类的实例赋值给类型为子类的变量。
+   - 想要将 animal 类型的 anl 赋值给类型为Cat的jack2，Cat必须兼容Animal，也就是说，Cat有的，Animal都得有。但是，Animal 不具备这样的特性，所以无法赋值给 jack2。换一种说法，Animal 可以看作是 Cat 的父类，当然不能将父类的实例赋值给类型为子类的变量。
    - 总结：
-     - A能断言为B，只需满足A兼容B或者B兼容A就可以。
-     - A赋值给B，则B必须兼容A。
+     - A 能断言为 B，只需满足 A 兼容 B 或者 B 兼容 A 就可以。
+     - A 赋值给 B，则 B 必须兼容 A。
      
 8. 使用类型断言的注意事项
    - 不能使用双重断言，即不能这样写：`as any as Foo`，这种不加限制的将一个类型转换为另外一个类型，极有可能在运行时报错。
-   - 类型断言不是类型转换，只影响编译时的类型，类型断言的结果在编译完成后，就会被删除。因此类型断言并不能完成真正的类型转换，不会影响变量的类型，要实现真正的类型转换，直接调用类型转换的方法，如`Number()`、`Boolean()`等。
+   - 类型断言不是类型转换，只影响编译时的类型，类型断言的结果在编译完成后，就会被删除。因此类型断言并不能完成真正的类型转换，不会影响变量的类型，要实现真正的类型转换，直接调用类型转换的方法，如 `Number()`、`Boolean()` 等。
    - 优先使用类型声明和泛型。与类型断言相比较。类型声明更加严格。同时使用泛型，在使用时指定具体的类型效果上比断言好。
 
 ### 11. 声明文件
+
 1. 当使用第三方库时，我们需要引用它的声明文件，才能获得对应的代码补全、接口提示等功能。
+
 2. 所谓的声明文件，我的理解就是将这个第三方库中需要对外暴露出来的方法和变量进行声明，这样我们就可以直接引用这些方法和变量。
-3. 通常我们会把声明语句放到一个单独的文件中，以jQuery为例，声明文件的名称是：`jQuery.d.ts`，**声明文件必须以`.d.ts`为后缀**。内容如下：
+
+3. 通常我们会把声明语句放到一个单独的文件中，以 jQuery 为例，声明文件的名称是：`jQuery.d.ts`，**声明文件必须以`.d.ts`为后缀**。内容如下：
    ```TypeScript
        // src/jQuery.d.ts
        declare var jQuery: (selector: string) => any;
    ```
-4. 一般来说，ts 会解析项目中所有的 *.ts 文件，当然也包含以 .d.ts 结尾的文件。所以当我们将 jQuery.d.ts 放到项目中时，其他所有 *.ts 文件就都可以获得 jQuery 的类型定义了:
+
+4. 一般来说，`ts` 会解析项目中所有的 `*.ts` 文件，当然也包含以 `.d.ts` 结尾的文件。所以当我们将 `jQuery.d.ts` 放到项目中时，其他所有 `*.ts` 文件就都可以获得 jQuery 的类型定义了:
      ```
         /path/to/project
         ├── src
@@ -714,7 +769,9 @@
         └── tsconfig.json
      ```
 5. 对于第三方的声明文件，推荐使用 `@types` 统一管理第三方库的声明文件。`@types` 的使用方式很简单，直接用 `npm` 安装对应的声明模块即可，以 `jQuery` 举例：`npm install @types/jquery --save-dev`
+
 6. 搜索第三方声明文件的地址：https://microsoft.github.io/TypeSearch/
+
 7. 涉及到的新语法如下表所示：
     
    语法|说明
@@ -735,6 +792,7 @@
    `/// <reference />` | 三斜线指令
    
 ### 12. 书写声明文件
+
 1. 当我们使用的第三方库没有提供声明文件的时候，需要我们自己去写声明文件。声明文件的内容和使用方式在不同的应用场景下有所不同。主要有以下几种情况：
     - `全局变量`：通过` <script> `标签引入第三方库，注入全局变量
     - `npm 包`：通过 `import foo from 'foo'` 导入，符合 ES6 模块规范
@@ -742,13 +800,18 @@
     - `直接扩展全局变量`：通过 `<script>` 标签引入后，改变一个全局变量的结构
     - `在 npm 包或 UMD 库中扩展全局变量`：引用 npm 包或 UMD 库后，改变一个全局变量的结构
     - `模块插件`：通过 `<script>` 或 `import` 导入后，改变另一个模块的结构
+
 2. 每一种场景下的声明方式等到需要的时候在学。^_^
 
 ## 二、进阶
+
 ### 1. 类型别名
-- 用法：使用 type 创建类型别名
-- 作用：类型别名常用于联合类型
-- 我的理解：类型别名的作用主要是增加语义性，实际上，新的名字是对类型的一个引用，约束还是原来的类型起作用。示例代码：
+
+1. 用法：使用 type 创建类型别名
+
+2. 作用：类型别名常用于联合类型
+
+3. 我的理解：类型别名的作用主要是增加语义性，实际上，新的名字是对类型的一个引用，约束还是原来的类型起作用。示例代码：
   ```typescript
       // 将string类型取另外一个名字——name，接下来我们就可以使用Name代替string，语义性更强
       type Name = string ;
@@ -772,7 +835,9 @@
   
   
 ### 2. 字符串字面量类型
+
 1. 符串字面量类型用来约束取值只能是某几个字符串中的一个。
+
 2. 也是使用`type`关键字进行定义。使用`|`用来分隔可选的几个字符串。示例代码如下：
    ```typescript
      // 使用type定义一个字符串字面量类型，取值只能是red、green、blue这三个字符串之一
@@ -792,12 +857,16 @@
    ```
    
 ### 3. 元组（Tuple）
-1. 元组（Tuple）的概念：合并了不同类型的对象，而数组（Array）则是用来合并同种类型的对象
-2. 注意与python中的元组的概念进行区分，在python中，元组与列表类似，都是线性表，主要区别是元内容不可变
+
+1. 元组（Tuple）的概念：合并了不同类型的对象，而数组（Array）则是用来合并同种类型的对象。
+
+2. 注意与 python 中的元组的概念进行区分，在 python 中，元组与列表类似，都是线性表，主要区别是元内容不可变。
+
 3. 元组有以下几个特点：
    - 内容可变，但是类型不可变。
    - 初始化可以不用赋值。赋值的时候，数量和对应的数据类型必须对应正确。
    - 可以使用push()和pop()方法。
+
 4. 元组的定义方式
    - 定义时就赋值
      ```typescript
@@ -832,6 +901,7 @@
       rose[1] = 20;
    ```  
    我们并没有将rose定义为数组，所以运行会报错。
+   
 6. 元组可以使用解构操作。
    ```typescript
       let smith: [string, number];
@@ -843,7 +913,7 @@
       // 30
       console.log('b', b);
    ```
-7. 元组也可以设置可选元素，用?表示
+7. 元组也可以设置可选元素，用 `?` 表示
    ```typescript
       // 元组也可以设置可选元素，用?表示
       let phone: [string, number?];
@@ -918,7 +988,7 @@
        // 在drawPoints()使用剩余参数，进行接收
        drawPoints(...p1);
     ```
-11. 给元组设置只读类型。可以为任何元组类型加上 readonly 关键字前缀，以使其成为只读元组。
+11. 给元组设置只读类型。可以为任何元组类型加上 `readonly` 关键字前缀，以使其成为只读元组。
     ```typescript
        // 使用readonly关键字设置Fruits这个元组为只读属性
        type Fruits= readonly [string, string];
@@ -941,7 +1011,7 @@
        // Argument of type 'true' is not assignable to parameter of type 'string | number'.
        // student.push(true);
     ```  
-    还可以使用pop()方法，移除元组的最后一个元素：
+    还可以使用 pop() 方法，移除元组的最后一个元素：
     ```typescript
        let student: [string, number];
        student = ['tom', 114];
@@ -958,8 +1028,11 @@
     
     
 ### 4. 枚举（Enum）
+
 1. 作用：枚举类型用于取值被限定在一定范围内的场景，比如一周只能有七天，颜色限定为红绿蓝等。
-2. 枚举使用enum关键字定义。
+
+2. 枚举使用 `enum` 关键字定义。
+
 3. 枚举成员会被赋值为从 0 开始递增的数字，同时也会对枚举值到枚举名进行反向映射。示例代码：
    ```typescript
       // 定义一个枚举类
@@ -996,15 +1069,14 @@
        console.log(Days3[3] === 'Sun') ;    // false
        console.log(Days3[3] === 'Wed') ;    // true
    ```
-6. 手动赋值的可以是小数，也可也是负数，但是后续未赋值的枚举项的递增赋值仍然是1。
+6. 手动赋值的可以是小数，也可也是负数，但是后续未赋值的枚举项的递增赋值仍然是 1。
    ```typescript
       enum Days4 {Sun = 7, Mon = 1.5, Tue, Wed, Thu, Fri, Sat};
       console.log(Days4['Mon'] === 1.5) ;    // true
       console.log(Days4['Tue'] === 2.5) ;    // true
       console.log(Days4['Sat'] === 6.5) ;    // true
    ```
-7. 常数项和计算项。枚举项有两种类型：常数项（constant member）和计算所得项（computed member），常数项就是我们在定义是就给枚举项赋值或者是未赋值而由系统分配的  
-前面的示例代码中的枚举类都是常数项，而计算所得项时需要动态计算，比如一个字符串的长度。
+7. 常数项和计算项。枚举项有两种类型：常数项（constant member）和计算所得项（computed member），常数项就是我们在定义是就给枚举项赋值或者是未赋值而由系统分配的。前面的示例代码中的枚举类都是常数项，而计算所得项时需要动态计算，比如一个字符串的长度。
    ```typescript
       // 定义一个计算所得项的枚举类
       // 'Blue'.length就是一个计算所得项
@@ -1016,7 +1088,7 @@
       // error TS1061: Enum member must have initializer.
       // enum Colors2 {Red = 'Red'.length, Green};
    ```
-8. 常数枚举。指的是 const enum 定义的枚举类型。常数枚举与普通枚举的区别是，它会在编译阶段被删除，并且不能包含计算成员。示例代码：
+8. 常数枚举。指的是 `const enum` 定义的枚举类型。常数枚举与普通枚举的区别是，它会在编译阶段被删除，并且不能包含计算成员。示例代码：
    ```typescript
       // 使用const关键字定义一个常数枚举类
       const enum Directions {Up, Down, Left, Right};
@@ -1058,10 +1130,11 @@
    ``` 
    
 ### 5. 类（Class）
-1. ES6中的类。传统的JavaScript存在类的概念，我们通过构造函数来模拟一个类，并使用原型继承的方式实现继承。  
-   在ES6中，引入和class关键字和extends关键字。  
-   class用于定义类，extends实现继承。  
-2. ES6中类的用法：
+
+1. ES6 中的类。传统的 JavaScript 存在类的概念，我们通过构造函数来模拟一个类，并使用原型继承的方式实现继承。  
+   - 在 ES6 中，引入和 class 关键字和 extends 关键字。  
+   - class 用于定义类，extends 实现继承。  
+2. ES6 中类的用法：
    - 属性与方法
      ```typescript
         class Animal {
@@ -1098,9 +1171,9 @@
          console.log(kitty.sayHi());
          console.log(kitty.greeting());
      ```
-   - getter和setter。使用 getter 和 setter 可以改变属性的赋值和读取行为。  
-     如果定义了setter和getter方法，编译时，必须在最后加上 -t es5，即 `tsc 14-Advanced-Class.ts -t`。  
-     表明将ts代码编译为es5即更高版本的js代码。
+   - getter 和 setter。使用 getter 和 setter 可以改变属性的赋值和读取行为。  
+     如果定义了 setter 和 getter 方法，编译时，必须在最后加上 `-t es5`，即 `tsc 14-Advanced-Class.ts -t`。  
+     表明将 ts 代码编译为 es5 即更高版本的 js 代码。
      ```typescript
         class School {
         
@@ -1143,9 +1216,9 @@
         console.log(sch.name);
      ```   
      总结：
-       - getter和setter定义的方法，名称必须要同属性名相同。对this.name进行操作就会调用setter/getter，也就是说setter/getter是hook函数，而真实的存储变量是_name。
-       - 以下划线（_）开头的变量，我们一般默认为是私有属性。在ES7中统一规定，以#开头的变量为私有属性。
-       - 如果我们没有声明`private _name`，而是直接使用`this.name`，如下所示：
+       - getter 和 setter 定义的方法，名称必须要同属性名相同。对this.name 进行操作就会调用 setter/getter，也就是说 setter/getter 是 hook 函数，而真实的存储变量是 _name。
+       - 以下划线（_）开头的变量，我们一般默认为是私有属性。在 ES7 中统一规定，以 `#` 开头的变量为私有属性。
+       - 如果我们没有声明 `private _name`，而是直接使用`this.name`，如下所示：
          ```typescript
             class School {
                      constructor(name) {
@@ -1171,9 +1244,9 @@
          // 栈溢出
          let sch = new School('SSF');
          ```  
-         会报错：栈溢出。这是因为我们在构造函数中调用`this.name = name`，会去调用set name，在set name方法中，我们又执行this.name = name，进行无限递归，最后导致栈溢出。  
-         所以，我们必须使用另外一个变量接收和存储name。也就是前面she声明的`private _name: string`。
-   - 静态方法，使用static关键字定义，通过类调用，不能通过实例调用。
+         会报错：栈溢出。这是因为我们在构造函数中调用`this.name = name`，会去调用 set name，在 set name 方法中，我们又执行 `this.name = name`，进行无限递归，最后导致栈溢出。  
+         所以，我们必须使用另外一个变量接收和存储 name。也就是前面声明的 `private _name: string`。
+   - 静态方法，使用 `static` 关键字定义，通过类调用，不能通过实例调用。
      ```typescript
         class Students {
             static isStudent(s) {
@@ -1186,8 +1259,8 @@
         // true
         console.log(Students.isStudent(s1));
      ```
-3. ES7中类的用法
-   - 实例属性。ES7之前，实例属性通过this.xxx定义，ES7 提案中可以直接在类里面定义。
+3. ES7 中类的用法
+   - 实例属性。ES7 之前，实例属性通过 this.xxx 定义，ES7 提案中可以直接在类里面定义。
      ```typescript
         class Person {
             // 直接定义实例属性
@@ -1207,7 +1280,7 @@
         // 115
         console.log(Numbers.id);
      ```
-4. TypeScript对类的支持
+4. TypeScript 对类的支持
    - 修饰符：public。修饰的属性或方法是公有的，可以在任何地方被访问到，默认所有的属性和方法都是 public 的。
      ```typescript
         class Fruits {
@@ -1284,7 +1357,7 @@
         // protected修饰的属性和方法，只能被子类继承，但是子类实例还是无法访问这些属性和方法
         // console.log(fff.name);
      ```
-   - 使用private修饰构造函数，这个类不能被实例化或者被子类继承。
+   - 使用 private 修饰构造函数，这个类不能被实例化或者被子类继承。
      ```typescript
         // 当构造函数修饰为 private 时，该类不允许被继承或者实例化
         class Fruits4 {
@@ -1308,7 +1381,7 @@
         // error TS2673: Constructor of class 'Fruits4' is private and only accessible within the class declaration.
         // let fr = new Fruits4('mellon');
      ```
-   - 使用protected修饰构造函数，该类只能被继承，不能被实例化。
+   - 使用 protected 修饰构造函数，该类只能被继承，不能被实例化。
      ```typescript
         class Fruits5 {
             protected name: string;
@@ -1329,7 +1402,7 @@
         //  error TS2674: Constructor of class 'Fruits5' is protected and only accessible within the class declaration.
         // let fr = new Fruits5('mellon');
      ```
-   - 修饰符和readonly还可以使用在构造函数参数中，等同于类中定义该属性同时给该属性赋值，使得代码更加简洁。
+   - 修饰符和 readonly 还可以使用在构造函数参数中，等同于类中定义该属性同时给该属性赋值，使得代码更加简洁。
      ```typescript
         class Fruits6 {
             // public name: string;
@@ -1364,7 +1437,7 @@
         // error TS2540: Cannot assign to 'name' because it is a read-only property.
         // ff7.name = 'banana';
      ```
-   - 抽象类。抽象类是供其他类继承的基类，抽象类不允许被实例化。抽象类中的抽象方法必须在子类中被实现。在TypeScript中，使用abstract进行定义。
+   - 抽象类。抽象类是供其他类继承的基类，抽象类不允许被实例化。抽象类中的抽象方法必须在子类中被实现。在 TypeScript 中，使用 abstract 进行定义。
      ```typescript
         abstract class Phone {
             public name: string;
@@ -1403,23 +1476,26 @@
      ```  
      抽象类不能被实例化。  
      抽象类中定义的方法必须在子类中被实现。  
-     抽象类中的方法也要用abstract定义。
+     抽象类中的方法也要用 abstract 定义。
 5. 总结
-   - 使用class关键字定义。
-   - 使用extends关键字实现继承。
-   - 类中定义方法不使用function关键字。
-   - 可以定义getter和setter方法，限制存取某个属性的行为。getter和setter方法要与属性同名，但是存储这个属性需要设一个别名。
-   - 使用static定义静态方法和属性。
-   - 直接在类中定义实例属性，而不使用this.xxx的方式。
-   - 修饰符：public、protected和private，用来修饰属性和方法。
-   - 只读属性readonly，只能读，不能修改，与修饰符一起使用，放在修饰符后面。
+   - 使用 class 关键字定义。
+   - 使用 extends 关键字实现继承。
+   - 类中定义方法不使用 function 关键字。
+   - 可以定义 getter 和 setter 方法，限制存取某个属性的行为。getter 和 setter 方法要与属性同名，但是存储这个属性需要设一个别名。
+   - 使用 static 定义静态方法和属性。
+   - 直接在类中定义实例属性，而不使用 `this.xxx` 的方式。
+   - 修饰符：public、protected 和 private，用来修饰属性和方法。
+   - 只读属性 readonly，只能读，不能修改，与修饰符一起使用，放在修饰符后面。
    - 抽象类：abstract，是供其他类继承的基类，抽象类不允许被实例化。抽象类中的抽象方法必须在子类中被实现，抽象类中的方法也必须使用abstract定义。
    
 ### 6. 类与接口
+
 1. 接口（Interfaces）的作用：
    - 用于对「对象的形状（Shape）」进行描述。
    - 就是对类的一部分行为进行抽象。
-2. 接口是对不同的类的一些共同特性进行抽象和封装，使用implements关键字来实现这个接口。
+
+2. 接口是对不同的类的一些共同特性进行抽象和封装，使用 implements 关键字来实现这个接口。
+
 3. 一个类只能有一个父类，但是可以实现多个接口，即单继承，多实现。
    ```typescript
       // 定义一个接口
@@ -1483,7 +1559,7 @@
       
       }
    ```
-6. 类继承接口。在常见的面向对象的编程语言中，接口时不能继承类的，但是在TypeScript中，接口是可以继承类的。
+6. 类继承接口。在常见的面向对象的编程语言中，接口时不能继承类的，但是在 TypeScript 中，接口是可以继承类的。
    ```typescript
       class Point {
           x: number;
@@ -1504,14 +1580,14 @@
       // {x: 1, y: 2, z: 3} 
       console.log(point3d);
    ```
-   - 我们创建的类，既可以当作一个类来使用（使用new关键字），也可以作为一个类型来使用（约束某个变量的类型）。
+   - 我们创建的类，既可以当作一个类来使用（使用 `new` 关键字），也可以作为一个类型来使用（约束某个变量的类型）。
      ```typescript
         function getPoint(p: Point) {
             console.log('x = ', p.x, 'y = ', p.y);
         } 
         getPoint({x: 10, y: 55});
      ```
-   - 我们在创建Point类时，同时也创建了一个名为 Point 的类型（实例的类型），用来约束实例的类型的。
+   - 我们在创建 Point 类时，同时也创建了一个名为 Point 的类型（实例的类型），用来约束实例的类型的。
    - 等价于下面的代码：新声明的 PointInstanceType 类型，与声明 class Point 时创建的 Point 类型是等价的。
      ```typescript
         interface PointInstanceType {
@@ -1525,15 +1601,15 @@
         
         printPoint({x: 47, y: 99});
      ```
-   - 当我们声明interface NewPoint3D extends Point3D时，实际上，NewPoint3D继承的时Point的实例类型。等价于`interface NewPoint3D extends PointInstanceType`
-   - NewPoint3D继承的是接口PointInstanceType。所以「接口继承类」和「接口继承接口」没有什么本质的区别。
+   - 当我们声明 `interface NewPoint3D extends Point3D` 时，实际上，NewPoint3D 继承的时 Point 的实例类型。等价于 `interface NewPoint3D extends PointInstanceType`
+   - NewPoint3D 继承的是接口 PointInstanceType。所以「接口继承类」和「接口继承接口」没有什么本质的区别。
      ```typescript
         interface NewPoint3D extends Point {
             z: number,
         }
      ```
    - 声明 Point 类时创建的 Point 类型只包含其中的实例属性和实例方法。也就是说，PointInstanceType没有构造方法，静态属性，静态方法
-   - 其实也很好理解，因为PointInstanceType时用来约束变量的，也就是实例，实例时没有静态属性和静态方法的。所以PointInstanceType没有构造方法，静态属性，静态方法，只有实例属性和实例方法。同理，接口在继承类的时候，也是只能继承实例属性和实例方法。
+   - 其实也很好理解，因为 PointInstanceType 时用来约束变量的，也就是实例，实例是没有静态属性和静态方法的。所以 PointInstanceType 没有构造方法，静态属性，静态方法，只有实例属性和实例方法。同理，接口在继承类的时候，也是只能继承实例属性和实例方法。
      ```typescript
         class NewPoint {
             // 静态属性，坐标原点
@@ -1598,8 +1674,10 @@
         ps2.printPoint();
      ```
      
-### 7. 泛型
+### 7. 泛型 —— Generic
+
 1. 泛型的作用。泛型指在定义函数、接口或类的时候，不预先指定具体的类型，而在使用的时候再指定类型的一种特性。
+
 2. 泛型的基本使用
    - 首先定义一个函数，创建一个指定长度并填充了指定值的数组，代码如下：
      ```typescript
@@ -1615,7 +1693,7 @@
         let ret = createArray(4, 'x');
         console.log(ret);
      ```
-   - createArray()的返回值类型是之前提到过的数组泛型.数组项被约束为any类型，同时value也是any类型，显然，数组项应该是和value同一个类型但是使用any是做不到的，因此这里引入了泛型。下面的代码展示了使用泛型定义函数：
+   - createArray() 的返回值类型是之前提到过的数组泛型。数组项被约束为any类型，同时 value 也是 any 类型，显然，数组项应该是和 value 同一个类型但是使用any是做不到的，因此这里引入了泛型。下面的代码展示了使用泛型定义函数：
      ```typescript
         function createArrayWithValue<T>(length: number, value: T): Array<T> {
             let ret: T[] = [];
@@ -1625,13 +1703,13 @@
             return ret;
         }
      ```  
-   - 我们在函数名后添加了 <T>，其中 T 用来指代任意输入的类型，在后面的输入 value: T 和输出 Array<T> 中即可使用,表示都是同一种数据类型。  
+   - 我们在函数名后添加了 `<T>`，其中 `T` 用来指代任意输入的类型，在后面的输入 `value: T` 和输出 `Array<T>` 中即可使用，表示都是同一种数据类型。  
    - 在使用的时候，我们在函数名的后面指定具体的数据类型：`<string>`，如下所示：
       ```typescript
          let ret2 = createArrayWithValue<string>(4, 'a');
          console.log(ret2);
       ```  
-   - 也可以不用指定具体的数据类型，TypeScript会自己进行推断：
+   - 也可以不用指定具体的数据类型，TypeScript 会自己进行推断：
       ```typescript
          let ret3 = createArrayWithValue(10, 0);
          console.log(ret3);
@@ -1664,7 +1742,7 @@
             length: number
         }
      ```
-   - 让泛型T继承LengthWise，进而对T进行了约束，T中必须有length属性。
+   - 让泛型 T 继承 LengthWise，进而对 T 进行了约束，T 中必须有 length 属性。
      ```typescript
         function loggingIndentity<T extends LengthWise>(arg: T): T {
             console.log(arg.length);
@@ -1715,6 +1793,7 @@
       console.log(car);
    ```
    **注意：在使用泛型接口的时候，需要定义泛型的类型。**
+
 6. 泛型类。在类上定义泛型。
    ```typescript
       class GenericsNumber<T> {
@@ -1760,7 +1839,9 @@
    - E（Element）：表示元素类型。
 
 ### 8. 声明合并
+
 1. 如果定义了两个或多个相同名字的函数、接口，那么它们会合并成一个类型。
+
 2. 函数重载。
    ```typescript
        function reverse(input: number): number;
@@ -1777,6 +1858,7 @@
        console.log(reverse('1234'));
    ```  
    精确定义写在前面，且只声明，不用写函数体。最后一个函数一定时包含前面所有类型，并定义了函数体。
+
 3. 接口合并。如果我们定义了多个同名的接口，TypeScript会将他们进行合并。
    ```typescript
       interface Alarm {
@@ -1803,7 +1885,7 @@
               weight: number;
          }
      ```
-   - 这里的price声明为string类型，在合并时就会报错，因为前面的price时number类型。
+   - 这里的 price 声明为 string 类型，在合并时就会报错，因为前面的 price 时 number 类型。
    - 接口中，函数的合并与函数重载相同。
      ```typescript
          interface Light {
@@ -1839,12 +1921,10 @@
         console.log(ll.alert('apple'));
         console.log(ll.alert(1235));
      ```  
-     注意：我们在定义ll这个对象中的alert()这个函数时，由于alert()属于函数重载，所以ll中的alert()接收的参数和返回值类型一定要将前面定义的alert()的参数和返回值类型包括进去，所以这里使用了泛型。  
-     ps：使用联合类型定义重载alert()会报错，不知道为什么。
+     注意：我们在定义 ll 这个对象中的 alert() 这个函数时，由于 alert() 属于函数重载，所以 ll 中的 alert() 接收的参数和返回值类型一定要将前面定义的 alert() 的参数和返回值类型包括进去，所以这里使用了泛型。  
+     ps：使用联合类型定义重载 alert() 会报错，不知道为什么。
 
-      
-
-### 9. 交叉类型
+### 9. 交叉类型 —— `&`
 
 1. 交叉类型是将多个类型合并为一个类型。也就是求并集。
 
@@ -1888,18 +1968,18 @@
       // }
       console.log(p10);
    ```
-4. 交叉类型可以解决代码的复用问题。如果我们想同时使用两个类型，而这两个类型中的属性由很多重合的，比如说html元素，此时，我们就可以使用交叉类型，将这个两个类型合并为一个新的类型。
+4. 交叉类型可以解决代码的复用问题。如果我们想同时使用两个类型，而这两个类型中的属性由很多重合的，比如说 html 元素，此时，我们就可以使用交叉类型，将这个两个类型合并为一个新的类型。
 
 5. 更多关于交叉类型的内容：[TypeScript 交叉类型](http://semlinker.com/ts-intersection-types/)
 
-### 10. 类型映射 —— Partial
+### 10. 类型映射 —— `Partial`
 
 1. 将一个接口中的所有属性变为可选属性。
 
 2. 用法
    - 语法：  
      `type newOptionalType = Partial<Type>`
-   - `Type`是我们需要转换的类型，返回值`newOptionalType`是一个新的类型，这个类型的属性与Type完全一样，只不过都是可选的（加了?）。
+   - `Type`是我们需要转换的类型，返回值`newOptionalType`是一个新的类型，这个类型的属性与Type完全一样，只不过都是可选的（加了 `?`）。
    
 3. 这是一个工具类型，我们可以全局使用。
 
@@ -1925,7 +2005,7 @@
       };
    ```
 
-### 11. 属性移除 —— Omit
+### 11. 属性移除 —— `Omit`
 
 1. 语法：`Omit<Type, Keys>`
 
