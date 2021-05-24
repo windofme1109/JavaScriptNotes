@@ -112,6 +112,7 @@
 
 3. for of
    - ES6 最新引入的遍历方式。
+   - for of 直接拿到的是数组的元素，不是索引。
    - 可以相应 break、continue
    - 不仅支持数组，还支持绝大多数类似数组对象，如 DOM nodelist 对象。
    - 支持字符串遍历。
@@ -152,7 +153,7 @@ js是单线程还是多线程，为什么这么设计
 
 3. for 循环
 
-## new Array()接收的参数是什么
+## new Array() 接收的参数是什么
 
 1. 如果只有一个参数且为数字，这个参数表示的是数组的长度。数组元素是 empty。 
 
@@ -181,36 +182,132 @@ js是单线程还是多线程，为什么这么设计
 2. 传入 {}。返回的也是是空对象，这个对象会继承 Object 原型链上的属性，如 tostring() 方法这些。
 
 3. 为什么用Object.create(null)
-   - 使用create创建的对象，没有任何属性，显示No properties，我们可以把它当作一个非常纯净的map来使用，我们可以自己定义hasOwnProperty、toString方法，不管是有意还是不小心，我们完全不必担心会将原型链上的同名方法覆盖掉。
-   - 在我们使用for…in循环的时候会遍历对象原型链上的属性，使用create(null)就不必再对属性进行检查了，也可以使用Object.keys[]
+   - 使用 create() 创建的对象，没有任何属性，显示 No properties，我们可以把它当作一个非常纯净的map来使用，我们可以自己定义 hasOwnProperty、toString 方法，不管是有意还是不小心，我们完全不必担心会将原型链上的同名方法覆盖掉。
+   - 在我们使用 for…in 循环的时候会遍历对象原型链上的属性，使用 create(null) 就不必再对属性进行检查了，也可以使用Object.keys()。
 
-4. 什么时候用Object.create(null)
-   - 你需要一个非常干净且高度可定制的对象当做数据字典的时候
-   - 减少hasOwnProperty造成的性能损失并且可以偷懒少些一点代码的时候
-   - 其他的时候，请用{} 
+4. 什么时候用 Object.create(null)
+   - 你需要一个非常干净且高度可定制的对象当做数据字典的时候。
+   - 减少 hasOwnProperty 造成的性能损失并且可以偷懒少些一点代码的时候。
+   - 其他的时候，请用 {}。
 
 ## 如何区分函数是 new 调用还是直接调用
 
 1. 通过 instanceof 判断
 
 
-防抖节流区分,手写
+## 防抖节流区分,手写
 
-实现 map,reduce
+## 实现 map,reduce
 
-统计字符串中次数最多字母
+1. map
+   ```javascript
+      /**
+       *
+       * @param callback
+       * @returns {[]}
+       */
+      Array.prototype.myMap = function (callback) {
+          let ret = [];
+      
+          for (let i = 0; i < this.length; i++) {
+              let temp = this[i];
+              ret.push(callback(temp, i));
+          }
+      
+          return ret;
+      }
+      
+      let arr = [1, 2, 3];
+      
+      let ret = arr.myMap((item, index) => item * 2);
+      
+      console.log(ret);
+   ```
+
+2. reduce 
+   ```javascript
+      /**
+       *
+       * @param callback
+       * @param initialVal
+       * @returns {*}
+       */
+      Array.prototype.myReduce = function (callback, initialVal) {
+      
+          // 存放累计结果，即 执行完 callback 的返回值
+          let accumulator = undefined;
+      
+          if (initialVal !== undefined) {
+              accumulator = initialVal;
+          } else {
+              accumulator = this[0];
+          }
+      
+          if (initialVal !== undefined) {
+              for (let i = 0; i < this.length; i++) {
+                  accumulator = callback(accumulator, this[i], i);
+              }
+          } else {
+              for (let i = 1; i < this.length; i++) {
+                  accumulator = callback(accumulator, this[i], i);
+              }
+          }
+      
+          return accumulator;
+      
+      }
+      
+      let arr = [1, 2, 3, 4];
+      
+      console.log(arr.myReduce((prev, cur) => prev + cur));
+   ```
+## 统计字符串中次数最多字母
 
 
 
 
-实现一个数组扁平化方法 flat
+## 实现一个数组扁平化方法 flat
 
-实现数组扁平化函数 flat
+1. 递归版
+   ```javascript
+      function flatten(arr) {
+          let ret = [];
+      
+          for (let key of arr) {
+      
+              if (Array.isArray(key)) {
+                  ret = ret.concat(flatten(key));
+              } else {
+                  ret.push(key)
+              }
+          }
+      
+          return ret;
+      }
+      const ret1 = flatten([['a'], ['b', 'd', ['e'], 'f'], ['c', [[['l']]]],'g', 'r', 'w']);
+      
+      console.log(ret1)
+      
+   ```
+2. reduce 版本
+   ```javascript
+      /**
+        * 2. reduce 版本
+        * @param arr
+        * @returns {*}
+        */
+        function flatten(arr) {
+            return arr.reduce((prev, cur) => {
+                return prev.concat(Array.isArray(cur) ? flatten(cur) : cur);
+            }, []);
+        }
+   ```
+## 实现数组扁平化函数 flat
 
 
-手写promise(写完then后面试官说可以了)
+手写 promise(写完then后面试官说可以了)
 
-说一下js中的类和 java 中的类的区别
+说一下 js 中的类和 java 中的类的区别
 
 原生js怎么实现拖放
 
@@ -220,9 +317,15 @@ axios源码整体架构
 
 手写Promise.all
 
-Promise中用了什么设计模式
+Promise 中用了什么设计模式
 
-Promise 都有哪些状态
+## Promise 都有哪些状态
+
+1. pending
+
+2. fulfill
+
+3. reject
 
 
 说下jwt
