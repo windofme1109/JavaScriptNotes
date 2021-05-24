@@ -30,3 +30,21 @@
 算法二:实现类似百度那种联想搜索(模糊匹配)
 
 数组去重怎么实现,不用set怎么实现
+
+算法1:rgb转16进制函数
+
+算法2:
+
+//实现一个retry函数
+//如果fn返回成功,则打印一下,最终结果成功
+//如果fn返回失败,则打印times下,最终结果失败
+retry(fn,times)
+retry(() => {
+  console.log('doing')
+  return Promise.reject(Error('done'))
+}, 3)
+
+retry(() => {
+  console.log('doing')
+  return Promise.resolve('done')
+}, 3)
