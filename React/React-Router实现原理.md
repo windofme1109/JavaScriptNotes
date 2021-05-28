@@ -42,12 +42,17 @@
 
 2. 由于 HashRouter 会在路径上添加 `/#/`，而 `/#/` 后面的所有都不会发送到服务器端，即对于服务器而言，路径依旧是 `localhost:8080`，路由切换在前端完成。
 
+3. 使用 hash 的路由模式：
+   ![](./img/hashRouter.png)
+
 ### 2. BrowserRouter
 
 1. BrowserRouter 监测的是浏览器地址栏的 url 中的 path 部分，根据具体的 path 来进行路由组件的切换。当地址栏的 path 发生变化时，浏览器会向服务器发送请求。
 
 2. 使用 BrowserRouter 需要再加一层服务器配置(node/nginx)，让前端发送的请求映射到对应的 html 文件上。
 
+3. 使用 history 的路由模式：
+   ![](./img/browserRouter.png)
 ### 3. 参考资料
 
 1. [深入了解 React Router 原理](https://www.jianshu.com/p/53dc287a8020)
