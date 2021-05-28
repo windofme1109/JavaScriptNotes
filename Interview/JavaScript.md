@@ -137,13 +137,13 @@
 
 5. 手写 call、apply 和 bind。
 
-js中函数是如何调用的
+## js 中函数是如何调用的
 
-说下原型和继承
+## 说下原型和继承
 
-说下浏览器事件循环
+## 说下浏览器事件循环
 
-js是单线程还是多线程，为什么这么设计
+## js是单线程还是多线程，为什么这么设计
 
 ## 类数组怎么转换成数组
 
@@ -196,6 +196,46 @@ js是单线程还是多线程，为什么这么设计
 
 
 ## 防抖节流区分,手写
+
+1. 防抖
+   - 事件触发以后，开始计时，如果事件继续被触发，则清空计时器，重新开始计时，直到计时间隔内没有事件被触发，则执行事件处理函数。
+   - 代码：
+     ```js
+        function debounce(fn, delay = 300) {
+            let timer;
+
+            return function () {
+                const context = this;
+                const args = arguments;
+
+                if (timer) {
+                    clearTimeout(timer);
+                }
+
+                timer = setTimeout(function () {
+                    fn.apply(context, args);
+                }, delay);
+            }
+        }
+     ```
+2. 节流
+   - 事件触发后，开始计时，在计时这段事件内，即使事件被触发，也不再响应，计时时间到，执行事件处理函数，同时清空定时器。
+   - 代码：
+     ```js
+        function throttle(fn, delay = 300) {
+            let timer;
+            return function () {
+                const context = this;
+                const args = arguments;
+                if (!timer) {
+                    timer = setTimeout(function () {
+                        timer = null;
+                        fn.apply(context, args);
+                    }, delay);
+                }
+            }
+        }
+     ```
 
 ## 实现 map,reduce
 
@@ -261,8 +301,43 @@ js是单线程还是多线程，为什么这么设计
       
       console.log(arr.myReduce((prev, cur) => prev + cur));
    ```
+
 ## 统计字符串中次数最多字母
 
+1. 思路
+   - 切分字符串
+   - 使用 reduce 分组，同级每个字母出现的次数
+   - for 循环找到出现次数最多的字母
+
+2. 代码：
+   ```js
+      function maxCount(str) {
+
+          // 统计每个字符出现的次数
+          let ret = str.split('').reduce((acc, ele) => {
+              if(acc[ele]) {
+                  acc[ele]++;
+              } else {
+                  acc[ele] = 1;
+              }
+              return acc;
+          }, {});
+
+          let maxCount = 0;
+          let maxCountLetter = '';
+
+          for (let key of Object.keys(ret)) {
+             let count = ret[key];
+             if (count > maxCount) {
+              maxCount = count;
+              maxCountLetter = key;
+             }
+          }
+
+       return maxCountLetter;
+
+      }
+   ``` 
 
 
 
@@ -304,21 +379,6 @@ js是单线程还是多线程，为什么这么设计
    ```
 ## 实现数组扁平化函数 flat
 
-
-手写 promise(写完then后面试官说可以了)
-
-说一下 js 中的类和 java 中的类的区别
-
-原生js怎么实现拖放
-
-平时对js和css基础有过了解吗
-
-axios源码整体架构
-
-手写Promise.all
-
-Promise 中用了什么设计模式
-
 ## Promise 都有哪些状态
 
 1. pending
@@ -327,21 +387,128 @@ Promise 中用了什么设计模式
 
 3. reject
 
+## 手写 promise(写完then后面试官说可以了)
+
+## Promise 中用了什么设计模式
+
+1. 观察者模式
+
+## 手写 Promise.all
+
+## promise.all 返回的是什么
+
+1. 返回值是一个 Promise。
+
+2. all 方法接收一个由多个 Promise 组成的数组，只有当所有的 Promise 都返回成功的状态，all 方法才返回成功状态的 Promise，只要其中有一个失败，就返回这个失败的 Promise。
+
+## promise.race 
+
+1. 返回值是一个 Promise。
+
+2. race 方法接收一个由多个 Promise 组成的数组，只要有一个 Promise 返回结果，无论是成功还是失败，race 就返回这个 Promise 的结果。取决于最快的哪个 Promise 结果。
+
+## Promise 里都是微任务吗
+
+1. then / catch / finally 都是微任务
+
+## new Promise 返回的实例和实例 then 方法执行后返回的 promise 是一个吗
+
+1. 不是一个，then 方法返回的是新的 Promise
+
+## promise 和 async 你觉得差异点是什么
+
+## js 为什么设计成单线程
+
+1. 这主要和 js 的用途有关，js 主要用于浏览器，实现用户和浏览器的交互，比如操作DOM，发送 ajax 请求等，这样的需求决定浏览器只能是单线程，如果是多线程，会带来复杂的同步问题。如果 js 是多线程，一个线程要修改 DOM，另外一个线程需要删除 DOM，那么浏览器完全不知所措。所以，现实的需求以及实现的简单性决定 js 是单线程的。
+
+## 事件循环说一下
+
+1. js 的任务分为两种，同步任务和异步任务，其中同步任务进入主线程执行，异步任务进入任务队列。
+
+2. 对于异步任务，首先其进入 event table 注册回调函数，然后等待异步任务被触发。当异步任务被触发以后，将回调函数放入 event queue 中，等待进入 js 主线程执行。当主线程的任务全部执行完成后，去 event queue 中取出任务放到主线程执行。上述过程不断循环执行，就是 event loop。
+
+## js 为什么会有回调地狱呢
+
+1. 因为 js 是单线程的，所以将任务分为同步任务和异步任务，异步任务依赖回调函数。
+
+2. 当一个事件被触发或任务完成时，回调函数此时会执行，同时接收这次事件或者任务的结果。此时如果有别的的异步任务依赖此次异步任务的结果，那么只能将别的异步任务放入回调中，这样就形成了回调函数的嵌套。
+
+3. 如果很多异步任务都依赖前一个异步任务的结果，那么就会形成多个回调函数的嵌套，因此就形成了回调地狱。
+
+4. 回调地狱的问题：代码可读性低、编写费劲、容易出错
+
+5. 解决方法：
+   - Promise
+   - async / await
+
+## 为什么 java 没有回调地狱
+
+1. java 一般用于服务端，服务端主要是 I/O 操作非常多，比如读取数据库、读取文件等，这些任务适合使用同步模式，也不会造成阻塞，因此，java 不会出现回调地狱。
+
+## 说一下 js 中的类和 java 中的类的区别
+
+1. js 没有真正的类，所谓的类，使用构造函数模拟出来。
+
+2. ES6 引入了 class 关键字，可以实现类似于 java 中类的功能，这个 class 只是语法糖，并不是真正的 class。
+
+
+## 说一下进程线程，如何通信?
+
+1. 进程
+   - 资源分配的最小的单位
+   - 它代表CPU 所能处理的单个任务。任一时刻，CPU 总是运行一个进程，其他进程处于非运行状态。
+   - 如果把 CPU 比作一个工厂，那么进程就是其中的一个车间，只不过这个工厂电力有限，一次只能一个车间开动。
+   - 不同的线程之间数据很难共享。
+   - 进程之间不会相互影响。
+2. 线程
+   - CPU 调度的最小单位。
+   - 还是以车间为例，车间里面有很多工人，他们一起协作，完成一个任务。线程就类似于车间里面的工人，一个进程下包括多个线程，多个线程一起完成一个任务。
+   - 进程之间可以共享数据，共享内存空间。
+   - 一个线程挂掉会导致整个进程崩溃。
+
+3. 
+
+## 两个线程可以直接通信吗
+
+1. 可以直接通信
+
+原生 js 怎么实现拖放
+
+平时对js和css基础有过了解吗
+
+axios源码整体架构
 
 说下jwt
 知道jwt有哪些缺点吗
 
-
-
 知道内存碎片怎么产生的吗 v8
-
-
 
 说一下锁(懵逼),举例是读锁和写锁
 
 为什么要去看axios的源码,大体实现
 
-this指向
+业务中的安全问题有没有遇到过?怎么解决的?(说了base64,cors,xss,csrf,cookie的httponly和samesite属性)
+
+react中遇到的坑，怎么解决的
+
+大数据量场景前端怎么处理,让页面展示尽可能流畅
+
+前端缩略图(截图)方案是什么
+
+业务中的实时保存会有性能开销,又没有做什么优化？
+
+如何设计这套缓存
+
+实现一个Map
+
+对技术栈或新技术上是怎样的一个态度
+聊一下代码检查(eslint,ts)
+
+git reset 和git rebase了解吗
+
+requestAnimationFrame 和 requestIdleCallback了解吗
+
+## this指向
 ```js
    var fullname = '1';
    var obj = {
@@ -360,26 +527,28 @@ this指向
 ```
 
 
-算法题1:节点渲染
+## 算法题1:节点渲染
+```js
+   const el = require('./element.js')；
+   const ul = el('ul', {id: 'list'}, [
+     el('li', {class: 'item'}, ['Item 1']),
+     el('li', {class: 'item'}, ['Item 2']),
+     el('li', {class: 'item'}, ['Item 3'])
+   ])
+   const ulRoot = ul.render();
+   document.body.appendChild(ulRoot);
 
-const el = require('./element.js')；
-const ul = el('ul', {id: 'list'}, [
-  el('li', {class: 'item'}, ['Item 1']),
-  el('li', {class: 'item'}, ['Item 2']),
-  el('li', {class: 'item'}, ['Item 3'])
-])
-const ulRoot = ul.render();
-document.body.appendChild(ulRoot);
+   <ul id='list'>
+     <li class='item'>Item 1</li>
+     <li class='item'>Item 2</li>
+     <li class='item'>Item 3</li>
+   </ul>
 
-<ul id='list'>
-  <li class='item'>Item 1</li>
-  <li class='item'>Item 2</li>
-  <li class='item'>Item 3</li>
-</ul>
+```
 
 算法题2:属性获取
-
-{
+```js
+   {
     a:{
       b:{
         c:{f:"aa"}
@@ -394,6 +563,8 @@ document.body.appendChild(ulRoot);
     }
 }
 // [f,g,i,c,e,h,k,b,d,j,a]
+```
+
 
 
 手写一个Scheduler类,实现并发控制
@@ -429,38 +600,6 @@ addTask(400, '4')
 // 1000ms时,1完成,输出1
 // 1200ms时,4完成,输出4
 
-说一下进程线程,如何通信?
-
-两个线程可以直接通信吗
-
-业务中的安全问题有没有遇到过?怎么解决的?(说了base64,cors,xss,csrf,cookie的httponly和samesite属性)
-
-
-
-react中遇到的坑，怎么解决的
-
-大数据量场景前端怎么处理,让页面展示尽可能流畅
-
-前端缩略图(截图)方案是什么
-
-业务中的实时保存会有性能开销,又没有做什么优化？
-
-
-
-js为什么设计成单线程
-
-事件循环说一下
-
-Promise里都是微任务吗
-
-new Promise返回的实例和实例then方法执行后返回的promise是一个吗
-
-
-git reset 和git rebase了解吗
-
-
-
-
 
 打印题
 
@@ -490,15 +629,6 @@ console.log(o2.fn())
 console.log(o3.fn())
 
 
-js为什么会有回调地狱呢
-
-为什么 java 没有回调地狱
-
-promise.all返回的是什么
-
-promise和async你觉得差异点是什么
-
-
 
 打印题
 
@@ -519,7 +649,7 @@ var p = test.init();
 p();
 new p()
 
-聊一下代码检查(eslint,ts)
+
 
 
 
@@ -533,9 +663,9 @@ function foo() {
         foo();
     }, 0)
 }
-requestAnimationFrame 和 requestIdleCallback了解吗
 
-node中加载相同模块,会重复打印吗
+
+
 
 //a.js 
 function foo() {
@@ -547,11 +677,7 @@ require('./a.js');
 require('./a.js');
 //node b.js
 
-如何设计这套缓存
 
-实现一个Map
-
-对技术栈或新技术上是怎样的一个态度
 
 事件循环的打印题(比较基础)
 
