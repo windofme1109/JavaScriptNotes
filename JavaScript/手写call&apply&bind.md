@@ -158,6 +158,7 @@
           // 就是实现 bindFn 的原型继承调用 bind 函数的原型
           bindFn.prototype = new Fn();
 
+          bindFn.prototype.constructor = bindFn;
           // 不能像下面这样写，因为这样如果 bindFn 的原型对象发生变化，会影响到原来的函数的原型对象
           // 所以需要使用 Fn 的实例对象进行隔离
           // bindFn.prototype = _this.prototype
