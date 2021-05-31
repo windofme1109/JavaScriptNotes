@@ -497,14 +497,25 @@ react中遇到的坑，怎么解决的
 
 业务中的实时保存会有性能开销,又没有做什么优化？
 
-如何设计这套缓存
+## 如何设计这套缓存
+```javascript
+   //a.js 
+   function foo() {
+       console.log('foo'); // 
+    }
+   foo();
+   //b.js
+   require('./a.js');
+   require('./a.js');
+   //node b.js
+```
 
 实现一个Map
 
 对技术栈或新技术上是怎样的一个态度
 聊一下代码检查(eslint,ts)
 
-git reset 和git rebase了解吗
+git reset 和 git rebase 了解吗
 
 requestAnimationFrame 和 requestIdleCallback了解吗
 
@@ -567,133 +578,136 @@ requestAnimationFrame 和 requestIdleCallback了解吗
 
 
 
-手写一个Scheduler类,实现并发控制
-//JS实现一个带并发限制的异步调度器Scheduler,
-//保证同时运行的任务最多有两个。
-//完善代码中Scheduler类,使得以下程序能正确输出：
-//Scheduler内部可以写其他的方法
-class Scheduler {
-  add(promiseCreator) { ... }
+## 手写一个 Scheduler 类,实现并发控制
 
-  // ...
-}
-
-const timeout = (time) => new Promise(resolve => {
-  setTimeout(resolve, time)
-})
-
-const scheduler = new Scheduler()
-const addTask = (time, order) => {
-  scheduler.add(() => timeout(time))
-    .then(() => console.log(order))
-}
-
-addTask(1000, '1')
-addTask(500, '2')
-addTask(300, '3')
-addTask(400, '4')
-// output: 2 3 1 4
-
-// 一开始,1、2两个任务进入队列
-// 500ms时,2完成,输出2,任务3进队
-// 800ms时,3完成,输出3,任务4进队
-// 1000ms时,1完成,输出1
-// 1200ms时,4完成,输出4
-
-
-打印题
-
-const o1 = {
- text: 'o1',
-  fn: function() { 
-   return this.text
-  }
-}
-
-const o2 = {
- text: 'o2',
-  fn: function() {
-   return o1.fn()
-  }
-}
-
-const o3 = {
- text: 'o3',
-  fn: function() {
-   var fn = o1.fn
-    return fn()
-  }
-}
-console.log(o1.fn())
-console.log(o2.fn())
-console.log(o3.fn())
-
-
-
-打印题
-
-var a = 20;
-var test = {
-  a: 40,
-  init: () => {
-    console.log(this.a);
-    function go() {
-      console.log(this.a);
-    }
-    go.prototype.a = 50;
-    return go;
-  }
-};
-
-var p = test.init();
-p();
-new p()
+```javascript
+   //JS实现一个带并发限制的异步调度器Scheduler,
+   //保证同时运行的任务最多有两个。
+   //完善代码中Scheduler类,使得以下程序能正确输出：
+   //Scheduler内部可以写其他的方法
+   class Scheduler {
+     add(promiseCreator) { ... }
+   
+     // ...
+   }
+   
+   const timeout = (time) => new Promise(resolve => {
+     setTimeout(resolve, time)
+   })
+   
+   const scheduler = new Scheduler()
+   const addTask = (time, order) => {
+     scheduler.add(() => timeout(time))
+       .then(() => console.log(order))
+   }
+   
+   addTask(1000, '1')
+   addTask(500, '2')
+   addTask(300, '3')
+   addTask(400, '4')
+   // output: 2 3 1 4
+   
+   // 一开始,1、2两个任务进入队列
+   // 500ms时,2完成,输出2,任务3进队
+   // 800ms时,3完成,输出3,任务4进队
+   // 1000ms时,1完成,输出1
+   // 1200ms时,4完成,输出4
+```
 
 
 
 
 
-解释下下面两段代码执行结果的差异
+## 打印题
 
-function foo() {
-    foo();
-}
-function foo() {
-    setTimeout(() => {
-        foo();
-    }, 0)
-}
+```javascript
+   const o1 = {
+    text: 'o1',
+     fn: function() { 
+      return this.text
+     }
+   }
+   
+   const o2 = {
+    text: 'o2',
+     fn: function() {
+      return o1.fn()
+     }
+   }
+   
+   const o3 = {
+    text: 'o3',
+     fn: function() {
+      var fn = o1.fn
+       return fn()
+     }
+   }
+   console.log(o1.fn())
+   console.log(o2.fn())
+   console.log(o3.fn())
+```
 
 
 
 
-//a.js 
-function foo() {
-    console.log('foo'); // 
- }
-foo();
-//b.js
-require('./a.js');
-require('./a.js');
-//node b.js
+## 打印题
+```javascript
+   var a = 20;
+   var test = {
+     a: 40,
+     init: () => {
+       console.log(this.a);
+       function go() {
+         console.log(this.a);
+       }
+       go.prototype.a = 50;
+       return go;
+     }
+   };
+   
+   var p = test.init();
+   p();
+   new p()
+
+```
+
+## 解释下下面两段代码执行结果的差异
+```javascript
+   function foo() {
+       foo();
+   }
+   function foo() {
+       setTimeout(() => {
+           foo();
+       }, 0)
+   }
+```
 
 
 
-事件循环的打印题(比较基础)
 
-setTimeout(() => {
-    console.log(1)
-}, 0)
-new Promise((resolve) => {
-    console.log(2)
-    for (let i = 0; i < 10000; i++) {
-        if (i === 9999) { resolve() }
-    }
-    console.log(3)
-}).then(() => {
-    console.log(4)
-})
-console.log(5)
+
+
+
+
+
+## 事件循环的打印题(比较基础)
+```javascript
+   setTimeout(() => {
+       console.log(1)
+   }, 0)
+   new Promise((resolve) => {
+       console.log(2)
+       for (let i = 0; i < 10000; i++) {
+           if (i === 9999) { resolve() }
+       }
+       console.log(3)
+   }).then(() => {
+       console.log(4)
+   })
+   console.log(5)
+```
+
 
 
 
