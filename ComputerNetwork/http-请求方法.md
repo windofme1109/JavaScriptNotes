@@ -66,7 +66,7 @@
    -POST 对数据长度无限制。
 
 2. 编码类型
-   - GET 只允许 ASCII 字符。非 ASCII 字符要进行编码转换。GET 请求的 content-type 通常是 `application/x-www-form-urlencode`
+   - GET 只允许 ASCII 字符。非 ASCII 字符要进行编码转换。GET 请求的 content-type 通常是 `application/x-www-form-urlencoded`
    - POST 没有限制，也允许二进制数据。编码类型：`application/x-www-form-urlencoded` 、 `multipart/form-data`、`application/json` 或者 `application/xml`。为二进制数据使用多重编码。
 
 3. 数据形式

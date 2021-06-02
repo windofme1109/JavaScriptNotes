@@ -103,7 +103,7 @@
 
 2. 只有一个命令 GET。
 
-3. 没有HEADER等描述数据的信息。
+3. 没有 HEADER 等描述数据的信息。
 
 4. 服务器发送完毕，就关闭TCP连接。
 
@@ -121,7 +121,7 @@
 
 2. pipeline。在一个 TCP 连接中可以同时发送多个 http 请求，但是服务器在处理请求的过程是按照顺序处理并返回的。也就是发送请求是并行，处理并返回数据是串行。 
 
-3. 增加了 host 和其他的命令。host 表示在同一台物理服务器上，我们要请求哪一个软件层次的服务，比如说是 java 服务或是node服务。
+3. 增加了 host 和其他的命令。host 表示在同一台物理服务器上，我们要请求哪一个软件层次的服务，比如说是 java 服务或是 node 服务。
 
 
 ### 4. http/2
@@ -438,48 +438,56 @@ Etag由服务器发送给浏览器。发起请求时，浏览器将Etag的值赋
 
 ### 3. 强缓存
 
-- 浏览器第一次请求数据，服务器除了将资源返回给浏览器之外，还会将缓存规则包含在响应header中。  
+- 浏览器第一次请求数据，服务器除了将资源返回给浏览器之外，还会将缓存规则包含在响应 header 中。  
 
-- 对于强缓存而言，响应header中有两个字段：Expires（过期时间）和Cache-Control，用来标明失效规则。
+- 对于强缓存而言，响应 header 中有两个字段：Expires（过期时间）和Cache-Control，用来标明失效规则。
   - Expires  
-  表示过期时间，是GMT格式的日期时间字符串。由服务器设置，并发送给浏览器。这个字段是http 1.0时期的产物。使用上存在问题，就是浏览器获取的是本地时间，但是本地时间容易被修改，这样就会导致这个过期的时间不准确。
+  表示过期时间，是 GMT 格式的日期时间字符串。由服务器设置，并发送给浏览器。这个字段是 http 1.0 时期的产物。使用上存在问题，就是浏览器获取的是本地时间，但是本地时间容易被修改，这样就会导致这个过期的时间不准确。
   - Cache-Control
   前面说到了，这里不详细说了。
-- 同时设置了Expires和Cache-Control，Cache-Control的优先级要高于Expires。
+
+- 同时设置了 Expires 和 Cache-Control，Cache-Control 的优先级要高于 Expires。
+
 - 那么什么是强缓存呢？实际上就是缓存没有过期，我们不需要发送请求，浏览器直接使用本地缓存即可。
+
 ### 4. 协商缓存
-- 也就是需要和服务器协商一下，能否使用缓存。
-- 缓存资源的头部的Cache-Control字段设置了no-cache，那么浏览器每次使用缓存前，都要发请求服务器，询问一下能否使用本地缓存，如果能使用，服务器返回304。不能使用，服务器返回最新的资源和和缓存标识给浏览器。
-- 具体过程
-  1. 浏览器第一次请求该资源，服务器将资源和缓存标识传递给浏览器，此时的缓存标识包含Last-Modified和Etag。
-  2. 如果未命中强缓存，则浏览器会发送请求到服务器。请求头主要包含两个字段：If-Modified-Since和If-None-Match。If-Modified-Since就是上一次服务器返回的Last-Modified的值，而If-None-Match则是上一次服务器返回的Etag的值。
-  3. 服务器接收到这个请求后，会将请求头中的If-Modified-Since同请求资源的最后修改时间（Last-Modified）进行比对：
-     - 如果最后修改时间同If-Modified-Since表示的时间相同，则说明资源文件没有发生变化，此时服务器返回304，不返回任何资源。通知浏览器可以继续使用本地缓存。
-     - 如果最后修改时间大于If-Modified-Since表示的时间，则说明资源文件发生变化，此时服务器返回200，并携带最新的资源返回。
-  4. 服务器将请求头中的If-None-Match与资源的唯一标识（Etag）进行比对：
+
+1. 也就是需要和服务器协商一下，能否使用缓存。
+
+2. 缓存资源的头部的 Cache-Control 字段设置了 no-cache，那么浏览器每次使用缓存前，都要发请求服务器，询问一下能否使用本地缓存，如果能使用，服务器返回 304。如果不能使用，服务器返回最新的资源和和缓存标识给浏览器。
+
+3. 具体过程
+  1. 浏览器第一次请求该资源，服务器将资源和缓存标识传递给浏览器，此时的缓存标识包含 Last-Modified 和 Etag。
+  2. 如果未命中强缓存，则浏览器会发送请求到服务器。请求头主要包含两个字段：If-Modified-Since 和 If-None-Match。If-Modified-Since 就是上一次服务器返回的 Last-Modified 的值，而 If-None-Match 则是上一次服务器返回的 Etag 的值。
+  3. 服务器接收到这个请求后，会将请求头中的 If-Modified-Since 同请求资源的最后修改时间（Last-Modified）进行比对：
+     - 如果最后修改时间同 If-Modified-Since 表示的时间相同，则说明资源文件没有发生变化，此时服务器返回 304，不返回任何资源。通知浏览器可以继续使用本地缓存。
+     - 如果最后修改时间大于 If-Modified-Since 表示的时间，则说明资源文件发生变化，此时服务器返回 200，并携带最新的资源返回。
+  4. 服务器将请求头中的 If-None-Match 与资源的唯一标识（Etag）进行比对：
      - 相同，则说明资源文件没有发生变化，此时服务器返回304，不返回任何资源。通知浏览器可以继续使用本地缓存。
      - 不同，则说明资源文件发生变化，此时服务器返回200，并携带最新的资源返回。
-   5. 注意，第3步和第4步是同时进行的。Etag的优先级高于Last-Modified。也就是说，优先验证Etag，没有变化的情况下，才会去验证Last-Modified。
+   5. 注意，第3步和第4步是同时进行的。Etag 的优先级高于 Last-Modified。也就是说，优先验证 Etag，没有变化的情况下，才会去验证 Last-Modified。
+
 ### 5. 一些问题总结
 
-- Etag与If-None-Match是一对，值相同，只不过Etag是服务器生成并传给浏览器的，而If-None-Match则是浏览器传递给服务器的。
+1. Etag 与 If-None-Match 是一对，值相同，只不过Etag是服务器生成并传给浏览器的，而If-None-Match则是浏览器传递给服务器的。
 
-- Last-Modified和If-Modified-Since是一对。Last-Modified是服务器生成传给浏览器的，而If-Modified-Since则是浏览器传递给服务器的。
+2. Last-Modified 和 If-Modified-Since 是一对。Last-Modified 是服务器生成传给浏览器的，而 If-Modified-Since 则是浏览器传递给服务器的。
 
-- Etag优先级高于Last-Modified。具体是这样：
+3. Etag 优先级高于 Last-Modified。具体是这样：
   - 如果同时有 etag 和 last-modified 存在，在发送请求的时候会一次性的发送给服务器，没有优先级，服务器会比较这两个信息（在具体实现上，大多数做法针对这种情况只会比对 etag）。
   - 服务器在输出上，如果输出了 etag 就没有必要再输出 last-modified（实际上大多数情况会都输出）。
 
-- 既然有了Last-Modified，为什么还要有Etag？  
-  - Last-Modified存在以下几个问题：
-    1. Last-Modified标注的最后修改只能精确到秒级，如果某些文件在1秒钟以内，被修改多次的话，它将不能准确标注文件的修改时间。
-    2. 如果某些文件会被定期生成，当有时内容并没有任何变化，但Last-Modified却改变了，导致文件没法使用缓存。
+4. 既然有了Last-Modified，为什么还要有 Etag？  
+  - Last-Modified 存在以下几个问题：
+    1. Last-Modified 标注的最后修改只能精确到秒级，如果某些文件在1秒钟以内，被修改多次的话，它将不能准确标注文件的修改时间。
+    2. 如果某些文件会被定期生成，当有时内容并没有任何变化，但Last-Modified 却改变了，导致文件没法使用缓存。
     3. 有可能存在服务器没有准确获取文件修改时间，或者与代理服务器时间不一致等情形。
-  - Etag是服务器自动生成或者由开发者生成的对应资源在服务器端的唯一标识符，能够更加准确的控制缓存。Last-Modified与ETag是可以一起使用的，服务器会优先验证ETag，一致的情况下，才会继续比对Last-Modified，最后才决定是否返回304。
-- 生成Etag的方式  
+  - Etag 是服务器自动生成或者由开发者生成的对应资源在服务器端的唯一标识符，能够更加准确的控制缓存。Last-Modified 与ETag 是可以一起使用的，服务器会优先验证 ETag，一致的情况下，才会继续比对 Last-Modified，最后才决定是否返回 304。
+
+5. 生成 Etag 的方式  
 根据文件的内容、修改时间、大小等生成。
 
-- 用户行为与缓存
+6. 用户行为与缓存
   
   |用户操作|Expires/Cache-Control|Etag/Last-Modified|
   :---:|:---:|:---:
@@ -491,22 +499,37 @@ Etag由服务器发送给浏览器。发起请求时，浏览器将Etag的值赋
   Ctrl+F5刷新|无效|无效
   
 ## 6. Cookie
-### 1. Cookie的基本说明
-- Cookie通过服务器返回响应头中的Set-Cookie设置的。
-- Set-Cookie是响应头的一个字段，通过这个字段，将Cookie保存到浏览器中。
-- 下一次浏览器请求同一个域下的资源时，就会在请求头中带上Cookie，这样保证在这一次会话中，服务器返回的资源都是属于当前用户的。（保持登录状态、记录了客户的一些行为）
-- Cookie是一对键值对，可以设置多个。
-### 2. Cookie的基本属性
-- max-age和expires设置过期时间。
-- Secure只在https的时候发送。
-- 设置了HttpOnly，表示无法通过JavaScript中的document.cookie访问。保证了安全性。
-- 禁止通过JavaScript访问一些重要的数据，是保证用户数据安全的重要措施。
 
-### 3. Cookie的Domain属性
-- Domain：域，表示当前cookie所属于哪个域或子域下面。
-- 对于服务器返回的Set-Cookie中，如果没有指定Domain的值，那么其Domain的值是默认为当前所提交的http的请求所对应的主域名的。比如访问 http://www.example.com，返回一个cookie，没有指名domain值，那么其为值为默认的www.example.com。
-- 例如，某个Cookie属于www.a.com，那么在www.b.com下就无法访问这个Cookie。还有有个域，是www.test.a.com，作为a的二级域名，和a应该属于同一个域，应该也可访问这个Cookie，那么我们可以通过设置Domian这个属性，来达到这个目的。
-- 在访问www.a.com时，我们咋服务器端设Cookie的domain属性为a.com，那么所有属于a.com域名下的二级、三级域名等都可以访问这个Cookie。设置方式：`'Set-Cookie': 'abc=123;domian=a.com'`
+### 1. Cookie的基本说明
+
+1. Cookie 通过服务器返回响应头中的 Set-Cookie 设置的。
+
+2. Set-Cookie 是响应头的一个字段，通过这个字段，将 Cookie 保存到浏览器中。
+
+3. 下一次浏览器请求同一个域下的资源时，就会在请求头中带上 Cookie，这样保证在这一次会话中，服务器返回的资源都是属于当前用户的。（保持登录状态、记录了客户的一些行为）
+
+4. Cookie 是一对键值对，可以设置多个。
+
+### 2. Cookie的基本属性
+
+1. max-age 和 expires 设置过期时间。
+
+2. Secure 只在 https 的时候发送。如果当前是 http，则不会发送这个 cookie。
+
+3. 设置了 HttpOnly，表示无法通过 JavaScript 中的 document.cookie 访问。保证了安全性。
+
+4. 禁止通过 JavaScript 访问一些重要的数据，是保证用户数据安全的重要措施。
+
+### 3. Cookie 的 Domain 属性
+
+1. Domain：域，表示当前 cookie 所属于哪个域或子域下面。
+
+2. 对于服务器返回的 Set-Cookie 中，如果没有指定 Domain 的值，那么其 Domain 的值是默认为当前所提交的 http 的请求所对应的主域名的。比如访问 `http://www.example.com`，返回一个 cookie，没有指名 domain 值，那么其为值为默认的 www.example.com。
+
+3. 例如，某个 Cookie 属于www.a.com，那么在www.b.com下就无法访问这个 Cookie。还有有个域，是 www.test.a.com，作为 a 的二级域名，和 a 应该属于同一个域，应该也可访问这个 Cookie，那么我们可以通过设置 Domian 这个属性，来达到这个目的。
+
+4. 在访问 www.a.com 时，我们在服务器端设  Cookie 的 domain 属性为 a.com，那么所有属于 a.com 域名下的二级、三级域名等都可以访问这个 Cookie。设置方式：`'Set-Cookie': 'abc=123;domian=a.com'`
+
 ## 7. http长连接  
 - http1.x有几种连接模式:
   - short-lived connections(短连接) 
@@ -608,6 +631,11 @@ Etag由服务器发送给浏览器。发起请求时，浏览器将Etag的值赋
 3. [看完这篇 HTTPS，和面试官扯皮就没问题了](https://juejin.cn/post/6844904089495535624)
 
 4. [HTTP和HTTPS协议，看一篇就够了](https://blog.csdn.net/xiaoming100001/article/details/81109617)
+4. [大前端进阶系列之HTTPS详解](https://juejin.cn/post/6956399640484773901)
+
+4. [「HTTPS」如何通俗易懂的给你讲明白HTTPS？](https://juejin.cn/post/6955767063524671524)
+
+4. [分分钟让你理解HTTPS](https://juejin.cn/post/6844903599303032845)
 
 ## 2. http 存在的问题
 
@@ -636,10 +664,10 @@ Etag由服务器发送给浏览器。发起请求时，浏览器将Etag的值赋
    ![](./img/https-2.image)
 
 3. 步骤：
-   1. 首先客户端通过URL访问服务器建立SSL连接。
+   1. 首先客户端通过 URL 访问服务器建立 SSL 连接。
    2. 服务端收到客户端请求后，会将网站支持的证书信息（证书中包含公钥）传送一份给客户端。
-   3. 客户端验证证书的有效性。然后和服务器开始协商SSL连接的安全等级，也就是信息加密的等级。
-   4. 客户端的浏览器根据双方同意的安全等级，建立会话密钥，然后利用网站的公钥将会话密钥加密，并传送给网站。
+   3. 客户端验证证书的有效性。验证通过后，从证书中提取公钥 Pub，并生成一个随机密钥 —— 会话密钥。
+   4. 浏览器使用公钥 Pub 对 会话密钥进行加密，然后传送给服务器。
    5. 服务器利用自己的私钥解密出会话密钥。
    6. 服务器利用会话密钥加密与客户端之间的通信。
 
@@ -662,8 +690,11 @@ Etag由服务器发送给浏览器。发起请求时，浏览器将Etag的值赋
 
 ## 1. 学习资料
 1. [Beginner’s Guide](http://nginx.org/en/docs/beginners_guide.html)
+
 2. [前端Nginx那些事](https://juejin.cn/post/6844904102447546382)
+
 3. [前端想要了解的Nginx](https://juejin.cn/post/6844903816521842702)
+
 4. [前端必备 Nginx 配置](https://juejin.cn/post/6844903942262882318)
 
 ## 2. Nginx 基本命令
@@ -799,7 +830,7 @@ nginx -s quit|等待工作进程处理完成后关闭
 
    ```
 
-2. 我们使用 Nginx 实现代理转发、http 缓存、负载均衡、反向代理等，这里主要记录代理转发和http 缓存的配置方式。
+2. 我们使用 Nginx 实现代理转发、http 缓存、负载均衡、反向代理等，这里主要记录代理转发和 http 缓存的配置方式。
 
 3. `#` 开头的是注释。
 
