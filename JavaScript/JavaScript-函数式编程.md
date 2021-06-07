@@ -117,9 +117,15 @@
 
 ### 1. 基本说明
 
+1. 偏函数，固定一个函数的一个或多个参数，然后返回一个新函数，在新函数中传入剩下的参数。
+
+2. 对任意位置进行占位。
+
+3. 柯里化可以理解为是一种特殊的偏函数。
+
 ### 2. 代码实现
 
-1. 闭包
+1. 闭包 —— 基础版
    ```js
       /**
        *
@@ -144,3 +150,56 @@
           }
       }      
    ```
+  
+2. 进阶版 —— 带占位符（仿照 underscore 中的 partial）
+
+   ```javascript
+   
+      // 全局变量
+      const _ = 'PLACEHOLDER';
+      
+      /**
+       * 偏函数 - 占位符
+       * 定义全局变量：_
+       * 使用 _ 表示占位
+       * @param fn
+       * @returns {function(): *}
+       */
+      const partial = function (fn) {
+    
+         // 取出占位的参数
+         const fixedArgs = Array.prototype.slice.call(arguments, 1);
+         return function () {
+             const restArgs = Array.prototype.slice.call(arguments);
+     
+             let position = 0;
+     
+             for (let i = 0; i < fixedArgs.length; i++) {
+                 // 将占位的参数替换掉
+                 if (fixedArgs[i] === _) {
+                     fixedArgs[i] = restArgs[position++];
+                 }
+             }
+     
+             while (position < restArgs.length) {
+                 // 固定的参数可能少于 fn 的实际参数个数
+                 // restArgs 中出出去填补 _，剩下的参数补上
+                 fixedArgs.push(restArgs[position++]);
+             }
+     
+             return fn.apply(this, fixedArgs);
+         }
+     }
+     
+      function sub(x, y) {
+         return y - x;
+      }
+      const subFive = partial(sub, 5);
+      const subFrom20 = partial(sub, _, 20);
+      // 15
+      console.log(subFive(20));
+      // 18
+      console.log(subFrom20(2));
+   ```
+   
+  
