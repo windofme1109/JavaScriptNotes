@@ -155,6 +155,72 @@
 
 ## 7. 算法 2 : 斐波那契数列
 
+1. 基础递归版本
+   ```js
+      /**
+       * 基础版 —— 正常递归
+       * @param n
+       * @returns {number|*}
+       * @constructor
+       */
+      function Fibonacci(n) {
+          if (n === 0) {
+              return 0;
+          }
+
+          if (n === 1) {
+              return 1;
+          }
+
+          return Fibonacci(n - 1) + Fibonacci(n - 2);
+      }
+   ```
+
+2. 尾递归版本
+   ```js
+      /**
+        * 尾调用版本
+        * 尾递归的实现，往往需要改写递归函数，确保最后一步只调用自身。做到这一点的方法，就是把所有用到的内部变量改写成函数的参数
+        * @param n
+        * @param first
+        * @param second
+        * @returns {number}
+        * @constructor
+        */
+         function Fibonacci(n, first = 1, second = 1) {
+             if (n <= 1) {
+                 return second;
+             }
+             / 将递推过程放到了计算参数过程中：first + second
+             return Fibonacci(n - 1, second, first + second);
+         }
+   ```
+
+3. 循环版本
+   ```js
+      /**
+      * 循环版本
+      * @param n
+      * @returns {number}
+      * @constructor
+      */
+      function Fibonacci(n) {
+         let first = 0;
+         let second = 1;
+         let sum = second;
+         if (n <= 1) {
+             return sum;
+         }
+
+         for (let i = 2; i <= n; i++) {
+             sum = first + second;
+             first = second;
+             second = sum;
+         }     
+
+         return sum;
+      }
+   ```
 ## 8. 算法 1 : 二叉树层序遍历和s形的层序遍历
 
 ## 9. 算法 2 : 如何在从左到右升序,从上到下升序,每一行第一个元素大于上一行最后一个元素的二维数组中查找某个数字的索引?如果是一维数组呢?
@@ -168,6 +234,126 @@
 ## 13. 算法 2 : 前 k 个元素
 
 ## 14. 实现一个带缓存的求阶乘函数
+
+1. 闭包
+   ```js
+      function cachedFactorial() {
+          let cache = {};
+
+          return function factorial(n) {
+              if (cache[n]) {
+                  return cache[n];
+              }
+
+              let ret;
+
+              if (n <= 1) {
+                  return n;
+              } else {
+                  ret = n * factorial(n - 1);
+              }
+
+              cache[n] = ret;
+
+              return ret;
+
+          }
+
+      }
+   ```
+
+## 15. 带缓存的斐波那契数列
+
+1. 闭包
+   ```js
+      function cachedFibonacci() {
+         let cached = {};
+
+         return function fibonacci(n) {
+             if (cached[n]) {
+                 return cached[n];
+             }
+
+             let ret;
+
+             if (n <= 1) {
+                 return n;
+             } else {
+                 ret = fibonacci(n - 1) + fibonacci(n - 2);
+             }
+
+             cached[n] = ret;
+
+             return ret;
+         }
+
+     }
+   ```
+
+
+## 16. 缓存函数
+
+1. 闭包 + 函数也是一个对象
+   ```js
+      /**
+        * 记忆函数，用来缓存函数的结果，仿照 understore 里面的 memoize 函数的写法
+        * @param fn
+        * @returns {function(*): *}
+        */
+         function memorized(fn) {
+             const memorized = function (key) {
+                 let cache = memorized.cache;
+                 if (!cache[key]) {
+                     cache[key] = fn.apply(this, arguments);
+                 }
+                 return cache[key];
+
+             }
+             memorized.cache = {};
+
+             return memorized;
+         }
+         // 如果要用好记忆函数的缓存功能，如果是递归调用，同时是数值计算的化，递归的形式最好如下所示，即将返回值函数写成递归形式
+         const memorizedFib = memorized(function(n) {
+              return n <= 1 ? n : memorizedFib(n - 1) + memorizedFib(n - 2);
+          });
+         
+          const memorizedFac = memorized(function(n) {
+             return n <= 1 ? 1 : n * memorizedFac(n - 1);
+          });
+   ```
+
+2. 单纯闭包
+   ```js
+      /**
+       * 单纯使用闭包实现缓存函数功能
+       * @param fun
+       * @returns {function(): *}
+       */
+       function cacheFunc(fun) {
+           let cache = {};
+
+           return function() {
+               let key = arguments[0];
+
+               if (!cache[key]) {
+                   cache[key] = fun.apply(this, arguments);
+               }
+
+               return cache[key];
+           }
+       }
+
+       const cachedFib = cacheFunc(function(n) {
+          return n <= 1 ? n : cachedFib(n - 1) + cachedFib(n - 2);
+       })
+   ```
+
+## 17. 函数柯里化 —— curried
+
+## 18. 函数组合 —— compose
+
+## 19. 偏函数 —— partial
 
 ## 15. 算法 1 : 给定一串数字, 求它全排列结果
 
