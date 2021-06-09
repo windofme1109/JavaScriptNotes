@@ -227,6 +227,29 @@
 
 ## 10. 算法 3 : 二分法的实现
 
+1. while 循环
+   ```js
+      function binarySearch(arr, key) {
+          let start = 0;
+          let end = arr.length - 1;
+          let guess;
+
+          while (start <= end) {
+              guess = Math.floor((start + end) / 2);
+
+              if (arr[guess] > key) {
+                  end = guess - 1;
+              } else if (arr[guess] < key) {
+                  start = guess + 1;
+              } else {
+                  return guess;
+              }
+          }
+
+         return -1;
+     }
+   ```
+
 ## 11. 算法 4 : 单链表反转
 
 ##  12. 算法 1 : promise 并发控制
@@ -351,19 +374,208 @@
 
 ## 17. 函数柯里化 —— curried
 
+1. 版本 1：
+   ```js
+      function curriedFunc(fn) {
+          if (typeof fn !== 'function') {
+              throw Error('fn must be function');
+          }
+          return function curried() {
+              const args = Array.prototype.slice.call(arguments);
+              if (args.length !== fn.length) {
+                  return function () {
+                      return curried.apply(this, args.concat(...arguments));
+                  }
+
+              }
+
+              return fn.apply(this, args);
+          }
+      }
+   ```
+2. 版本 2：
+   ```js
+      function curriedFunc(fn, params) {
+          return function () {
+              let args = Array.prototype.slice.call(arguments);
+
+              if (params !== undefined) {
+                  args = args.concat(params);
+              }
+
+              if (args.length !== fn.length) {
+                  return curriedFunc(fn, args);
+              }
+
+              return fn.apply(null, args);
+          }
+      }
+   ```
+
 ## 18. 函数组合 —— compose
+
+1. 版本 1：
+   ```js
+      /**
+       * 组合函数，将多个单参数函数组合为一个函数
+       * 接收多个单参数函数，这些单参数函数的执行顺序是从右向左
+       * @param args
+       * @returns {function(*=): *}
+       */
+      const compose = (...args) => {
+          // 组合函数从右向左执行
+          // 因此需要将其翻转过来
+          // 因为 reduce 的执行顺序是从左向右
+          args.reverse();
+
+          return function (value) {
+              return args.reduce((acc, fn) => {
+            return fn(acc)
+              }, value)
+          }
+
+      }
+   ```
 
 ## 19. 偏函数 —— partial
 
-## 15. 算法 1 : 给定一串数字, 求它全排列结果
+1. 版本 1：
+   ```js
+      const partial = function (fn) {
 
-## 16. 算法 2 : 实现类似百度那种联想搜索(模糊匹配)
+          // 取出占位的参数
+          const fixedArgs = Array.prototype.slice.call(arguments, 1);
+          return function () {
+              const restArgs = Array.prototype.slice.call(arguments);
+              let length = fixedArgs.length;
+              // 新建一个空数组，用来接收完整的参数
+              // 避免多次调用固定参数后的函数，对 fixedArgs 造成污染
+              const args = Array(length);
 
-## 17. 数组去重怎么实现,不用 set 怎么实现
+              let position = 0;
 
-## 18. 算法 1 : rgb 转 16 进制函数
+              for (let i = 0; i < length; i++) {
+                  // 向 args 数值填充数值
+                  // 判断固定的参数中是否有占位参数，如果有，就替换，没有，就直接取固定参数
+                  args[i] = fixedArgs[i] === _ ? restArgs[position++] : fixedArgs[i];
+             }
 
-## 19. 算法 2 :
+             while (position < restArgs.length) {
+                 // 固定的参数可能少于 fn 的实际参数个数
+                 // restArgs 中除去填补 _，剩下的参数补上
+                 args.push(restArgs[position++]);
+             }     
+
+             return fn.apply(this, args);
+         }
+     }
+   ```
+
+## 20. 算法 1 : 给定一串数字, 求它全排列结果
+
+## 21. 算法 2 : 实现类似百度那种联想搜索(模糊匹配)
+
+## 22. 数组去重怎么实现,不用 Set 怎么实现
+
+1. 使用 reduce + sort
+   ```js
+      function arrWithoutRepeat1(arr) {
+          // 排序
+          arr.sort((a, b) => a - b);
+      
+          let ret = arr.reduce((acc, cur) => {
+              if (acc.length === 0 || acc[acc.length - 1] !== cur) {
+                  acc.push(cur);
+              }
+      
+              return acc;
+          }, []);
+      
+          return ret;
+      }
+   ```
+2. 使用 filter + indexOf
+   ```javascript
+      function arrWithoutRepeat(arr) {
+          return arr.filter((item, index) => {
+              // 判断 item 首次出现的位置是否与当前 item 的索引相同
+              return index === arr.indexOf(item);
+          });
+      }
+   ```
+3. 使用 set
+   ```js
+      function arrWithoutRepeatUsingSet(arr) {
+          return [...new Set(arr)];
+      }
+   ```
+4. 使用 for + indexOf
+   ```js
+      function arrWithoutRepeat(arr) {
+          let ret = [];
+      
+          for (let i = 0; i < arr.length; i++) {
+              if (ret.indexOf(arr[i]) === -1) {
+                  ret.push(arr[i]);
+              }
+          }
+      
+          return ret;
+      }
+   ```
+
+## 23. 算法 1 : rgb 转 16 进制函数
+
+1. rgb 是三原色，每个颜色使用 0 - 255 之间的数字表示。
+
+2. 颜色也可以使用 16 进制表示。以 # 开头，一共六位，每两位表示一个颜色。
+
+3. 核心就是实现 10 进制转换为 16进制。
+
+4. 使用 toString。toString 可以接收一个数字作为参数，这个参数可以将指定的数字转换为这个参数指定的进制的数字。
+   ```js
+      function rgb2Hex(red, green, blue) {
+          return [red, green, blue].reduce((acc, cur) => {
+              return acc + cur.toString(16);
+          }, '#');
+      }
+   ```
+
+2. 自己实现一个 10 进制转 16 进制的算法：
+   ```js
+      function rgb2Hex(red, green, blue) {
+          return [red, green, blue].reduce((acc, cur) => {
+              return acc + toHex(cur);
+          }, '#');
+      }
+
+      /**
+       * 10 进制转 16 进制
+       * @param num
+       * @param radix
+       * @returns {string}
+       */
+       function toHex(num, radix = 16) {
+           let base = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'];
+           let remainder = num % radix;
+           let quotient = Math.floor(num / radix);
+
+           let ret = [remainder];
+
+
+           while (quotient !== 0) {
+               remainder = quotient % radix;
+               quotient = Math.floor(quotient / radix);
+               ret.push(remainder);
+           }
+
+          return ret.reverse().map(item => {
+              return base[item];
+          }).join('');
+       }      
+   ```
+
+## 24. 算法 2 :
    ```javascript
       //实现一个retry函数
       //如果fn返回成功,则打印一下,最终结果成功
