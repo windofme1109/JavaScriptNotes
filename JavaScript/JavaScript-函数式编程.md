@@ -152,8 +152,8 @@
    ```
   
 2. 进阶版 —— 带占位符（仿照 underscore 中的 partial）
-
-   ```javascript
+   - 实现方式 1
+     ```javascript
    
       // 全局变量
       const _ = 'PLACEHOLDER';
@@ -165,31 +165,35 @@
        * @param fn
        * @returns {function(): *}
        */
-      const partial = function (fn) {
-    
-         // 取出占位的参数
-         const fixedArgs = Array.prototype.slice.call(arguments, 1);
-         return function () {
-             const restArgs = Array.prototype.slice.call(arguments);
-     
-             let position = 0;
-     
-             for (let i = 0; i < fixedArgs.length; i++) {
-                 // 将占位的参数替换掉
-                 if (fixedArgs[i] === _) {
-                     fixedArgs[i] = restArgs[position++];
-                 }
-             }
-     
-             while (position < restArgs.length) {
-                 // 固定的参数可能少于 fn 的实际参数个数
-                 // restArgs 中出出去填补 _，剩下的参数补上
-                 fixedArgs.push(restArgs[position++]);
-             }
-     
-             return fn.apply(this, fixedArgs);
-         }
-     }
+       const partial = function (fn) {
+
+       // 取出占位的参数
+       const fixedArgs = Array.prototype.slice.call(arguments, 1);
+       return function () {
+           const restArgs = Array.prototype.slice.call(arguments);
+           let length = fixedArgs.length;
+           // 新建一个空数组，用来接收完整的参数
+           // 避免多次调用固定参数后的函数，对 fixedArgs 造成污染
+           const args = Array(length);
+
+           let position = 0;
+
+              for (let i = 0; i < length; i++) {
+                  // 向 args 数值填充数值
+                  // 判断固定的参数中是否有占位参数，如果有，就替换，没有，就直接取固定参数
+                  args[i] = fixedArgs[i] === _ ? restArgs[position++] : fixedArgs[i];
+              }
+        
+
+              while (position < restArgs.length) {
+                  // 固定的参数可能少于 fn 的实际参数个数
+                  // restArgs 中除去填补 _，剩下的参数补上
+                  args.push(restArgs[position++]);
+              }
+
+              return fn.apply(this, args);
+          }
+      }
      
       function sub(x, y) {
          return y - x;
@@ -200,6 +204,36 @@
       console.log(subFive(20));
       // 18
       console.log(subFrom20(2));
-   ```
+     ```
+   - 实现方式 2：
+     ```js
+
+        // 全局变量
+        const _ = 'PLACEHOLDER';
+        const partial2 = (fn, ...fixedArgs) => {
+           return (...restArgs) => {
+               // 建立 fixedArgs 的一个副本，使用这个副本接收完整的参数
+               // 避免多次调用固定参数后的函数，对 fixedArgs 造成污染
+               let args = fixedArgs.slice(0);
+
+               let position = 0;
+
+               for (let i = 0; i < args.length; i++) {
+                   if (args[i] === _) {
+                       args[i] = restArgs[position];
+                       position += 1;
+                   }
+               }
+
+               while (position < restArgs.length) {
+                   args.push(restArgs[position]);
+                   position += 1;
+               }
+               console.log(args);
+               return fn.apply(this, args);
+           }
+
+       }
+     ```
    
   
