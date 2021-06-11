@@ -110,7 +110,12 @@
       // e 
       console.log(result);
    ```   
+
 ## 5. 算法复杂度层面比较一下快排和其他排序
+  
+1. 快排和合并排序的时间复杂度是 O(nlogn)
+
+2. 冒泡、插入、选择的时间复杂度是 O(n^2)
 
 ## 6. 算法 1 : 数组中出现最多的数字
  
@@ -472,6 +477,62 @@
    ```
 
 ## 20. 算法 1 : 给定一串数字, 求它全排列结果
+
+1. 不带重复元素的：
+   ```js
+      function permute(nums) {
+          let ret = [];
+          let length = nums.length;
+
+          function backtrace(path) {
+              if (path.length === length) {
+                  return ret.push([...path]);
+              }
+
+              for (let i = 0; i < length; i++) {
+                  if (!path.includes(nums[i])) {
+                      path.push(nums[i]);
+                      backtrace(path);
+                      path.pop()
+                  }
+              }
+          }
+
+          backtrace([]);
+          return ret;
+      }
+   ```
+
+2. 带重复元素的
+   ```js
+      function permuteUnique(nums) {
+          let ret = [];
+          let index = [];
+          let length = nums.length;
+
+          function backtrace(path, index) {
+              if (path.length === length) {
+                  return ret.push([...path]);
+              }
+
+              for (let i = 0; i < length; i++) {
+                  if ((nums[i] === nums[i - 1] && index.inclues(i - 1)) || index.inclues(i)) {
+                      continue;
+                  }
+
+                  path.push(nums[i]);
+                  index.push(i);
+                  backtrace(path, index);
+                  path.pop();
+                  index.pop();
+              }
+          }
+
+          backtrace([], index);
+
+          return ret;
+      }
+   ```
 
 ## 21. 算法 2 : 实现类似百度那种联想搜索(模糊匹配)
 
