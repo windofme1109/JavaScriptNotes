@@ -210,8 +210,8 @@
 2. 适用场景：如果我们想撤销之前的某一版本，但是又想保留该目标版本后面的版本，记录下这整个版本变动流程，就可以用这种方法。
 
 3. 具体步骤：
-   1. 查看版本号：`git log`:
-      ![](./img/git-revert-2.png)
+   1. 查看版本号：`git log`:  
+      ![](./img/git-revert-2.png)  
       发现 `git revert 命令 - 3` 这次提交有问题，想要撤销。找到这一次提交的 hash 值：`a3f415087eb98aa96993b1638c92f72ebc2aa94c`
    2. 使用 `git revert -n 版本号` 回滚，并使用 `git commit -m 版本名` 提交。
       1. 回滚：`git revert -n a3f415087eb98aa96993b1638c92f72ebc2aa94c`
@@ -221,10 +221,13 @@
       ![](./img/git-revert-3.png)
    4. 将本地提交推送到远端：`git push`。
 
-4. 参考资料：
+4. `revert` 命令使得 head 指针继续向前，需要撤销的提交后面的提交依旧保留。
+
+5. 参考资料：
    1. [Git恢复之前版本的两种方法reset、revert（图文详解）](https://blog.csdn.net/yxlshk/article/details/79944535)
    2. [git（五）回退reset与revert](https://blog.csdn.net/LS7011846/article/details/105353309)
    3. [代码回滚：git reset、git checkout和git revert区别和联系](https://www.cnblogs.com/houpeiyong/p/5890748.html)
+
 ### 2.9 删除某一分支
 
 1. 某个分支由于某些原因，不想要了，只能删除。比如说我现在在 dev 分支上，想要删除 dev 分支。
