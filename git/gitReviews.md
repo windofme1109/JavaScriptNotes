@@ -211,8 +211,15 @@
 
 3. 具体步骤：
    1. 查看版本号：`git log`:
+      发现 `git revert 命令 - 3` 这次提交有问题，想要撤销。找到这一次提交的 hash 值：`a3f415087eb98aa96993b1638c92f72ebc2aa94c`
    2. `git revert test a a` 啊啊啊 
-   3. 使用 `git revert -n 版本号` 回滚，并使用 `git commit -m 版本名` 提交
+   3. 使用 `git revert -n 版本号` 回滚，并使用 `git commit -m 版本名` 提交。
+      1. 回滚：`git revert -n a3f415087eb98aa96993b1638c92f72ebc2aa94c`
+         这里可能会出现冲突，那么需要手动修改冲突的文件。而且要 `git add 文件名`。
+      2. 提交：`git commit -m "revert git revert 命令 - 3"`
+   4. 此时可以用 `git log` 查看本地的版本信息，可见多生成了一个新的版本，该版本反做了 `git revert 命令 - 3` 版本，但是保留了其后面的版本：
+      ![]()
+   5. 
 ### 2.9 删除某一分支
 
 1. 某个分支由于某些原因，不想要了，只能删除。比如说我现在在 dev 分支上，想要删除 dev 分支。
