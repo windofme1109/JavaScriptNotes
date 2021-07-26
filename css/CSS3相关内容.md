@@ -549,8 +549,8 @@
 
 4. 这里主要讲解 ::before 和 ::after。
    1. 含义：
-     - `::before` 在元素前面插入内容。
-     - `::after` 在元素后面插入内容。
+     - `::before` 在元素的内容前面插入内容。
+     - `::after` 在元素的内容后面插入内容。
    2. ::before 和 ::after 必须具有 content 属性。
    3. ::before 在内容前面，::after 在内容后面。
    4. ::before 和::after 创建一个元素，属于行内元素。想要变成块级元素，必须设置 display 属性为 block。
@@ -586,6 +586,14 @@
         ```
    - 效果：  
      ![](./img/伪元素图示.png)
+   - 上例等同于下面的 html 结构：
+     ```html
+        <div class="test">
+            <span>今天</span>
+            是
+            <span>星期三</span>
+        </div>
+     ```
 6. 用法示例 - 2（纯 css 实现一个圆环）：
    - HTML结构：
      ```html
