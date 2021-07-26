@@ -1,4 +1,7 @@
+<head>
 <script id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+
 # leetcode-刷题常见技巧-JavaScript
 
 ## 1. 如何初始化一个数组
