@@ -88,32 +88,8 @@
 
 1. 一些 markdown 渲染引擎原生支持 TeX 语法，使用 `$ ... $` 或者 `$$ ... $$` 包裹 Tex 数学公式即可。如：`$x^n$`、`$x_1$`，在预览中就能看到最终的数学公式。
 
-2. 由于各个 markdown 渲染引擎 TeX 语法支持力度不同，所有会出现兼容性问题，比如说，WebStorm 自带的 markdown 插件根本不支持 Tex 语法（坑爹）。
+2. Visual Studio Code 的插件 Markdown Preview Enhanced 内置了 KaTeX 和 MathJax 这两个渲染引擎。KaTeX 更加轻量，渲染速度更快，但是对于公式和符号的支持没有 MathJax 好。可以使用 `$ ... $` 或者 `\( ... \)`（行内公式）； `$$ ... $$` 或者 `\[ ... \]`（独立公式）来包裹公式。
 
-### 2. 引入 MathJax （推荐）
-
-1. 通过 `script` 标签引入 MathJax，这样，我们就可以在 markdown 中愉快地书写数学公式了。
-
-2. 这种方式是可以保证兼容性。但是，WebStorm 自带的 markdown 插件也不支持这种方式（坑爹）。
-
-3. 示例如下：
-   ```
-      <script id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-       # leetcode-刷题常见技巧-JavaScript
-       ## 1. 如何初始化一个数组
-       ## 2. 快速判断一个数是否是 2 的整次幂（\(2^n\)）
-       ## 3. 快速判断一个整数是奇数还是整数
-       ## 4. 快速求一个数的 n 次幂（\(x^n\)）
-       ## 5. 求一个数的平方根
-
-       ### 1. 二分查找 
-       ## 6. 如何快速从 1 - n 中筛选出素数
-       ## 7. 如何反转一个整数
-       ## 8. 快速求 \(n!\) 中末尾 0 的个数
-   ```
-   预览如下：
-   ![](./img/MathJax-markdown.png)
-4. 注意：MathJax 使用 `\( ... \)`（行内公式）、`\[ ... \]`（独立公式）来包裹 TeX 公式。不使用常见的 `$` 进行包裹。
 
 ## 4. jsDelivr 的用法
 
