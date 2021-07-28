@@ -1,3 +1,18 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [在 html 与 markdown 文档中引入数学公式](#%E5%9C%A8-html-%E4%B8%8E-markdown-%E6%96%87%E6%A1%A3%E4%B8%AD%E5%BC%95%E5%85%A5%E6%95%B0%E5%AD%A6%E5%85%AC%E5%BC%8F)
+  - [1. 参考资料](#1-%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99)
+  - [2. 在 html 中引入数学公式](#2-%E5%9C%A8-html-%E4%B8%AD%E5%BC%95%E5%85%A5%E6%95%B0%E5%AD%A6%E5%85%AC%E5%BC%8F)
+    - [1. 图片](#1-%E5%9B%BE%E7%89%87)
+    - [2. 使用 TeX 书写数学公式（推荐）](#2-%E4%BD%BF%E7%94%A8-tex-%E4%B9%A6%E5%86%99%E6%95%B0%E5%AD%A6%E5%85%AC%E5%BC%8F%E6%8E%A8%E8%8D%90)
+  - [3. 在 markdown 中引入数学公式](#3-%E5%9C%A8-markdown-%E4%B8%AD%E5%BC%95%E5%85%A5%E6%95%B0%E5%AD%A6%E5%85%AC%E5%BC%8F)
+    - [1. 原生支持 TeX 语法](#1-%E5%8E%9F%E7%94%9F%E6%94%AF%E6%8C%81-tex-%E8%AF%AD%E6%B3%95)
+  - [4. jsDelivr 的用法](#4-jsdelivr-%E7%9A%84%E7%94%A8%E6%B3%95)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # 在 html 与 markdown 文档中引入数学公式
 
 ## 1. 参考资料
