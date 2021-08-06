@@ -91,3 +91,82 @@
             <span style={{display: 'inherit'}} title={formVal.appInstruction}>产品说明：{formVal.appInstruction || '生态产品说明'}</span>
        </div>
    ```
+
+## 3. 去掉页面滚动条，但保留滚动效果
+
+### 1. 使用伪元素：`::-webkit-scrollbar`
+
+1. 在需要隐藏滚动条的元素上，使用这个伪元素，设置其 `display` 属性为 `none`，就可以隐藏滚动条。如下所示：
+   - html 结构：
+     ```html
+        <div className="outer">
+            <ul className="ul-outer">
+                <li>1</li>
+                <li>2</li>
+                <li>3</li>
+                <li>4</li>
+                <li>5</li>
+                <li>6</li>
+                <li>7</li>
+                <li>8</li>
+                <li>9</li>
+                <li>10</li>
+             </ul>
+         </div> 
+     ```
+   - css 代码：
+     ```css
+        .outer .ul-outer {
+           height:30px;
+           overflow: scroll;
+      }
+        .outer .ul-outer::-webkit-scrollbar {
+           display: none;
+        }
+     ```
+ 
+2. `::-webkit-scrollbar` 这个伪元素不是标准属性，只能在 webkit 内核的浏览器中使用。
+
+3. `::-webkit-scrollbar` 的说明：[::-webkit-scrollbar](https://developer.mozilla.org/zh-CN/docs/Web/CSS/::-webkit-scrollbar)
+
+
+
+### 2. 将滚动条遮住
+
+1. 在需要出现滚动条的元素的外面套一个父元素，父元素的宽度要比子元素小，同时设置父元素的 `overflow` 属性为 `hidden`，而 子元素的 `overflow-y` 设置为 `scroll` 或者 `auto`，`overflow-x` 设置为 `hidden`。因为 父元素的 `overflow` 属性为 `hidden`，所以子元素即使比父元素宽或者长，父元素也不会出现横向或纵向的滚动条。子元素的 `overflow-y` 设置为 `scroll`，当子元素的内容高度大于子元素的高度时，会出现纵向的滚动条。但是，由于父元素的宽度小于子元素，同时 父元素的 `overflow` 属性为 `hidden`，所以超出父元素范围的滚动条就被遮挡了，从视觉上就看不到这个滚动条了。
+
+2. 具体实现如下：
+   - html 结构：
+     ```html
+        <div class="outer">
+            <div class="inner">
+                <div class="num">1</div>
+                <div class="num">2</div>
+                <div class="num">3</div>
+                <div class="num">4</div>
+                <div class="num">5</div>
+                <div class="num">6</div>
+                <div class="num">7</div>
+             </div>
+         </div> 
+     ```
+   - css 代码：
+     ```css
+        .outer {
+            width: 100px;
+            overflow: hidden;
+            border: 1px red solid;
+        }
+        .outer .inner {
+            width: 120px;
+            height:70px;
+            overflow-y: scroll;
+            overflow-x: hidden;
+        }
+        .outer .inner .num {
+            width: 100px;
+            height: 20px;
+            background-color: greenyellow;
+            margin: 10px 0;
+        }
+     ```
