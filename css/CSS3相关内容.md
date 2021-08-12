@@ -567,12 +567,59 @@
    - 对伪元素进行定位，设置 `relative` 是基于其原本出现的位置进行定位。而设置 `absolute` 则是基于第一个非 `static` 的父元素进行定位。而且会脱离文档流。因此我们要设置其主元素的 `position` 为 `relative`，这样绝对定位的伪元素就是基于主元素进行定位。
    - 如果对伪元素设置了绝对定位，同时设置主元素为相对定位，不对伪元素设置 `top`、`left`、`right` 和 `bottom`，那么伪元素的位置还是原本出现的位置。
 
+6. 伪元素定位示例：
+   - HTML 结构：
+     ```html
+        <div className="test-box">
+            <div className="inner-box">
+                 hello world
+            </div>
+        </div>
+     ```
+   - css 样式：
+     ```css
+        .test-box {
+            position: relative;
+        }
+        .test-box .inner-box {
+            width: 100px;
+            height: 30px;
+            border: 1px solid rebeccapurple;
+        }
+
+        .test-box::after {
+            content: '';
+            width: 10px;
+            height: 28px;
+            display: block;
+            position: absolute;
+            background-color: yellow;
+       }
+     ```
+     此时伪元素没有设置 `top`、`left`、`right` 和 `bottom`，那么伪元素的位置还是原本出现的位置。如下图所示：
+     ![](./img/after-position.png)
+     设置了方位，css 如下所示：
+     ```css
+        .test-box::after {
+            content: '';
+            width: 10px;
+            height: 28px;
+            display: block;
+            position: absolute;
+            top: 1px;
+            left: 10px;
+            background-color: yellow;
+        }
+     ```
+     结果如下图所示：
+     ![](./img/after-position-2.png)
+
 6. 伪元素用法示例 - 1：
-   - HTML结构：
+   - HTML 结构：
      ```html
         <div class="test">是</div>
      ```
-   - css样式：
+   - css 样式：
      ```css
         .test {
             width: 300px;
@@ -600,7 +647,8 @@
             <span>星期三</span>
         </div>
      ```
-6. 用法示例 - 2（纯 css 实现一个圆环）：
+
+7. 用法示例 - 2（纯 css 实现一个圆环）：
    - HTML结构：
      ```html
            <div class="outer"></div>
