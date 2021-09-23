@@ -1,5 +1,20 @@
 # Koa2 基本用法总结
  
+## 相关资料
+
+1. [官方教程 - guide](https://github.com/koajs/koa/blob/master/docs/guide.md)
+   
+2. [官方 github 地址](https://github.com/koajs)
+
+3. [koa2 中间件列表](https://github.com/koajs/koa/wiki#middleware)
+
+4. [koa2 官方示例](https://github.com/koajs/examples)
+
+5. [koa 官网 - 英文](https://koajs.com)
+
+6. [Koa2教程（入门篇）](https://www.jianshu.com/p/5ba990127978)
+
+
 ## 1. Koa2 的基本使用
 
 1. Koa2 需要 v7.6.0 及其更高版本的 Node.js，在这个版本及以上的 node 支持 ES 2015 以及 async/await 函数。
@@ -23,7 +38,8 @@
       app.listen(7001);
    ```
 
-5. `use()` 方法接收一个中间件函数，用来实现对 ctx（上下文对象）进行处理。中间件使用 async 函数，这样使得内部可以以同步的方式处理异步任务。
+6. `use()` 方法接收一个中间件函数，用来实现对 ctx（上下文对象）进行处理。中间件使用 async 函数，这样使得内部可以以同步的方式处理异步任务。
+
 
 ## 2. Koa2 的路由
 
@@ -34,6 +50,8 @@
 3. Koa2 中的路由和 Express 有所不同，在 Express 中直接引入Express 就可以配置路由，但是在 Koa 中我们需要安装对应的  `koa-router` 路由模块来实现。
 
 4. `koa-router` 这个模块的最新版本已经更名为：`@koa/router` 
+
+4. github 地址：[@koa/router](https://github.com/koajs/router)
 
 ### 1. `@koa/router` 的基本使用
 
@@ -175,7 +193,9 @@
 9. 具体过程如下图所示：
    ![](./img/koa2-call_middleware.png)
 
-10. 中间件分类
+10. 来自官网的一张图：
+    ![](./img/koa2-middleware-official.gif)
+11. 中间件分类
     1. 应用级中间件
     2. 路由级中间件
     3. 错误处理中间件
@@ -320,6 +340,8 @@
 
 3. 安装 `koa-bodyparser`：`npm install --save koa-bodyparser`
 
+4. github 地址：[koa-bodyparser](https://github.com/koajs/bodyparser)
+
 4. 使用：
    ```js
       const Koa = require('koa');
@@ -337,10 +359,389 @@
           ctx.body = '<h1>login success!!!!!</h1>';
       });
    ```
-6. 另外一个处理 post 请求体的中间件：`koa-body`
+6. 另外一个处理 post 请求体的中间件：`koa-body`，这个中间件支持下面几种请求的 `content-type`：
+   - `multipart/form-data`
+   - `application/x-www-urlencoded`
+   - `application/json`
+   - `application/json-patch+json`
+   - `application/vnd.api+json`
+   - `application/csp-report`
+   - `text/xml`
+7. `koa-body` 还支持对上传文件的解析。而 `koa-bodyparser` 只支持 `json`, `form` and `text` 这几种类型的 post 请求体，不支持 `multipart/form-data`。也就是不支持对上传文件的解析。
 
+8. `koa-body` 的安装：`npm install koa-body`
+
+9. github 地址：[koa-body](https://github.com/koajs/koa-body)
+
+9. `koa-body` 的使用：
+   ```js
+      const Koa = require('koa');
+      const koaBody = require('koa-body');
+ 
+      const app = new Koa();
+ 
+      app.use(koaBody());
+      app.use(async (ctx, next) => {
+          ctx.body = `Request Body: ${JSON.stringify(ctx.request.body)}`;
+      });
+ 
+      app.listen(3000);
+   ```
+
+10. `koa-body` 与 `@koa/router` 一起使用：
+    ```js
+       const Koa = require('koa');
+       const Router = require('@koa/router');
+       const app = new Koa();
+       const router = new Router({
+          // path的前缀，设置了 prefix 参数，则所有的path必须以/users      开头，才能被处理
+          // / ————> /users/
+          // /news ————> /users/news
+          // prefix: '/users'
+       });
+       const koaBody = require('koa-body');
+       app.use(koaBody());
+       router.post('/users', (ctx) => {
+           console.log(ctx.request.body);
+         // => POST body
+         ctx.body = JSON.stringify(ctx.request.body);
+       });
+ 
+       app.use(router.routes());
+ 
+       app.listen(3000);
+    ```
 ## 5. Koa2 处理静态资源
+
+
+ 一个http请求访问web服务静态资源，一般响应结果有三种情况
+
+    访问文本，例如js，css，png，jpg，gif
+    访问静态目录
+    找不到资源，抛出404错误
+
+        koa-static主要是用于访问静态资源
+
+
+二、Koa 中koa-static中间件的使用
+
+
+1、安装 koa-static
+
+
+npm install --save koa-static
+
+github 地址：[koa-static](https://github.com/koajs/static)
+
+2、引入配置中间件
+
+
+const static = require('koa-static'); 
+
+app.use(static(
+    path.join( __dirname,  'public')
+)) 
+
+
+
+3、这个时候您的静态资源就可以被koa中间件解析了
+
+4. `koa-static` 底层基于 `koa-send`，`koa-send` 是一个用于静态文件存储的中间件。`koa-send` 的官方文档地址：[koa-send](https://github.com/koajs/send)
+
+示例代码：
+   ```js
+      const Koa = require('koa');
+      const app = new Koa();
+
+      const Router = require('@koa/router');
+      const router = new Router();
+
+      // 解析静态资源
+      // 通俗的说，就是将指定的文件夹暴露给浏览器，使得其能够直接访问
+      const serve = require('koa-static');
+
+      // serve() 方法接收一个根路径作为参数
+      // 比如说引入 css 的标签是：<link rel="stylesheet" href="css/style.css">
+      // 相对路径是：css/style.css
+      // 浏览器请求的 url 是：http://localhost:7001/static/css/style.css
+      // 直接请求肯定会报 404
+      // 使用 koa-static 这个中间件
+      // 服务器收到我们请求静态资源（image、js、css）的请求，使用 koa-static 中间件
+      // 将相对路径与 serve() 中传入的根路径进行拼接，即 ./static/css/style.css
+      // 将这个路径所指向的文件，作为响应，返回给浏览器
+      app.use(serve('./static'));
+
+      // 可以指定多个根路径
+      // 服务器会从上到下（调用next()方法），依次进行路径的拼接，并根据路径查询相关的资源
+      // 找到了，就直接返回给浏览器
+      app.use(serve('./public'));
+   ```
+   server() 可以接收一个相对路径，也可以接收一个绝对路径。
+
 
 ## 6. Koa2 处理 Cookies
 
+1、Koa中设置Cookie的值
+
+ctx.cookies.set(name, value, [options])
+
+
+
+通过 options 设置 cookie name 的 value :
+
+
+
+options 名称 options 值
+
+maxAge              一个数字表示从 Date.now() 得到的毫秒数
+expires cookie      过期的 Date
+path cookie         路径, 默认是'/'
+domain cookie       域名
+secure             安全 cookie   默认false，设置成true表示只有 https可以访问
+httpOnly           是否只是服务器可访问 cookie, 默认是 true
+overwrite          一个布尔值，表示是否覆盖以前设置的同名的 cookie (默认是 false). 如果是 true, 在同一个请求中设置相同名称的所有 Cookie（不管路径或域）是否在设置此Cookie 时从 Set-Cookie 标头中过滤掉。
+
+2、Koa中获取Cookie的值
+
+ctx.cookies.get('name');
+
+
+
+三、Koa中设置中文Cookie
+
+
+console.log(new Buffer('hello, world!').toString('base64'));// 转换成base64字符串：aGVsbG8sIHdvcmxkIQ==
+console.log(new Buffer('aGVsbG8sIHdvcmxkIQ==', 'base64').toString());// 还原base64字符串：hello, world!
+
+示例代码：
+```js
+   const Koa = require('koa');
+   const app = new Koa();
+
+   const Router = require('@koa/router');
+   const router = new Router();
+
+   // 解析静态资源
+   // 通俗的说，就是将指定的文件夹暴露给浏览器，使得其能够直接访问
+   const serve = require('koa-static');
+
+   app.use(serve('./static'));
+   app.use(serve('./public'));
+
+   const bodyParser = require('koa-bodyparser');
+   // 在解析post请求体之前，必须先使用bodyParser中间件
+   app.use(bodyParser());
+
+   const getPostData = require('./modules/common')
+
+
+   router.get('/news', async (ctx, next) => {
+
+       // 通过 ctx.cookies.get('name')来获取cookie，接收的参数是cookie的name
+       const userinfo = ctx.cookies.get('userinfo');
+       // 获取中文形式的cookie，由于中文是经过base64编码的，所以获取cookie值以后，还得进行base64解码
+       const encodedUserSchool = ctx.cookies.get('school');
+       // base64解码
+       const userSchool = Buffer.from(encodedUserSchool,    'base64').toString();
+      console.log(userinfo);
+       console.log(userSchool);
+   
+       ctx.body = `
+           <h1>新闻</h1>
+           <p>userInfo ${userinfo}</p>
+       `
+
+   });
+
+   router.get('/shop', async (ctx, next) => {
+
+      // 通过 ctx.cookies.get('name')来获取cookie，接收的参数是cookie的name
+      const userinfo = ctx.cookies.get('userinfo');
+
+   
+       console.log(userinfo);
+   
+       ctx.body = `
+           <h1>购物</h1>
+           <p>userInfo ${userinfo}</p>
+      `
+
+   });
+
+   router.get('/', async (ctx, next) => {
+
+       // 通过 ctx.cookies.set(name, value, [options])用来设置cookies
+       // options是可选参数，用来配置cookies的一些选项，值是一个对象
+       ctx.cookies.set('userinfo', 'jack', {
+           // maxAge表示这个cookies的最大存活时间
+        maxAge: 60*1000*60*24,
+           // expires表示过期的具体时间
+           // expires: '2020-12-23',
+           // 在哪个路径下，可以访问到这个cookie，设置了/news，则只有在这个路径下，才能访问cookie
+           // path: '/news',
+           // 设置cookie的域名，在这个域名下的二级域名界面（a.baidu.com，b.baidu.com），都可以访问这个cookie
+           // domain: '*.baidu.com',
+           // true表示这个cookie只有服务器可以访问，设置为false，服务器和客户端（js）都可以访问
+           // httpOnly: true,
+       })
+       // koa中的cookies无法直接设置中文
+       // 直接设置了中文，就提示TypeError: argument value is invalid
+       // ctx.cookies.set('school', '北邮', {
+       //     maxAge: 60*1000*60*24,
+       // })
+
+       // 想要在cookie中设置中文，必须先将中文转换为base64编码，获取这个cookie后，再进行base64解码
+       const userSchool = Buffer.from('北邮').toString('base64');
+       ctx.cookies.set('school', userSchool, {
+        maxAge: 60*1000*60*24,
+       })
+       ctx.body = `
+          <h1>首页</h1>
+       `
+   });
+```
+
+
 ## 7. Koa2 处理 Session
+
+ session是另一种记录客户状态的机制，不同的是Cookie保存在客户端浏览器中，而session保存在服务器上。
+
+
+二、Session的工作流程
+
+
+当浏览器访问服务器并发送第一次请求时，服务器端会创建一个session对象，生成一个类似于key,value的键值对， 然后将key(cookie)返回到浏览器(客户)端，浏览器下次再访问时，携带key(cookie)，找到对应的session(value)。 客户的信息都保存在session中
+
+
+github 地址：[koa-session](github.com/koajs/session)
+
+三、koa-session的使用: 
+
+
+1.安装  koa-session
+
+
+
+npm install koa-session --save
+
+
+
+2.引入express-session
+
+
+
+const session = require('koa-session');
+
+
+
+ 3.设置官方文档提供的中间件
+
+
+
+app.keys = ['some secret hurr'];
+const CONFIG = {
+   key: 'koa:sess',   //cookie key (default is koa:sess)
+   maxAge: 86400000,  // cookie的过期时间 maxAge in ms (default is 1 days)
+   overwrite: true,  //是否可以overwrite    (默认default true)
+   httpOnly: true, //cookie是否只有服务器端可以访问 httpOnly or not (default true)
+   signed: true,   //签名默认true
+   rolling: false,  //在每次请求时强行设置cookie，这将重置cookie过期时间（默认：false）
+   renew: false,  //(boolean) renew session when session is nearly expired,
+};
+app.use(session(CONFIG, app));
+
+
+
+4.使用
+
+     设置值 ctx.session.username = "张三";
+     获取值 ctx.session.username
+
+示例代码：
+   ```js
+      const Koa = require('koa');
+      const app = new Koa();
+
+      const Router = require('@koa/router');
+      const router = new Router();
+
+      // 设置Session
+      const session = require('koa-session');
+      /**
+       * 配置session
+       */
+
+        // 加密字符串（salt）
+        app.keys = ['some secret hurr'];
+
+        const CONFIG = {
+            // cookie的签名
+            key: 'koa.sess', /** (string) cookie key (default is koa.sess) */
+            /** (number || 'session') maxAge in ms (default is 1 days) */
+            /** 'session' will result in a cookie that expires when session/browser is closed */
+            /** Warning: If a session cookie is stolen, this cookie will never expire */
+            // 过期时间
+            maxAge: 86400000,
+            // 自动将cookie（与session相关的cookie）添加到请求头中
+            // 默认为true，设置为false，则不会添加，因此服务端获取不到相应的key，也就无法获取session
+            autoCommit: true, /** (boolean) automatically commit         headers (default true) */
+            overwrite: true, /** (boolean) can overwrite or not         (default true) */
+            httpOnly: true, /** (boolean) httpOnly or not (default true) */
+            signed: true, /** (boolean) signed or not (default true)         */
+            // 每次请求都重新设置session，即重置session的过期时间
+            rolling: false, /** (boolean) Force a session identifier cookie to be set on every response. The expiration is reset to the original maxAge, resetting the expiration countdown. (default is false) */
+            // 当session要过期的时候，更新session
+            renew: false, /** (boolean) renew session when session is nearly expired, so we can always keep user logged in. (default is false)*/
+            // 安全的cookie，要求必须是https访问
+            secure: false, /** (boolean) secure cookie*/
+            sameSite: null, /** (string) session cookie sameSite         options (default null, don't set it) */
+        };
+
+        app.use(session(CONFIG, app));
+
+        // 解析静态资源
+        // 通俗的说，就是将指定的文件夹暴露给浏览器，使得其能够直接访问
+        const serve = require('koa-static');
+
+        app.use(serve('./static'));
+        app.use(serve('./public'));
+
+        const bodyParser = require('koa-bodyparser');
+        // 在解析post请求体之前，必须先使用bodyParser中间件
+        app.use(bodyParser());
+
+        const getPostData = require('./modules/common')
+
+
+        router.get('/news', async (ctx, next) => {
+
+            // 获取session
+        const userinfo = ctx.session.userinfo;
+            ctx.body = `
+                <h1>新闻</h1>
+                <p>userInfo ${userinfo}</p>
+            `
+
+        });
+
+
+      router.get('/', async (ctx, next) => {
+
+          // 配置了koa-session中间件以后，在ctx对象上多出了一个session属性，我们能可以通过这个属性设置和读取session
+          // 设置session
+          ctx.session.userinfo = 'rose';
+
+          ctx.body = `
+        <h1>首页</h1>
+          `;
+      });
+
+
+
+
+      app.use(router.routes());
+      app.use(router.allowedMethods());
+
+      app.listen(7001);
+   ```
+
