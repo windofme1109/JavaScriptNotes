@@ -1,3 +1,22 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [浏览器对ES6模块的支持](#%E6%B5%8F%E8%A7%88%E5%99%A8%E5%AF%B9es6%E6%A8%A1%E5%9D%97%E7%9A%84%E6%94%AF%E6%8C%81)
+  - [1. 参考资料](#1-%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99)
+  - [2. 浏览器兼容性](#2-%E6%B5%8F%E8%A7%88%E5%99%A8%E5%85%BC%E5%AE%B9%E6%80%A7)
+  - [3. 浏览器中使用 ES6 模块](#3-%E6%B5%8F%E8%A7%88%E5%99%A8%E4%B8%AD%E4%BD%BF%E7%94%A8-es6-%E6%A8%A1%E5%9D%97)
+  - [4. 浏览器中使用 ES6 模块注意的地方](#4-%E6%B5%8F%E8%A7%88%E5%99%A8%E4%B8%AD%E4%BD%BF%E7%94%A8-es6-%E6%A8%A1%E5%9D%97%E6%B3%A8%E6%84%8F%E7%9A%84%E5%9C%B0%E6%96%B9)
+    - [1. 不能写“裸”路径](#1-%E4%B8%8D%E8%83%BD%E5%86%99%E8%A3%B8%E8%B7%AF%E5%BE%84)
+    - [2. 必须指定模块的后缀为 js](#2-%E5%BF%85%E9%A1%BB%E6%8C%87%E5%AE%9A%E6%A8%A1%E5%9D%97%E7%9A%84%E5%90%8E%E7%BC%80%E4%B8%BA-js)
+    - [2. 向下兼容](#2-%E5%90%91%E4%B8%8B%E5%85%BC%E5%AE%B9)
+    - [3. 默认的加载方式](#3-%E9%BB%98%E8%AE%A4%E7%9A%84%E5%8A%A0%E8%BD%BD%E6%96%B9%E5%BC%8F)
+    - [4. 多次加载同一模块，执行一次](#4-%E5%A4%9A%E6%AC%A1%E5%8A%A0%E8%BD%BD%E5%90%8C%E4%B8%80%E6%A8%A1%E5%9D%97%E6%89%A7%E8%A1%8C%E4%B8%80%E6%AC%A1)
+    - [5. 跨域限制](#5-%E8%B7%A8%E5%9F%9F%E9%99%90%E5%88%B6)
+    - [6. Mime-Type](#6-mime-type)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # 浏览器对ES6模块的支持
 
 ## 1. 参考资料
@@ -18,7 +37,7 @@
    
 8. [ESM Import与Bundle Free](https://juejin.cn/post/6933844113267638280) 
    
-9.  [ES6的模块加载，你们真的完全懂了吗？](https://juejin.cn/post/7001671927836180487) 
+9. [ES6的模块加载，你们真的完全懂了吗？](https://juejin.cn/post/7001671927836180487) 
     
 10. [JavaScript modules 模块](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Guide/Modules) 
     
@@ -27,6 +46,8 @@
 12. [在浏览器中使用JavaScript module(模块)](https://www.webhek.com/post/ecmascript-modules-in-browsers.html) 
 
 13. [在浏览器中使用ES6的模块功能 import 及 export](https://segmentfault.com/a/1190000014342718) 
+
+14. [Module 的加载实现 - 浏览器加载](https://es6.ruanyifeng.com/#docs/module-loader#%E6%B5%8F%E8%A7%88%E5%99%A8%E5%8A%A0%E8%BD%BD)
 
 ## 2. 浏览器兼容性
 
@@ -305,11 +326,63 @@
 ### 5. 跨域限制
 
 1. 浏览器默认不支持跨域请求模块，这一点儿与传统 js 或图片完全不一样。传统 js 或图片默认就是支持跨域的。
+   - 浏览器端示例：
+     ```html
+        <script type="module" src="http://localhost:8001/my-modules/myMath.js"></script>
+     ```
+     会被跨域阻止：
+     ![](./img/browser-module-cors.png)
 
-2. 如果想允许跨域请求 js 模块。需要在从服务器返回的 `header` 上显示的给予有效的 CORS声明：`Access-Control-Allow-Origin: *`。
+2. 如果想允许跨域请求 js 模块。需要在从服务器返回的 `header` 上显示的给予有效的 CORS 声明：`Access-Control-Allow-Origin: *`。后端设置如下:
+   ```js
+      router.get('/my-modules/myMath.js', async (ctx, next) => {
+          const time = Date.now();
+    
+          ctx.response.set({
+              'access-control-allow-origin': '*',
+          });
+          ctx.response.type = 'application/javascript';
+          ctx.body = `
+                 export function add(x, y) {
+                     return x + y;
+                 }
+          `;
+      });
+   ```
+   此时重新请求 myMath.js，就能顺利加载模块，不报跨域的错了。
+   ![](./img/browser-module-cors-2.png)
+   
 
-### 6. Mime-Types
+### 6. Mime-Type
 
-1. 不同于传统的 `scripts`, 对于 `type="module"` 的 `script` 标签，我们必须必须向浏览器提供有效的 `javascript` `MIME types`，不然请求到的模块 `javascript` 不会执行。即在响应头中设置 `content-type` 为 `application/javascript`。如下所示：
+1. 不同于传统的 `scripts`, 对于 `type="module"` 的 `script` 标签，我们必须必须向浏览器提供有效的 `javascript` `MIME types`，不然请求到的模块 `javascript` 不会执行。即在响应头中设置 `content-type` 为 `application/javascript` 或者 `text/javascript`。如下所示：
    ![](./img/browser-modules-content-type.png)
- 
+
+2. 我们在响应头中设置 content-type 为 `text/plain`：
+   ```js
+      router.get('/my-modules/myMath.js', async (ctx, next) => {
+         const time = Date.now();
+         ctx.response.set({
+           'access-control-allow-origin': '*',
+         });
+         ctx.response.type = 'text/plain';
+         ctx.body = `
+              export function add(x, y) {
+               return x + y;
+              }
+         `;
+      });
+   ```
+   浏览器端请求模块代码如下：
+   ```html
+      <script type="module">
+         import {add} from 'http://localhost:8001/my-modules/myMath.js';
+         console.log(add(2, 3));
+      </script>
+   ```
+   而我们指定当前的 `script` 标签内的脚本为 `module` 模式，那么浏览器会将 `myMath.js` 作为 js 模块进行加载。
+   但是在服务端，我们指定了 `myMath.js` 的 `content-type` 为 `text/plain`，即是纯文本文件，当浏览器收到响应以后，发现 `myMath.js` 的 `content-type` 为 `text/plain`，那么浏览器不会将 `myMath.js` 作为 js 文件去解析。
+   这样浏览器就会报错，信息如下：
+   ![](./img/browser-module-mime-type.png)
+
+3. 加载模块的时候，我们必须提供有效 `Mime Type`，这样浏览器才能将其识别为 js 模块并进行加载。有效的 `Mime Type` 包括 `application/javascript` 或者 `text/javascript`。
