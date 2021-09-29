@@ -263,6 +263,12 @@
           }, (err) => {
               console.log('then3 failure: ', err);
           })
+   
+         // 输出
+         // then1 failure:  1s 时间到了，触发 rejected 1
+         // then1 success:  2s 时间到了，触发 resolve 2
+         // then3 failure:  3s 时间到了，触发 rejected 3
+
    ```
 8. 上例中，p1 的状态最后是 rejected，所以调用的是第一个 then() 第二个回调函数。而 p2 的状态是 resolved，因此调用第二个 then() 的第二个回调函数，而 p3 的状态是 rejected，因此调用第三个 then() 的第二个回调函数。
 
@@ -272,9 +278,189 @@
 
 ### 1. Promise.prototype.then()
 
+1. then() 方法接收两个参数：onFulfilled 和 onRejected，onFulfilled 和 onRejected 是回调函数，其中 onFulfilled 是 Promise 状态变为 resolved 时调用，而 onRejected 是 Promise 状态变为 rejected 时调用。
+
+2. 如果忽略针对某个状态的回调函数参数，或者提供非函数 (nonfunction) 参数，那么 then 方法将会丢失关于该状态的回调函数信息，但是并不会产生错误。如果调用 then 的 Promise 的状态（fulfillment 或 rejection）发生改变，但是 then 中并没有关于这种状态的回调函数，那么 then 将创建一个没有经过回调函数处理的新 Promise 对象，这个新 Promise 只是简单地接受调用这个 then 的原 Promise 的终态作为它的终态。-- MDN
+
+3. then() 函数形式如下：
+   ```js
+      p.then(onFulfilled, [onRejected]);
+      p.then(value => {
+      // fulfillment
+      }, reason => {
+      // rejection
+      });
+   ```
+4. 函数说明：
+   - 参数
+     - onFulfilled 可选  
+       当 Promise 变成接受状态（fulfilled）时调用的函数。该函数有一个参数，即接受的最终结果（the fulfillment  value）。如果该参数不是函数，则会在内部被替换为 (x) => x，即原样返回 promise 最终结果的函数
+     - onRejected 可选  
+       当 Promise 变成拒绝状态（rejected）时调用的函数。该函数有一个参数，即拒绝的原因（rejection reason）。 如果该参数不是函数，则会在内部被替换为一个 "Thrower" 函数 (it throws an error it received as argument)。
+   - 返回值：当一个 Promise 完成（fulfilled）或者失败（rejected）时，返回函数将被异步调用（由当前的线程循环来调度完成）。具体的返回值依据以下规则返回。如果 then 中的回调函数：
+     1. 返回了一个值，那么 then 返回的 Promise 将会成为 resolved 状态，并且将返回的值作为 resolved 状态的回调函数的参数值。
+     2. 没有返回任何值，那么 then 返回的 Promise 将会成为 resolved 状态，并且该 resolved 状态的回调函数的参数值为 undefined。
+     3. 抛出一个错误，那么 then 返回的 Promise 将会成为 rejected 状态，并且将抛出的错误作为 rejected 状态的回调函数的参数值。
+     4. 返回一个已经是 resolved 状态的 Promise，那么 then 返回的 Promise 也会成为 resolved 状态，并且将那个 Promise 的 resolved 状态的回调函数的参数值作为该被返回的 Promise 的 resolved 状态回调函数的参数值。
+     5. 返回一个已经是 rejected 状态的 Promise，那么 then 返回的 Promise 也会成为 rejected 状态，并且将那个 Promise 的 rejected 状态的回调函数的参数值作为该被返回的 Promise 的 rejected 状态回调函数的参数值。
+     6. 返回一个未定状态（pending）的 Promise，那么 then 返回 Promise 的状态也是未定的，并且它的终态与那个 Promise 的终态相同；同时，它变为终态时调用的回调函数参数与那个 Promise 变为终态时的回调函数的参数是相同的。
+
+5. then() 函数返回一个 Promise 示例。这样就可以实现 then() 的链式调用。
+
+6. 如果前一个 then() 函数返回一个值，那么这个值会被 Promise.resolve() 包装，作为下一个 then() 的第一个回调函数的参数，即前一个 then() 返回的 Promise 变成 resolved 状态。
+
+7. 如果前一个 then() 函数抛出一个异常，那么这个异常会被 Promise.reject() 包装，作为下一个 then() 的第二个回调函数的参数，即前一个 then() 返回的 Promise 变成 rejected 状态。
+
+8. 示例 - 基本用法：
+      ```js
+      var fs = require('fs') ;
+
+      // 新建Promise对象
+      var p1 = new Promise(function(resolve, reject) {
+         // 异步操作
+         fs.readFile('./data/a.txt', 'utf-8', function(err, data) {
+              if (err) {
+                 // 任务失败
+                 // 容器的pending状态转变为rejected
+                 reject(err) ; 
+              } else {
+                 // 任务成功
+                // 容器的pending状态转变为resolved
+                resolve(data) ;
+              }
+          })
+      });
+   
+      p1.then(function(result) {
+          console.log('成功') ;
+          console.log(result) ;
+      }, function(err) {
+          console.log('失败') ;
+          console.log(err) ;
+      })
+
+   ```
+
+9. 示例 - 链式调用：
+   ```js
+      const p1 = new Promise((resolve, reject) => {
+
+          setTimeout(() => {
+              // resolve('1s 时间到了，触发 resolve 1');
+
+              reject('1s 时间到了，触发 rejected 1');
+          }, 1000);
+      });
+
+      const p2 = new Promise((resolve, reject) => {
+
+          setTimeout(() => {
+              resolve('2s 时间到了，触发 resolve 2');
+          }, 2000);
+      });
+
+      const p3 = new Promise((resolve, reject) => {
+
+          setTimeout(() => {
+              // resolve('3s 时间到了，触发 resolve 3');
+              reject('3s 时间到了，触发 rejected 3');
+          }, 3000);
+      });
+
+      // 简单的链式调用
+
+      p1
+          .then((res) => {
+              console.log('then1 success: ', res);
+              return p2;
+          }, (err) => {
+              console.log('then1 failure: ', err);
+              return p2;
+          })
+          .then((res) => {
+             console.log('then1 success: ', res);
+             return p3;
+          }, (err) => {
+              console.log('then2 failure: ', err);
+              return p3;
+          })
+          .then((res) => {
+              console.log('then3 success: ', res);
+          }, (err) => {
+              console.log('then3 failure: ', err);
+          })
+   
+         // 输出
+         // then1 failure:  1s 时间到了，触发 rejected 1
+         // then1 success:  2s 时间到了，触发 resolve 2
+         // then3 failure:  3s 时间到了，触发 rejected 3
+
+   ```
+
+
+
 ### 2. Promise.prototype.catch()
 
+1. 参考资料
+   - [深刻理解Promise系列(四):catch](https://www.jianshu.com/p/1c829edec185)
+   - [关于promise中reject和catch的问题](https://www.jianshu.com/p/78711885955b)
+   - [关于Promise.catch()错误捕获机制的理解](https://blog.csdn.net/weixin_44776206/article/details/109402410)
+
+2. catch() 方法用来捕获异常，即处理 Promise 为 rejected 的状态。实际上，catch() 内部调用的 Promise.prototype.then() 方法中的 rejected 状态下的方法，也就是调用 `obj.catch(onRejected)` 即调用其内部的 `obj.then(undefined, onRejected)`。
+
+3. 函数调用形式：
+   ```js
+      p.catch(onRejected);
+
+      p.catch(function(reason) {
+          // 拒绝
+      });
+
+   ```
+4. 函数参数说明：
+   - 参数：
+     - onRejected  
+       当 Promise 被 rejected 时,被调用的一个回调函数。 该函数拥有一个参数：
+reason，表示 rejection 的原因。  
+       如果then() 方法的第二个回调函数 onRejected 抛出一个错误或返回一个本身失败的 Promise， 通过 catch() 返回的 Promise 被 rejected；否则，它将显示为成功（resolved）。 
+   - 返回值：一个Promise。
+
+5. catch() 方法返回的还是一个 Promise 对象，因此后面还可以接着调用 then() 方法。
+
+6. catch() 方法之中，还能再抛出错误。
+
+
 ### 3. Promise.prototype.finally()
+
+finally() 方法返回一个Promise。在promise结束时，无论结果是fulfilled或者是rejected，都会执行指定的回调函数。这为在Promise是否成功完成后都需要执行的代码提供了一种方式。
+这避免了同样的语句需要在then()和catch()中各写一次的情况。
+语法
+
+p.finally(onFinally);
+
+p.finally(function() {
+// 返回状态为(resolved 或 rejected)
+});
+
+参数
+
+onFinally
+Promise 结束后调用的Function。
+
+返回值
+
+返回一个设置了 finally 回调函数的Promise对象。
+描述
+
+如果你想在 promise 执行完毕后无论其结果怎样都做一些处理或清理时，finally() 方法可能是有用的。
+
+finally() 虽然与 .then(onFinally, onFinally) 类似，它们不同的是：
+
+    调用内联函数时，不需要多次声明该函数或为该函数创建一个变量保存它。
+    由于无法知道promise的最终状态，所以finally的回调函数中不接收任何参数，它仅用于无论最终结果如何都要执行的情况。
+    与Promise.resolve(2).then(() => {}, () => {}) （resolved的结果为undefined）不同，Promise.resolve(2).finally(() => {}) resolved的结果为 2。
+    同样，Promise.reject(3).then(() => {}, () => {}) (fulfilled的结果为undefined), Promise.reject(3).finally(() => {}) rejected 的结果为 3。
+
 
 ### 4. Promise.all()
 
@@ -415,7 +601,46 @@
 8. 如果迭代包含一个或多个非承诺值和/或已解决/拒绝的承诺，则 Promise.race 将解析为迭代中找到的第一个值。
 
 ### 6. Promise.resolve()
+https://www.cnblogs.com/qianxiaox/p/14124551.html
+https://blog.csdn.net/qq_37939251/article/details/93650542
+https://www.jianshu.com/p/3bd1c6865bba
+
+Promise.resolve(value)方法返回一个以给定值解析后的Promise 对象。如果这个值是一个 promise ，那么将返回这个 promise ；如果这个值是thenable（即带有"then" 方法），返回的promise会“跟随”这个thenable的对象，采用它的最终状态；否则返回的promise将以此值完成。此函数将类promise对象的多层嵌套展平。
+
+语法
+
+Promise.resolve(value);
+
+参数
+
+value
+
+将被Promise对象解析的参数，也可以是一个Promise对象，或者是一个thenable。
+返回值
+
+返回一个带着给定值解析过的Promise对象，如果参数本身就是一个Promise对象，则直接返回这个Promise对象。
+描述
+
+静态方法 Promise.resolve返回一个解析过的Promise对象。
+
+
+
 
 ### 7. Promise.reject()
-   
-   
+
+Promise.reject()方法返回一个带有拒绝原因的Promise对象
+
+Promise.reject(reason);
+
+参数
+
+reason
+表示Promise被拒绝的原因。
+
+返回值
+
+    一个给定原因了的被拒绝的 Promise。
+
+描述
+
+静态函数Promise.reject返回一个被拒绝的Promise对象。通过使用Error的实例获取错误原因reason对调试和选择性错误捕捉很有帮助。
