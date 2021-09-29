@@ -65,7 +65,7 @@
    ```  
    `this.middlewareList` 用来存放中间件函数。
 
-3.  在 LikeKoa2 类中，定义 use()、Listen() 函数。
+3.  在 LikeKoa2 类中，定义 use()、listen() 函数。
     ```javascript
        use(fn) {
            this.middlewareList.push(fn);
