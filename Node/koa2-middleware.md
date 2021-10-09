@@ -151,8 +151,79 @@
    ```javascript
       module.exports = LikeKoa2;
    ```
- 
-7. 完整的代码：
+
+7. 完善版本的 compose() 函数，添加以下几个功能：
+   - 判断 middlewareList 是不是数组
+   - 判断 middlewareList 中的元素是不是函数
+   - 判断一个中间件函数中是否多次调用 next()
+   - 完善版的 compose() 代码如下：
+     ```js
+        function myCompose(middlewareList) {
+            // 判断 middlewareList 是不是一个数组，如果不是数组，抛出异常
+            if (!Array.isArray(middlewareList)) {
+                throw new TypeError('middlewareList must be an array!');
+            }
+
+            // 判断每个中间件是不是函数，如果有中间件不是函数，则抛出异常
+            for (const fn of middlewareList) {
+                if (typeof fn !== 'function') {
+                    throw new TypeError('middleware must be a function!');
+                }
+            }
+            return function (ctx) {
+
+                // 用来记录当前调用的是第几个中间件
+                let index = -1;
+                return dispatch(0);
+
+                function dispatch(i) {
+                    // 因为中间件是按照剥洋葱模式进行调用
+                    // 在中间件内部调用 next()，就是对下一个中间件函数的调用
+                    // 实际上，在进行组合的时候，我们已经将中间件函数的调用顺序确定了
+                    // 比如说，现在有两个中间件 m1 和 m2，那么进行组合的时候是这样的：
+                    // dispatch(0) {
+                    //    return m1(ctx, dispatch.bind(null, 1));
+                    // }
+                    // dispatch(1) 如下：
+                    // dispatch(1) {
+                    //      return m2(ctx, dispatch.bind(null, 2));
+                    //
+                    // }
+                    // dispatch(2) 如下：
+                    // dispatch(2) {
+                    //      return Promise.resolve();
+                    //
+                    // }
+                    // 如果我们在 m1 里面调用 next() 函数，那么实际上是调用的是 dispatch(1)
+                    // 如果我们在 m2 里面调用 next() 函数，那么实际上是调用的是 dispatch(2)
+                    // 所以，我们每在一个中间件函数中调用 next()，那么 dispatch() 的参数 i 就会在当前基础上加 1
+                    // 如果我们在一个中间件函数中多次调用 next()，比如说在 m1 中调用两次 next()，那么实际上是调用了两次 dispatch(1)
+                    // 第一次调用 next()，i = 1，此时 index = 0，i > index，正常执行后面的流程，所以 index = i = 1
+                    // 第一次调用 next()，i 还是为 1，此时 index = 1，i = index，重复调用了 next，因此要抛出异常
+                    // 所以，只要是同一个中间件函数内部多次调用 next()，参数 i 都不会加 1
+                    // 所以这里要进行判断，如果 i <= index，表示我们调用了多次 next() 函数，要抛出一个异常
+                    if (i <= index) {
+                        return Promise.reject(new Error('next called multiple times'));
+                    }
+
+                    index = i;
+                    // 取出中间件函数
+                    let fn = middlewareList[i];
+                    if (!fn) {
+                        return Promise.resolve();
+                    }
+
+                    try {
+                        return Promise.resolve(fn(ctx, dispatch.bind(null, i + 1)));
+                    } catch (err) {
+                        return Promise.reject(err);
+                    }
+
+                }
+            }
+        }
+     ```
+8. 完整的代码：
    ```javascript
       const http = require('http');
       
