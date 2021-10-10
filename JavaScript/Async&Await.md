@@ -10,15 +10,30 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-## 1. async/await
+# 1. async/await
+
+# 1. 特点
+1. 内置执行器
+
+2. async 函数返回的是 Promise 对象,Promise 可以作为 await 命令的参数
+
+3. 比起星号和 yield，更好的语义
+
+4. await 命令后面，可以是 Promise 对象和原始类型的值（数值、字符串和布尔值，但这时会自动转成立即 resolved 的 Promise 对象）
+
+5. await 必须写在 async 函数中
+
+6. async 函数内部 return 语句返回的值，会成为 then 方法回调函数的参数
+
+
 
 ### 1.1 用法
 
-- 在函数定义时，在function关键字前面加上async，表明函数内部有异步操作。await放在async函数内部，在需要异步操作的语句前面加上await。代码示例如下：
+- 在函数定义时，在 function 关键字前面加上 async，表明函数内部有异步操作。await 放在 async 函数内部，在需要异步操作的语句前面加上 await。代码示例如下：
  ```javascript
        async function readFile(fileName) {
-        // readFile()是一个异步读取文件的函数
-        const content = await readFile() ;
+        // read()是一个异步读取文件的函数
+        const content = await read(fileName) ;
       
         return content ;
   }
@@ -26,7 +41,7 @@
   
 ### 1.2 调用
 
-- 使用async定义的函数返回值是promise对象，可以使用then()方法。 
+- 使用 async 定义的函数返回值是 promise 对象，可以使用 then() 方法。 
  ```javascript
       readFile('a.txt').then((result) => {
         conole.log(result) ;
@@ -35,11 +50,11 @@
 
 ### 1.3 注意的问题
 
-- async 函数返回的是一个 Promise 对象（从文档中也可以得到这个信息）。async 函数（包含函数语句、函数表达式、Lambda表达式）会返回一个 Promise 对象，如果在函数中 return 一个直接量，async 会把这个直接量通过 Promise.resolve() 封装成 Promise 对象。
+1. async 函数返回的是一个 Promise 对象（从文档中也可以得到这个信息）。async 函数（包含函数语句、函数表达式、Lambda 表达式）会返回一个 Promise 对象，如果在函数中 return 一个直接量，async 会把这个直接量通过 Promise.resolve() 封装成 Promise 对象。
 
-- async函数返回一个promise对象，所以，可以使用then()方法添加回调函数。
+2. async 函数返回一个 promise 对象，所以，可以使用 then() 方法添加回调函数。
 
-- await等待的是一个表达式，这个表达式计算结果可以是Promise对象也可以是其他值。
+3. await 等待的是一个表达式，这个表达式计算结果可以是 Promise 对象也可以是其他值。
  ```javascript
     function getSomething() {
         return 'something' ;
@@ -58,7 +73,7 @@
     // something hello async
     test() ;
  ```
-- await遇到Promise对象，然后阻塞后面的代码，等着Promise对象Resolve，然后得到resolve的值，作为await的表达式的结果。也就是说，await等待的是Promise对象执行的结果，即执行成功的结果。async 函数调用不会造成阻塞,它内部所有的阻塞都被封装在一个 Promise 对象中异步执行。
+- await 遇到 Promise 对象，然后阻塞后面的代码，等着 Promise 对象Resolve，然后得到 resolve 的值，作为 await 的表达式的结果。也就是说，await 等待的是 Promise 对象执行的结果，即执行成功的结果。async 函数调用不会造成阻塞,它内部所有的阻塞都被封装在一个 Promise 对象中异步执行。
  ```javascript
     function takeLongTime() {
         return new Promise(function (resolve, reject) {
@@ -83,9 +98,9 @@
        console.log(err) ;
     }
  ```
-### 1.4 async/await的优势
+### 1.4 async/await 的优势
 
-- 优势在于Promise的then()方法的链式调用。代码示例如下：
+- 优势在于 Promise 的 then() 方法的链式调用。代码示例如下：
  ```javascript
     function takeLongTime(n) {
         return new Promise(function (resolve, reject) {
@@ -184,7 +199,7 @@
   
   总结：要使用 await 获取的异步操作结果，必须在 async 函数内部使用，在 async 函数外部，依旧无法获取异步操作的结果。
   
-- 从 Node 的v10版本里增加了 Promise 模块，从而我们可以通过Promise的方式来处理异步操作读取文件的API。获取的 Promise 模块的方式是：`require('fs').promises` 或者是：`require('fs/promises')`。使用 Promise 的方式进行异步操作：
+- 从 Node 的 v10 版本里增加了 Promise 模块，从而我们可以通过Promise的方式来处理异步操作读取文件的API。获取的 Promise 模块的方式是：`require('fs').promises` 或者是：`require('fs/promises')`。使用 Promise 的方式进行异步操作：
   ```javascript
      const promises = require('fs').promises;
      // 或者使用解构
