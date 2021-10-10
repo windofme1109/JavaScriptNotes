@@ -31,7 +31,7 @@
    ```
    缺点：设置多久的延时是一个难以两全的问题，时间太短不能保证 click 事件的 100% 触发，时间太长则会造成卡顿的感觉，影响用户体验。
 
-7. 解决方法 - 2：将 click 事件改为mousedown 事件，mousedown 事件是优先于 blur 事件执行。
+7. 解决方法 - 2：将 click 事件改为 mousedown 事件，mousedown 事件是优先于 blur 事件执行。
    ```js
        /*删除图标的点击事件*/
             $(".delete-icon").on("mousedown",function () {

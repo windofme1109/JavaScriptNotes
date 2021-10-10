@@ -127,40 +127,42 @@
 1. 异步编程的一种解决方案。使用 Promise 完成异步任务，可以避免回调地狱的出现。写法更简单，语义更明确。
 
 2. 理解：
-   1. Promise 既是一个对象，又是一个构造函数。可以将其看做为一个容器，里面存放着未来才会完成的异步任务。 
+   1. Promise 既是一个对象，又是一个构造函数。可以将其看做为一个容器，里面存放着未来才会完成的异步任务。
+   2. Promise 作为构造函数，接收一个执行器函数。这个执行器函数实际上就是一个异步任务。执行器函数接收两个参数：resolve 和 reject。当异步任务成功时， 调用 resolve 函数，将数据传入 resolve 函数，当异步任务失败时，调用 reject 函数，将错误信息传入 reject 函数中。
    2. 一共有三种状态：pending（等待）、fulfilled（成功）、rejected（失败）。转态转换只能是：pending --> fulfilled 或者 pending --> rejected。
    3. 状态一旦发生变化，就不可逆转。Promise 对象就一直保持这个状态。在任何时候都可以获取这个状态的数据。
    
-3. 常用方法：
-   1. then()
-   2. catch()
-   3. all()
-      - 参考资料
-        - [javascript异步之Promise.all()、Promise.race()、Promise.finally()](https://segmentfault.com/a/1190000017974025?utm_source=tag-newest)
-        - [MDN-Promise.all()](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Promise/all)
-      - all 这个方法，以数组形式接收多个 Promise 对象，只有所有的 Promise 对象都返回成功状态，all 方法才会返回成功状态，只要有一个失败了，all 就会返回失败的状态。
-      - `Promise.all(iterable)`
-        - 参数  iterable
-          - 一个可迭代对象，如 Array 或 String。
-        - 返回值
-          - 如果传入的参数是一个空的可迭代对象，则返回一个已完成（already resolved）状态的 Promise。
-          - 如果传入的参数不包含任何 promise，则返回一个异步完成（asynchronously resolved） Promise。注意：Google Chrome 58 在这种情况下返回一个已完成（already resolved）状态的 Promise。
-          - 其它情况下返回一个处理中（pending）的 Promise。这个返回的 promise 之后会在所有的 promise 都完成或有一个 promise 失败时异步地变为完成或失败。
-      - 此方法在集合多个 promise 的返回结果时很有用。
-      - 说明：
-        - 完成（Fulfillment）：
-          - 如果传入的可迭代对象为空，Promise.all 会同步地返回一个已完成（resolved）状态的promise。
-          - 如果所有传入的 promise 都变为完成状态，或者传入的可迭代对象内没有 promise，Promise.all 返回的 promise 异步地变为完成。
-          - 在任何情况下，Promise.all 返回的 promise 的完成状态的结果都是一个数组，它包含所有的传入迭代参数对象的值（也包括非 promise 值）。
+3. 常用方法 - then()
 
-        - 失败/拒绝（Rejection）：
-          - 如果传入的 promise 中有一个失败（rejected），Promise.all 异步地将失败的那个结果给失败状态的回调函数，而不管其它 promise 是否完成。
-      - 应用场景
-        - 几个 ajax 全部执行完了，才能渲染页面，
-        - 几个 ajax 全部执行完了，才能做一些数据的计算操作，
-        - 不关心执行顺序，只关心集体的执行结果
-      - 示例：
-        - 全部成功：
+4. 常用方法 - catch()
+
+5. 常用方法 - all()
+   - 参考资料
+     - [javascript异步之Promise.all()、Promise.race()、Promise.finally()](https://segmentfault.com/a/1190000017974025?utm_source=tag-newest)
+     - [MDN-Promise.all()](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Promise/all)
+   - all 这个方法，以数组形式接收多个 Promise 对象，只有所有的 Promise 对象都返回成功状态，all 方法才会返回成功状态，只要有一个失败了，all 就会返回失败的状态。
+   - `Promise.all(iterable)`
+      - 参数  iterable
+        - 一个可迭代对象，如 Array 或 String。
+      - 返回值
+        - 如果传入的参数是一个空的可迭代对象，则返回一个已完成（already resolved）状态的 Promise。
+        - 如果传入的参数不包含任何 promise，则返回一个异步完成（asynchronously resolved） Promise。注意：Google Chrome 58 在这种情况下返回一个已完成（already resolved）状态的 Promise。
+        - 其它情况下返回一个处理中（pending）的 Promise。这个返回的 promise 之后会在所有的 promise 都完成或有一个 promise 失败时异步地变为完成或失败。
+   - 此方法在集合多个 promise 的返回结果时很有用。
+     - 说明：
+       - 完成（Fulfillment）：
+         - 如果传入的可迭代对象为空，Promise.all 会同步地返回一个已完成（resolved）状态的promise。
+         - 如果所有传入的 promise 都变为完成状态，或者传入的可迭代对象内没有 promise，Promise.all 返回的 promise 异步地变为完成。
+         - 在任何情况下，Promise.all 返回的 promise 的完成状态的结果都是一个数组，它包含所有的传入迭代参数对象的值（也包括非 promise 值）。
+
+       - 失败/拒绝（Rejection）：
+         - 如果传入的 promise 中有一个失败（rejected），Promise.all 异步地将失败的那个结果给失败状态的回调函数，而不管其它 promise 是否完成。
+   - 应用场景
+     - 几个 ajax 全部执行完了，才能渲染页面，
+     - 几个 ajax 全部执行完了，才能做一些数据的计算操作，
+     - 不关心执行顺序，只关心集体的执行结果
+     - 示例：
+       - 全部成功：
           ```javascript
              const p1 = Promise.resolve(50);
              const p2 = 12345;
@@ -176,7 +178,7 @@
                  console.log(data);
              });
           ```
-        - 有一个失败：
+       - 有一个失败：
           ```javascript
              const p1 = new Promise((resolve, reject) => {
                  setTimeout(resolve, 1000, 'one');

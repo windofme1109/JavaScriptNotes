@@ -46,7 +46,9 @@
   - [6. Cookie](#6-cookie)
     - [1. Cookie的基本说明](#1-cookie%E7%9A%84%E5%9F%BA%E6%9C%AC%E8%AF%B4%E6%98%8E)
     - [2. Cookie的基本属性](#2-cookie%E7%9A%84%E5%9F%BA%E6%9C%AC%E5%B1%9E%E6%80%A7)
-    - [3. Cookie的Domain属性](#3-cookie%E7%9A%84domain%E5%B1%9E%E6%80%A7)
+    - [3. Cookie 的 Domain 与 Path 属性](#3-cookie-%E7%9A%84-domain-%E4%B8%8E-path-%E5%B1%9E%E6%80%A7)
+      - [1. Domain](#1-domain)
+      - [2. Path](#2-path)
   - [7. http长连接](#7-http%E9%95%BF%E8%BF%9E%E6%8E%A5)
   - [8. 数据协商](#8-%E6%95%B0%E6%8D%AE%E5%8D%8F%E5%95%86)
   - [9. content-type 详解](#9-content-type-%E8%AF%A6%E8%A7%A3)
@@ -520,17 +522,32 @@ Etag由服务器发送给浏览器。发起请求时，浏览器将Etag的值赋
 
 4. 禁止通过 JavaScript 访问一些重要的数据，是保证用户数据安全的重要措施。
 
-### 3. Cookie 的 Domain 属性
+### 3. Cookie 的 Domain 与 Path 属性
+
+#### 1. Domain
 
 1. Domain：域，表示当前 cookie 所属于哪个域或子域下面。
 
 2. 对于服务器返回的 Set-Cookie 中，如果没有指定 Domain 的值，那么其 Domain 的值是默认为当前所提交的 http 的请求所对应的主域名的。比如访问 `http://www.example.com`，返回一个 cookie，没有指名 domain 值，那么其为值为默认的 www.example.com。
 
-3. 例如，某个 Cookie 属于www.a.com，那么在www.b.com下就无法访问这个 Cookie。还有有个域，是 www.test.a.com，作为 a 的二级域名，和 a 应该属于同一个域，应该也可访问这个 Cookie，那么我们可以通过设置 Domian 这个属性，来达到这个目的。
+3. 例如，某个 Cookie 属于www.a.com，那么在www.b.com下就无法访问这个 Cookie。还有个域，是 www.test.a.com，作为 a 的二级域名，和 a 应该属于同一个域，应该也可访问这个 Cookie，那么我们可以通过设置 Domian 这个属性，来达到这个目的。
 
 4. 在访问 www.a.com 时，我们在服务器端设  Cookie 的 domain 属性为 a.com，那么所有属于 a.com 域名下的二级、三级域名等都可以访问这个 Cookie。设置方式：`'Set-Cookie': 'abc=123;domian=a.com'`
 
+#### 2. Path
+
+1. Path：路径。Path 表示 Cookie 所在的目录，默认为 `/`，就是根目录。在同一个服务器上有目录如下：`/test/`，`/test/cd/`，`/test/dd/`，现设一个 Cookie1 的 Path 为 `/test/`，Cookie2 的 Path 为 `/test/cd/`，那么 `/test/` 下的所有页面都可以访问到 Cookie1，即 `/test/cd/`，`/test/dd/` 都可以访问 Cookie1。而 `/test/` 和 `/test/dd/` 的子页面不能访问 Cookie2。这是因为 Cookie 只被其 Path 路径下的页面被访问。
+
+2. Path 的值可以是一个目录，或者是一个路径。如果 `http://www.china.com/test/index.html` 建立了一个 Cookie，那么在 `http://www.china.com/test/` 目录里的所有页面，以及该目录下面任何子目录里的页面都可以访问这个 Cookie。这就是说，在`http://www.china.com/test/test2/test3` 里的任何页面都可以访问`http://www.china.com/test/index.html` 建立的 Cookie。
+
+3. 但是如果 `http://www.china.com/test2/` 需要访问`http://www.china.com/test/index.html` 设置的 Cookie，该怎么办？
+这时，我们要把 Cookie 的 Path 属性设置成 `/`。在指定路径的时候，凡是来自同一服务器，URL 里有相同路径的所有 WEB 页面都可以共享 Cookie。简单来讲，下面的路径可以访问上面的路径的内容，当  Path 设置为 `/`,则意味着根路径下面都可以访问。
+
+
+
+
 ## 7. http长连接  
+
 - http1.x有几种连接模式:
   - short-lived connections(短连接) 
   - persistent connections(长连接)

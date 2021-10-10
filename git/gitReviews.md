@@ -17,6 +17,7 @@
   - [2.10 提交所有文件](#210-%E6%8F%90%E4%BA%A4%E6%89%80%E6%9C%89%E6%96%87%E4%BB%B6)
   - [2.11 删除暂存区的文件](#211-%E5%88%A0%E9%99%A4%E6%9A%82%E5%AD%98%E5%8C%BA%E7%9A%84%E6%96%87%E4%BB%B6)
   - [2.12 合并某次提交到另外一个分支上](#212-%E5%90%88%E5%B9%B6%E6%9F%90%E6%AC%A1%E6%8F%90%E4%BA%A4%E5%88%B0%E5%8F%A6%E5%A4%96%E4%B8%80%E4%B8%AA%E5%88%86%E6%94%AF%E4%B8%8A)
+  - [2.13 `.ssh` 目录下的 `config` 文件的配置项](#213-ssh-%E7%9B%AE%E5%BD%95%E4%B8%8B%E7%9A%84-config-%E6%96%87%E4%BB%B6%E7%9A%84%E9%85%8D%E7%BD%AE%E9%A1%B9)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -270,3 +271,44 @@
    1. 切换到 `develop` 分支，输入 `git log`，查找需要合并的 commit 记录，即 hash 值，如：7fcb3defff。
    2. 切换到 `master` 分支，使用 `git cherry-pick 7fcb3defff`  命令，就把该条提交记录合并到了 `master` 分支，这只是在本地合并到了 `master` 分支。
    3. 使用 `git push` 命令，推送到远端仓库。
+
+### 2.13 `.ssh` 目录下的 `config` 文件的配置项
+
+1. `.ssh` 目录是用来存放同 ssh 加密相关的内容，如生成的公钥、私钥等。
+
+2. config 是一个配置文件，配置项用来管理多个公钥私钥对、ssh 账号密码等。我们使用 git 时，可能有多个账号，每个账号对应着公钥和私钥，也可能同时使用 github、gitlab 等，这样就需配置文件  config 统一管理这些信息。
+
+2. git 在本地提交到 github 或 gitlab 上时，会读取 `.ssh` 目录下的公钥秘钥信息。如果在 `~/.ssh/` 目录下有 config 文件，则会优先读取 config 的配置信息，否则直接读取 `id_rsa` 和 `id_rsa.pub`。
+
+3. config 中的配置项说明如下：
+   配置项|说明
+   :---:|:---:
+   Host | 别名
+   HostName | 主机名
+   Port | 端口
+   User | 用户名
+   IdentityFile | 密钥文件的路径
+   IdentitiesOnly | 只接受 SSH key 登录
+   PreferredAuthentications | 强制使用 Public Key验证
+
+4. 可以通过 `man ssh_config` 这个命令，查看 `~/.ssh/config` 的语法。
+
+5. 注意：配置了 `User`，`git push` 时就一定要配置相同的用户名
+如果不设置 `User`，随意一个 `user.name` 都可以提交 `git push`
+如果设置了`User`，`user.name` 必须匹配到 config 中的 `User` 才能提交。
+
+5. config 文件示例：
+   ```
+      Host github.com
+      User windofme1109
+      IdentityFile ~/.ssh/id_rsa.github
+
+      Host gitee.com
+      User windofme1109
+      IdentityFile ~/.ssh/id_rsa.github
+
+      Host outergit.yonyou.com
+      User qinmr
+      IdentityFile ~/.ssh/id_rsa
+      Port 49622
+   ```
