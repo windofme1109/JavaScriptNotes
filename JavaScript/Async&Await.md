@@ -12,22 +12,35 @@
 
 # 1. async/await
 
-# 1. 特点
-1. 内置执行器
+## 1. 基本说明
 
-2. async 函数返回的是 Promise 对象,Promise 可以作为 await 命令的参数
+1. `async` 函数是 `Generator` 函数的语法糖。使用关键字 `async` 来表示，在函数内部使用 `await` 来表示异步。
 
-3. 比起星号和 yield，更好的语义
+2. 参考资料
+   - [理解 async/await](https://juejin.cn/post/6844903487805849613)
+   - [7张图，20分钟就能搞定的async/await原理！为什么要拖那么久？](https://juejin.cn/post/7007031572238958629)
+   - [async await 实现原理分析](https://zhuanlan.zhihu.com/p/157282332)
+   - [async、await运用原理](https://blog.csdn.net/qq_44624386/article/details/107920215)
+   - [async、await 实现原理](https://zhuanlan.zhihu.com/p/115112361)
+   - [async/await 的基础使用及原理简介](https://www.cnblogs.com/zhengyufeng/p/11106901.html)
+   - [async实现原理和执行逻辑总结](https://blog.csdn.net/qdmoment/article/details/90780583)
+   - [async/await执行原理详解](https://www.jianshu.com/p/72e36168944f)
+   - [Understanding JavaScript’s async await](https://ponyfoo.com/articles/understanding-javascript-async-await)
 
-4. await 命令后面，可以是 Promise 对象和原始类型的值（数值、字符串和布尔值，但这时会自动转成立即 resolved 的 Promise 对象）
+## 2. 特点
 
-5. await 必须写在 async 函数中
+1. 内置执行器。`Generator` 函数的执行必须依靠执行器，而 `aysnc` 函数自带执行器，调用方式跟普通函数的调用一样。
 
-6. async 函数内部 return 语句返回的值，会成为 then 方法回调函数的参数
+2. 更好的语义。`async` 和 `await` 相较于 `*` 和 `yield` 更加语义化。
+
+3. 更广的适用性。`co` 模块（第三方的 `Generator 执行器`）约定，`yield` 命令后面只能是 `Thunk` 函数或 `Promise` 对象。而 `async` 函数的 `await` 命令后面则可以是 `Promise` 或者原始类型的值（`number`，`string`，`boolean`，但这时等同于同步操作）
+
+4. 返回值是 `Promise`。`async` 函数返回值总是 `Promise` 对象，比 `Generator` 函数返回的 `Iterator` 对象方便，可以直接使用 `then()` 方法进行调用。
 
 
 
-### 1.1 用法
+
+### 3 用法
 
 - 在函数定义时，在 function 关键字前面加上 async，表明函数内部有异步操作。await 放在 async 函数内部，在需要异步操作的语句前面加上 await。代码示例如下：
  ```javascript
