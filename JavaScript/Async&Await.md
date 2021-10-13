@@ -40,29 +40,36 @@
 
 
 
-## 3. 用法
+## 3. async/await 用法
 
 ### 1. 基本用法
 
-- 在函数定义时，在 function 关键字前面加上 `async`，表明函数内部有异步操作。await 放在 `async` 函数内部，在需要异步操作的语句前面加上 await。代码示例如下：
- ```javascript
+1. 在函数定义时，在 function 关键字前面加上 `async`，表明函数内部有异步操作。await 放在 `async` 函数内部，在需要异步操作的语句前面加上 `await`。代码示例如下：
+   ```javascript
        async function readFile(fileName) {
-        // read()是一个异步读取文件的函数
-        const content = await read(fileName) ;
+             // read()是一个异步读取文件的函数
+             const content = await read(fileName) ;
       
-        return content ;
-  }
- ```
-  
+             return content ;
+       }
+    ```
+   
 ### 2. `async`
 
-- 使用 `async` 定义的函数返回值是 promise 对象，可以使用 then() 方法。 
- ```javascript
-      readFile('a.txt').then((result) => {
-        conole.log(result) ;
-      })
- ```
-- async 函数返回的 Promise 对象，必须等到内部所有await命令后面的 Promise 对象执行完，才会发生状态改变，除非遇到return语句或者抛出错误。也就是说，只有async函数内部的异步操作执行完，才会执行then方法指定的回调函数。
+1. 使用 `async` 定义的函数返回值是 Promise 对象，可以使用 then() 方法。 
+    ```javascript
+       async function readFile(fileName) {
+             // read()是一个异步读取文件的函数
+             const content = await read(fileName) ;
+      
+             return content ;
+       }
+       readFile('a.txt').then((result) => {
+           conole.log(result) ;
+       })
+    ```
+2. async 函数返回的 Promise 对象，必须等到内部所有 await 命令后面的 Promise 对象执行完，才会发生状态改变，除非遇到 return 语句或者抛出错误。也就是说，只有 async 函数内部的异步操作执行完，才会执行 then() 方法指定的回调函数。
+
 ### 3. `await`
 
 1. 正常情况下，await 命令后面是一个 Promise 对象，返回该 Promise 对象的结果。如果不是 Promise 对象，就直接返回对应的值。
@@ -94,7 +101,7 @@
           }
       }
 
-     async function func() {
+      async function func() {
 
           const sleepTime = await new Sleep(1000);
           console.log(sleepTime);
@@ -105,7 +112,7 @@
    ```
    Sleep 对象的实例并不是 Promise，但是因为有 then() 方法，所以 await 会将其看作 Promise 对象。then() 方法接收 resolve 和 reject，类似于 Promise 的构造函数，then() 里面的执行过程也是类似于 Promise 的构造函数的执行过程，包括状态转换的过程。
 
-3. await命令后面的 Promise 对象如果变为 rejected 状态，则 rejected 的参数会被 async 函数的 catch() 方法的回调函数接收到。
+3. await 命令后面的 Promise 对象如果变为 rejected 状态，则 rejected 的参数会被 async 函数的 catch() 方法的回调函数接收到。
    ```js
       async function func() {
           await Promise.reject('出错了');
@@ -184,32 +191,93 @@
 
 ### 4. 错误处理
 
+1. 如果 await 后面的异步操作出错，那么等同于 async 函数返回的 Promise 对象被 reject。即 await 后面的 Promise 对象变成 rejected 状态，那么 async 函数返回的 Promise 对象也会变成 rejected 状态，因此会被 catch() 函数捕获。
+   ```js
+      async function func() {
+          await new Promise((resolve, reject) => {
+              throw new Error('执行出错！');
+          })
+      }
+
+
+      func().then(res => {
+          console.log(res);
+      }).catch(err => {
+          // Error: 执行出错！
+          console.log(err);
+      });
+   ```
+   async 函数执行后，await 后面的 Promise 对象抛出一个异常，导致 async 函数返回值 Promise 对象 的 catch方法的回调函数被调用，它的参数就是抛出的异常对象。
+
+2. 防止抛出异常到函数外面的方式是将 await 放到 try...catch 语句中。
+   ```js
+       async function func() {
+           try {
+               await new Promise((resolve, reject) => {
+            throw new Error('执行出错！');
+               });
+           } catch (e) {
+               // err:  Error: 执行出错！
+               console.log('err: ', e);
+           }
+
+           return await 'hello world';
+
+       }
+
+
+       func().then(res => {
+       // hello world
+       console.log(res);
+       });
+   ```
+   第一个 await 后面的 Promise 对象在执行过程中抛出异常，被 async 函数内部的 catch 捕获。这不影响第二个 await 语句的执行。
+
+3. 如果有多个 await 命令，可以统一放在 try...catch 结构中。
+   ```js
+      async function func() {
+          try {
+              await new Promise((resolve, reject) => {
+                  throw new Error('执行出错！');
+              });
+
+              const res1 = await Promise.resolve('hello');
+              const res2 = await Promise.resolve('world');
+          } catch (e) {
+              console.log('err: ', e);
+          }
+    
+      }
+   ```
+   将多个 await 语句放在 try...catch 中，只要一个 await 后面的异步过程抛出异常，都可以被 catch 捕获。当然，如果抛出了异常，那么后面的 await 语句不会继续执行。
+
+
 ### 5. 注意的问题
 
 1. `async` 函数返回的是一个 Promise 对象（从文档中也可以得到这个信息）。`async` 函数（包含函数语句、函数表达式、Lambda 表达式）会返回一个 Promise 对象，如果在函数中 return 一个直接量，`async` 会把这个直接量通过 Promise.resolve() 封装成 Promise 对象。
 
-2. `async` 函数返回一个 promise 对象，所以，可以使用 then() 方法添加回调函数。
+2. `async` 函数返回一个 Promise 对象，所以，可以使用 then() 方法添加回调函数。
 
 3. await 等待的是一个表达式，这个表达式计算结果可以是 Promise 对象也可以是其他值。
- ```javascript
-    function getSomething() {
-        return 'something' ;
-    }
+   ```javascript
+       function getSomething() {
+           return 'something' ;
+       }
     
-    async function testAsync() {
-        return Promise.resolve('hello async') ;
-    }
+       async function testAsync() {
+           return Promise.resolve('hello async') ;
+       }
     
-    async function test() {
-        // await可以等待一个表达式的结果，这个表达式的结果可以是Promise对象，也可以是其他结果
-        const v1 = await getSomething() ;
-        const v2 = await testAsync() ;
-        console.log(v1, v2) ;
-    }
-    // something hello async
-    test() ;
- ```
-- await 遇到 Promise 对象，然后阻塞后面的代码，等着 Promise 对象Resolve，然后得到 resolve 的值，作为 await 的表达式的结果。也就是说，await 等待的是 Promise 对象执行的结果，即执行成功的结果。`async` 函数调用不会造成阻塞,它内部所有的阻塞都被封装在一个 Promise 对象中异步执行。
+       async function test() {
+           // await可以等待一个表达式的结果，这个表达式的结果可以是Promise对象，也可以是其他结果
+           const v1 = await getSomething() ;
+           const v2 = await testAsync() ;
+           console.log(v1, v2) ;
+       }
+       // something hello async
+       test() ;
+   ```
+4. await 遇到 Promise 对象，然后阻塞后面的代码，等着 Promise 对象的状态变为 resolved，然后得到 resolve 的值，作为 await 的表达式的结果。也就是说，await 等待的是 Promise 对象执行的结果，即执行成功的结果。`async` 函数调用不会造成阻塞,它内部所有的阻塞都被封装在一个 Promise 对象中异步执行。
  ```javascript
     function takeLongTime() {
         return new Promise(function (resolve, reject) {
@@ -226,7 +294,7 @@
     
     test() ;
  ```
-- await 命令后面的 Promise 对象，运行结果可能是 rejected，所以最好把 await 命令放在 try...catch 代码块中。
+5. await 命令后面的 Promise 对象，运行结果可能是 rejected，所以最好把 await 命令放在 try...catch 代码块中。
  ```javascript
     try {
        await someWithPromise() ;
@@ -234,116 +302,122 @@
        console.log(err) ;
     }
  ```
-### 1.4 `async`/await 的优势
 
-- 优势在于 Promise 的 then() 方法的链式调用。代码示例如下：
- ```javascript
-    function takeLongTime(n) {
-        return new Promise(function (resolve, reject) {
-            setTimeout(() => {
-                resolve(n + 200)
-            }, n) ;
-        })
-    }
-    
-    function step1(n) {
-        console.log(`step1 ${n}`) ;
-    
-        return takeLongTime(n) ;
-    }
-    
-    function step2(n) {
-        console.log(`step2 ${n}`) ;
-    
-        return takeLongTime(n) ;
-    }
-    
-    function step3(n) {
-        console.log(`step3 ${n}`) ;
-    
-        return takeLongTime(n) ;
-    }
-    
-    // 使用Promise完成链式调用
-    function doIt() {
-        console.time('doIt') ;
-        const time1= 300 ;
-        step1(time1)
-            .then(time2 => step2(time2))
-            .then(time3 => step3(time3))   // 每一个then()均返回一个Promise对象
-            .then(ret => {
-                console.log(`执行时间是：${ret}`) ;
-                console.timeEnd('doIt') ;
-            })
-    }
-    // step1 300
-    //    step2 500
-    //    step3 700
-    //    执行时间是：900
-    //    doIt: 1506.600ms
-    // doIt() ;
-    
-    // 使用async和await完成
-    async function doItAsync() {
-        console.time('doIt') ;
-        const time1= 300 ;
-        const time2 = await step1(time1) ;
-        const time3 = await step2(time2) ;
-        const ret = await step3(time3) ;
-        console.log(`执行时间是：${ret}`) ;
-        console.timeEnd('doIt') ;
-    
-    }
-    
-    //   step1 300
-    //   step2 500
-    //   step3 700
-    //   执行时间是：900
-    //   doIt: 1506.134ms 
-    doItAsync() ;
- ```
+## 4. `async`/`await` 的优势
 
-- 使用 `async`/await 使得写异步操作就像同步一样。
+1. 优势在于取代 Promise 的 then() 方法的链式调用。代码示例如下：
+   ```javascript
+       function takeLongTime(n) {
+           return new Promise(function (resolve, reject) {
+               setTimeout(() => {
+                   resolve(n + 200)
+               }, n) ;
+           })
+       }
+    
+       function step1(n) {
+           console.log(`step1 ${n}`) ;
+    
+           return takeLongTime(n) ;
+       }
+    
+       function step2(n) {
+           console.log(`step2 ${n}`) ;
+    
+           return takeLongTime(n) ;
+       }
+    
+       function step3(n) {
+           console.log(`step3 ${n}`) ;
+    
+           return takeLongTime(n) ;
+       }
+    
+         // 使用Promise完成链式调用
+         function doIt() {
+             console.time('doIt') ;
+             const time1= 300 ;
+             step1(time1)
+                 .then(time2 => step2(time2))
+                 .then(time3 => step3(time3))   // 每一个then()均返回一个Promise对象
+                 .then(ret => {
+                     console.log(`执行时间是：${ret}`) ;
+                     console.timeEnd('doIt') ;
+                 })
+         }
+         // step1 300
+         //    step2 500
+         //    step3 700
+         //    执行时间是：900
+         //    doIt: 1506.600ms
+         // doIt() ;
+    
+         // 使用async和await完成
+         async function doItAsync() {
+             console.time('doIt') ;
+             const time1= 300 ;
+             const time2 = await step1(time1) ;
+             const time3 = await step2(time2) ;
+             const ret = await step3(time3) ;
+             console.log(`执行时间是：${ret}`) ;
+             console.timeEnd('doIt') ;
+    
+         }
+    
+         //   step1 300
+         //   step2 500
+         //   step3 700
+         //   执行时间是：900
+         //   doIt: 1506.134ms 
+           doItAsync() ;
+   ```
 
-- `async` / await 的本质是使用 generator 包装了异步操作，只是语法糖，并没有真正实现同步操作。所以，我们是不能直接将 `await` 等到的异步结果，返回到 `async` 函数外面。举例如下：
-  ```javascript
+2. 使用 `async`/`await` 使得写异步操作就像同步一样。
 
-     const readJson = (path) => {
-         return new Promise((resolve, reject) => {
-             fs.readFile(path, function (err, data) {
-                 if (err) {
-                     return reject(err);
-                 }
-                 resolve(data);
-             })
-         })
-     }
+3. **注意**：`async` / `await` 的本质是使用 generator 包装了异步操作，只是语法糖，并没有真正实现同步操作。所以，我们是不能直接将 `await` 等到的异步结果，返回到 `async` 函数外面。举例如下：
+   ```javascript
+
+      const readJson = (path) => {
+          return new Promise((resolve, reject) => {
+              fs.readFile(path, function (err, data) {
+                  if (err) {
+                      return reject(err);
+                  }
+                  resolve(data);
+              })
+          })
+      }
   
-     async function getJson(path) {
-         const ret = await readJson(path);
+      async function getJson(path) {
+          const ret = await readJson(path);
      
-         return ret;
-     }
-  ```
-  `readJson()` 是一个异步获取文件内容的函数。我们这里使用 async / await 获取文件内容，然后将这个内容返回。接下来我们开始调用并打印结果：
+          return ret;
+      }
+   ```
+   `readJson()` 是一个异步获取文件内容的函数。我们这里使用 async / await 获取文件内容，然后将这个内容返回。接下来我们开始调用并打印结果：
    ```javascript
       let result = getJson('./a.json');
       // 输出 Promise { <pending> }
       console.log(result);
    ```  
-  输出是 `Promise { <pending> }`，居然不是我们想要的文件内容。这就说明，async / await 并没有将异步操作转换为同步操作， getJson() 还是异步操作，所以我们调用 getJson() 时，会立即返回一个 Promise 对象，状态是 pending，表示正在等待异步操作的结果。  
+   输出是 `Promise { <pending> }`，居然不是我们想要的文件内容。这就说明，async / await 并没有将异步操作转换为同步操作， getJson() 还是异步操作，所以我们调用 getJson() 时，会立即返回一个 Promise 对象，状态是 pending，表示正在等待异步操作的结果。  
   
-  总结：要使用 await 获取的异步操作结果，必须在 async 函数内部使用，在 async 函数外部，依旧无法获取异步操作的结果。
+4. 总结：要使用 await 获取的异步操作结果，必须在 async 函数内部使用，在 async 函数外部，依旧无法获取异步操作的结果。
   
-- 从 Node 的 v10 版本里增加了 Promise 模块，从而我们可以通过Promise的方式来处理异步操作读取文件的API。获取的 Promise 模块的方式是：`require('fs').promises` 或者是：`require('fs/promises')`。使用 Promise 的方式进行异步操作：
-  ```javascript
-     const promises = require('fs').promises;
-     // 或者使用解构
-     // const {promises} = require('fs');
-     const {readFile, writeFile} = promises;
-     // 以Promise的方式进行异步操作，必须指定文件的编码方式
-     readFile('./a.json', 'utf-8').then((ret) => {
-         console.log(ret);
-     })
-  ```
-  
+5. 一个知识点：从 Node 的 v10 版本里增加了 Promise 模块，从而我们可以通过Promise的方式来处理异步操作读取文件的API。获取的 Promise 模块的方式是：`require('fs').promises` 或者是：`require('fs/promises')`。使用 Promise 的方式进行异步操作：
+    ```javascript
+        const promises = require('fs').promises;
+        // 或者使用解构
+        // const {promises} = require('fs');
+        const {readFile, writeFile} = promises;
+        // 以Promise的方式进行异步操作，必须指定文件的编码方式
+        readFile('./a.json', 'utf-8').then((ret) => {
+            console.log(ret);
+        })
+    ```
+
+
+
+## 5. `async` / `await` 原理
+
+1. 
