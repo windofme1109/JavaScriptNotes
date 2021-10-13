@@ -63,7 +63,7 @@
    - 第三次调用 `next()` 方法， `Generator` 函数从上一次yield表达式停下的地方，执行到return语句结束（如果没有 `return` 语句，就执行到函数结束）。next方法返回的对象的 `value` 属性，就是紧跟在 `return` 语句后面的表达式的值（如果没有return语句，则 `value` 属性的值为 `undefined`），`done`属性的值 `true`，表示遍历已经结束。
    - 第四次调用 `next()` 方法，由于 `Generator` 函数已经执行完毕，所以，返回的对象的 `value` 属性的值是 `undefined`，`done` 属性的值是 `true`。以后再调用 `next()` ，都返回的是这个结果。
 
-7. 总结一下，调用  `Generator`  函数，返回一个遍历器对象，代表  `Generator`  函数的内部指针。以后，每次调用遍历器对象的 `next()` 方法，就会返回一个有着 `value` 和 `done` 两个属性的对象。 `value` 属性表示当前的内部状态的值，是yield表达式后面那个表达式的值；`done` 属性是一个布尔值，表示是否遍历结束。
+7. 总结一下，调用  `Generator`  函数，返回一个遍历器对象，代表  `Generator`  函数的内部指针。以后，每次调用遍历器对象的 `next()` 方法，就会返回一个有着 `value` 和 `done` 两个属性的对象。 `value` 属性表示当前的内部状态的值，是 `yield` 表达式后面那个表达式的值；`done` 属性是一个布尔值，表示是否遍历结束。
 
 8. 每次调用 `next()` 方法，内部的指针从函数头部或上一次停下来的地方开始执行，直到遇到下一个 `yield` 语句（或 `return` 语句）为止。
 
@@ -180,6 +180,7 @@
           yield 3 ;
           yield 4 ;
           yield 5 ;
+          return 6;
       }
 
       var g = getCount() ;
@@ -379,3 +380,385 @@
    在第四次调用 `next()` 时，控制台会有输出，过程是这样的：第三次调用 `next()` 时，`getNum()` 返回的 `Iterator` 对象已经遍历结束。此时应该执行的是return 'done' ，所以ret的值会被设置为done。然后，第四次调用 `next()` 方法，由于yield*表达式已经执行完毕，所以继续向下执行 `console.log('ret: ' + ret)`，所以控制台会输出`ret: done`。同时执行到 `yield 5` 结束。此时 `next()` 返回的对象就是 `{ value: 5, done: false }`。
 
 6. 任何数据结构只要实现了 `Iterator` 接口，就可以被 `yield*` 遍历。也就是说，我们可以对数组、字符串进行遍历。
+
+
+## 6. throw() 方法的作用
+
+1. Generator 函数返回的 Iterator 对象，都会有一个 throw() 方法，可以在函数体外抛出异常，然后在 Generator 函数体内捕获这个异常。
+
+2. 基本用法
+   ```js
+      function* gen() {
+          try {
+              yield 5;
+          } catch (err) {
+              console.log('内部捕获', err);
+          }
+      }
+
+      const g = gen();
+
+      g.next();
+
+      try {
+      g.throw('a');
+      g.throw('b');
+      } catch (err) {
+      console.log('外部捕获', err);
+      }
+
+      // 输出
+      // 内部捕获 a
+      // 外部捕获 b
+   ```
+   Iterator 对象 g 调用了两次 throw() 方法，抛出了两个异常，第一个异常被 Generator 函数内部的 catch 捕获。而第二个异常，由于 Generator 函数内部的 catch 语句已经执行完了，不会捕获这个异常，因此这个异常会被抛出到 Generator 外部，被外面的 catch 语句捕获。
+
+3. throw() 还可以接收一个参数，这个参数会作为异常对象被 catch 接收。因此 传入 throw() 的参数最好是 Error 对象的实例。
+   ```js
+      function* gen() {
+          try {
+              yield 5;
+          } catch (err) {
+              console.log('内部捕获', err);
+          }
+      }
+
+      const g = gen();
+
+      g.next();
+
+      // 内部捕获 Error: 出错了
+      g.throw(new Error('出错了'));
+   ```
+   throw() 接收一个 Error 对象实例，这样抛出的异常信息更加详细，指向更加明确。
+
+4. 全局 throw 命令抛出的异常，只能被函数体外的 catch 语句捕获。不会被 Generator 函数内部捕获。
+   ```js
+      function* gen() {
+          try {
+              yield 5;
+          } catch (err) {
+              if (err !== 'a') {
+                 throw err;
+              } 
+              console.log('内部捕获', err);
+          }
+      }
+
+      const g = gen();
+
+      g.next();
+
+
+      try {
+
+          throw new Error('a');
+          throw new Error('b');
+
+      } catch (err) {
+         // 外部捕获 Error: a
+         console.log('外部捕获', err);
+      }
+
+   ```
+   我们没有调用 Iterator 对象 g 的 throw() 方法，而是直接在函数外部抛出两个异常，第一个异常被函数外部的 catch 捕获。没有捕获第二个异常的原因是，抛出了第一个异常以后，就不再执行 try 代码块里面剩余的语句了。
+
+5. 如果 Generator 函数内部没有使用 try...catch 代码块，那么 throw() 方法抛出的错误，将被外部 try...catch 代码块捕获。
+   ```js
+      function* gen() {
+          yield 5;
+          console.log('内部捕获', err);
+
+      }
+
+      const g = gen();
+      g.next();
+   
+      try {
+         g.throw('a');
+      } catch (err) {
+          // 外部捕获 a
+          console.log('外部捕获', err);
+      }
+   ```
+   没有在 Generator 函数内部使用 try...catch 语句，所以 throw() 方法抛出的异常，会被外部的 catch 捕获。
+
+6. 如果 Generator 函数的内部外部都没有使用 try...catch 语句，那么使用 throw() 抛出异常，会导致程序报错，直接中断执行。
+   ```js
+      function* gen() {
+          yield console.log('1111');
+          yield console.log('2222');
+
+      }
+
+      const g = gen();
+
+      g.next();
+      g.throw();
+
+   ```
+   结果如下图所示：
+   ![](./img/generator-throw-error.png)
+
+7. throw() 方法抛出的错误要被内部捕获，前提是必须至少执行过一次 next() 方法。
+   ```js
+      function* gen() {
+          try {
+              yield 1;
+          } catch (err) {
+              console.log('内部捕获', err)
+          }
+
+      }
+
+      const g = gen();
+
+      // g.next();
+      g.throw(1);
+   ```
+   结果如下图所示：
+   ![](./img/generator-throw-error-2.png)
+   上例中，我们没有调用 next() 方法，直接就调用 throw()，结果是直接报错，throw() 抛出的异常没有被 Generator 函数内部的 catch 捕获。因为第一次执行 next()，相当于启动执行 Generator 函数内部的代码，否则 Generator 函数还没有开始执行，这时 throw() 方法抛错只可能抛出在函数外部。
+
+8. throw() 方法被捕获以后，会附带执行下一条 yield 表达式。也就是说，会附带执行一次 next() 方法。
+   ```js
+      function* gen() {
+          try {
+              yield console.log(1);
+          } catch (err) {
+          }
+
+          yield console.log(2);
+          yield console.log(3);
+
+      }
+
+      const g = gen();
+      // 1
+      g.next();
+      // 2
+      g.throw();
+      // 3
+      g.next();
+   ```
+   throw() 抛出的异常被捕获以后，自动执行了一次 next() 方法，所以会输出 2。从这里我们可以看出，只要 Generator 函数内部部署了 try...catch，那么 Iterator 对象的 throw() 方法抛出的错误，不影响下一次遍历。
+
+9. throw 语句与 Iterator 对象的 throw() 方法没有关系，二者不会相互影响。
+   ```js
+      function* gen() {
+          yield console.log('hello');
+          yield console.log('world');
+
+      }
+
+      const g = gen();
+      // hello
+      g.next();
+      
+      try {
+          throw new Error();
+      } catch (err) {
+          // world
+          g.next();
+      }
+
+   ```
+   Generator 函数外部 throw 命令抛出的异常不会影响到 Iterator 对象的状态，所以两次执行 next() 方法，都进行了正确的操作。
+
+10. Generator 函数体外抛出的错误（使用 throw() 函数抛出），可以在函数体内捕获；反过来，Generator 函数体内抛出的错误，也可以被函数体外的 catch 捕获。
+    ```js
+       function* gen() {
+           const x = yield 3;
+           const y = yield x.toUpperCase();
+
+           yield y;
+
+       }
+
+       const g = gen();
+
+
+       // { value: 3, done: false }
+       g.next();
+
+       try {
+       g.next(10);
+       } catch (err) {
+       // TypeError: x.toUpperCase is not a function
+       console.log(err);
+       }
+    ```
+    在执行第二个 next() 函数时，我们闯入了参数 10，这个参数或作为 第一个 yield 表达的结果，赋值给 x，所以 x 就是 10，那么 执行 x.toUpperCase() 时，显然就会抛出异常，这个异常就会被外面的 catch 语句捕获。
+
+11. 一旦 Generator 函数执行过程中抛出错误，且没有被内部捕获，就不会再执行下去了。如果此后还调用 next() 方法，将返回一个 value 属性为 undefined、done属性为 true 的对象，即 JavaScript 引擎认为这个 Generator 已经运行结束了。
+    ```js
+       function* gen() {
+           yield 1;
+           console.log('throwing an error');
+           throw new Error('generator broke!');
+
+           yield 2;
+           yield 3;
+
+       }
+
+
+       function log(generator) {
+           let res;
+
+           console.log('generator start');
+
+           const g = generator();
+
+           try {
+               res = g.next();
+               console.log('第一次运行 next', res);
+           } catch (e) {
+               console.log('捕获错误 ', res);
+           }
+
+           try {
+               res = g.next();
+               console.log('第二次运行 next', res);
+           } catch (e) {
+               console.log('捕获错误 ', res);
+           }
+           try {
+               res = g.next();
+               console.log('第三次运行 next', res);
+           } catch (e) {
+               console.log('捕获错误 ', res);
+           }
+
+           console.log('generator end');
+       }
+
+       log(gen);
+    
+       // generator start
+       // 第一次运行 next { value: 1, done: false }
+       // throwing an error
+       // 捕获错误  { value: 1, done: false }
+       // 第三次运行 next { value: undefined, done: true }
+       // generator end
+    ```
+    Generator 函数内部抛出异常以后，被 log() 内部第二个 catch 捕获。因此，Generator 函数到此就执行结束了。然后，第三次调用 next()，next() 返回值就是：{ value: undefined, done: true }，这表示 Generator 函数已经执行完成了。
+
+12. 总结：
+    1. throw() 函数用来抛出异常。
+    2. throw() 抛出的异常，如果 Generator 函数内部有 try...catch 语句，那么会被内部捕获。如果内部没有try...catch 语句，或者已经执行完了 catch 语句，则会被外面的 catch 语句捕获。如果外面也没有 try...catch 语句，那么程序会直接中断运行。
+    3. throw() 可以接收参数，这个参数会作为异常对象被 catch 接收。因此传入 throw() 的参数最好是 Error 对象的实例。
+    4. Generator 函数内部的抛出的异常可以被外面的 catch 捕获。
+    5. throw() 函数与 throw 命令不相关，二者可以同时使用。
+    6. throw() 抛出的异常被捕获以后，还会执行下一个 yield 语句，也就是执行一次 next()。
+
+### 7. return() 方法的作用
+
+1. Generator 函数返回的 Iterator 对象，还有一个 return() 方法，可以返回给定的值，并且终结遍历 Generator 函数。
+   ```js
+      
+      function* gen() {
+          yield 1;
+          yield 2;
+          yield 3;
+
+      }
+      
+      const g = gen();
+
+      const next1 = g.next();
+      // { value: 1, done: false }
+      console.log(next1);
+      
+      // { value: undefined, done: true }
+      // const res = g.return();
+      const res = g.return('foo');
+      // { value: 'foo', done: true }
+      console.log(res);
+      const next2 = g.next();
+      // { value: undefined, done: true }
+      console.log(next2);
+   ```
+   上面的代码中，我们调用了 Iterator 对象的 return() 方法，返回值的 value 属性就是 return() 接收的参数，如果不传参，value 就是 undefined，传参的话，value 就是 这个参数，而 done 属性会变成 true，表示 Generator 函数执行完成。后面再调用 next()，返回值总是 { value: undefined, done: true }。
+
+2. 如果 Generator 函数内部有 try...finally 代码块，且正在执行 try 代码块，那么调用 return() 函数会导致立刻进入 finally 代码块，执行完以后，整个函数才会结束。
+   ```js
+      function* gen() {
+          yield 1;
+          try {
+              yield 2;
+              yield 3;
+          } catch (e) {
+
+          } finally {
+              yield 4;
+              yield 5;
+          }
+
+      }
+      const g = gen();
+
+      const next1 = g.next();
+      // { value: 1, done: false }
+      console.log(next1);
+      const next2 = g.next();
+      // { value: 2, done: false }
+      console.log(next2);
+      const res = g.return(6);
+      // { value: 4, done: false }
+      console.log(res);
+      const next3 = g.next();
+      // { value: 5, done: false }
+      console.log(next3);
+      const next4 = g.next();
+      // { value: 6, done: true }
+      console.log(next4);
+   ```
+   第二个 next() 执行完以后，已经进入 try 的部分了，然后我们调用 return() 方法，那么不会执行 try 里面剩下的代码，而是直接进入 finally 部分，执行第一个 yield，所以返回值是 { value: 4, done: false }，第三次调用 next()，执行 finally 中第二个 yield，所以返回值是 { value: 5, done: false }，最后一次调用 next()，Generator 已经执行完毕，所以返回值中 done 属性为 true，而 value 本来应该是 undefined，因为调用 return() 时，传入了参数，所以 value 是 return() 函数接收的参数：6。
+
+### 8. next()、throw() 和 return() 的相同点
+
+1. next()、throw()、和 return()这三个方法本质上是同一件事，就是让 Generator 函数恢复执行，并且使用不同的语句替换 yield 表达式。
+
+2. next() 将 yield 表达式替换成一个值。
+   ```js
+      function* gen(x, y) {
+          let result = yield x + y;
+          return result;
+      }
+      const g = gen(1, 2);
+
+      const next1 = g.next();
+      // { value: 3, done: false }
+      console.log(next1);
+
+
+      // 相当于将 let result = yield x + y; 替换成 let       result = 4
+      const next2 = g.next(4);
+      // { value: 4, done: true }
+      console.log(next2);
+   ```
+3. throw() 将 yield 表达式替换成 throw 语句（主动抛出一个异常）。
+   ```js
+      function* gen(x, y) {
+          let result = yield x + y;
+          return result;
+      }
+      // 相当于将 let result = yield x + y; 替换成 let result = throw(new Error('出错了'))
+      // Error: 出错了
+      g.throw(new Error('出错了'));
+   ```
+4. return() 将 yield 表达式替换成 return 语句（终止 Generator 函数执行）。
+   ```js
+      function* gen(x, y) {
+          let result = yield x + y;
+          return result;
+      }
+      const g = gen(1, 2);
+
+      const result = g.return(2);
+
+      //  相当于将 let result = yield x + y; 替换成 let result = return 2;
+      // { value: 2, done: true }
+      console.log(result);
+   ```
