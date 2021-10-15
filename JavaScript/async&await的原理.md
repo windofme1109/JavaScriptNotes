@@ -367,7 +367,7 @@
                           res = gen[key](arg);
                       } catch (err) {
                           // 如果是 rejected 状态的 Promise，我们调用 Iterator 对象的 throw 方法，然后将结果传入 reject 函数中
-                          reject(err);
+                          return reject(err);
                       }
 
                       // res 为 next() 执行的结果，所以从 next 对象中，取出 value 和 执行状态 done
