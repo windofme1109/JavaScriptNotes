@@ -91,6 +91,16 @@
 
 3. 任何函数，只要参数有回调函数，就能写成 Thunk 函数的形式，下面是一个简易的 Thunk 函数转换器：
    ```js
+      
+      
+      
+      /**
+        * 接收一个带有回调函数的参数的函数，这个回调函数参数必须是最后一个参数
+        *
+        * @param fn 最后一个参数是回调函数的函数
+        * @returns {function(): function(*): *}
+        * @constructor
+        */
       function Thunk(fn) {
           return function () {
               const args = [...arguments];
@@ -106,7 +116,15 @@
    ```js
       
       const fs = require('fs');
-
+      
+   
+      /**
+        * readFileThunk() 是一个函数，是 fs.readFile() 经过 Thunk 函数的包装后的结果
+        * readFileThunk() 接收的参数是 fs.readFile() 的回调函数前面的参数
+        * readFileThunk() 的返回值也是一个函数，这个函数接收的是 fs.readFile() 的最后一个回调函数
+        *
+        * @type {function(): function(*): *}
+        */
       const readFileThunk = Thunk(fs.readFile);
 
       const path = './aa.txt';
@@ -125,11 +143,11 @@
 
 ## 5. Thunkify 模块
 
-1. 生产环境建议使用 Thunkify 模块。
+1. 生产环境对于带有回调函数的函数的转换建议使用 Thunkify 模块。
 
 2. npm 链接：[Thunkify](https://www.npmjs.com/package/thunkify)
 
-3. Thunkify 的主要作用是将传统的 node 函数（回调风格的函数）转换成 Thunk 函数。转换后的 Thunk 函数主要用在基于 Generator 的自动流程管理上，比如说 Generator的自动执行器 co 模块。
+3. Thunkify 的主要作用是将传统的 node 函数（回调风格的函数）转换成 Thunk 函数。转换后的 Thunk 函数主要用在基于 Generator 的自动流程管理上，比如说 Generator 的自动执行器 co 模块。
 
 4. Thunkify 的源码与上面的简易的 Thunk 非常类似：
    ```js 
@@ -162,4 +180,9 @@
    ```
 5. 它的源码主要多了一个检查机制，变量 called 确保回调函数只运行一次。
 
-## 6. Thunk 函数与 Generator
+
+## 7. Thunk 函数与 Curried 函数的区别
+
+1. Thunk 函数用于延迟执行。只有真正用到的地方才去执行 Thunk 函数。
+
+2. Curried 函数用于将多参数函数转换成单参数函数。 主要目的是对函数进行部分配置，以实现重用函数，提供更好地接口。
