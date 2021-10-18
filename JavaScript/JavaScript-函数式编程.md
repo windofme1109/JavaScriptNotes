@@ -18,6 +18,27 @@
 
 # JavaScript 函数式编程
 
+
+## 1. 参考资料
+
+1. [前端同学如何函数式编程？](https://juejin.cn/post/7012523441609768997)
+
+2. [函数式编程入门教程](http://www.ruanyifeng.com/blog/2017/02/fp-tutorial.html)
+
+3. [函数式编程进阶：杰克船长的黑珍珠号](https://juejin.cn/post/6844904034260910094)
+
+4. [JS函数式编程究竟是什么?](https://juejin.cn/post/6844903907647291400)
+
+5. [浅析JavaScript函数式编程](https://juejin.cn/post/6940442700889980965)
+
+6. [函数式编程（五）—— 函子](https://zhuanlan.zhihu.com/p/339722986)
+
+7. [函数式编程进阶：应用函子](https://zhuanlan.zhihu.com/p/275686659)
+
+8. [函数式编程 -- 函子（Functor）](https://blog.csdn.net/zimeng303/article/details/109280319)
+
+9. [JavaScript ES6函数式编程（三）：函子](https://www.cnblogs.com/chenwenhao/p/11742517.html)
+
 ## 1. 函数柯里化 —— curried
 
 ### 1. 基本说明
@@ -106,6 +127,30 @@
            return (value) => reduce(fns, (acc, fn) => fn(acc), value) ;
        }
    ```
+2. 使用原生的 reduce() 方法：
+   ```js
+      function compose() {
+          const fnList = Array.prototype.slice.call(arguments);
+          fnList.reverse();
+          return function(value) {
+              return fnList.reduce((acc, fn) => {
+                  return fn(acc);
+              }, value);
+          }
+      }
+   ```
+3. 使用原生的 reduceRight() 方法：
+   ```js
+      function compose() {
+          const fnList = Array.prototype.slice.call(arguments);
+          return function(value) {
+              // reduceRight() 是从右向左遍历数组，实现对数组数据的规约
+              return fnList.reduceRight((acc, fn) => {
+                  return fn(acc);
+              }, value);
+          }
+      }
+   ```
 
 ### 3. 组合的优势
  
@@ -113,7 +158,32 @@
     `compose(f, compose(g, h)) == compose(compose(f, g), h)`
 2. 优势：允许我们把函数组合到各自所需的 compose() 函数中。换句话说，我们可以不一次性组合所需的函数，我们可以提前组合，实现一些特定的需求，然后将组合的结果同其他函数再度组合，可以得到相同的效果（不提前组合）。
 
-## 3. 偏函数 —— partial
+## 3. 管道函数 —— pipe
+
+### 1. 基本说明
+
+1. 组合函数的数据流向是从右向左的，实际上我们也可以让数据从左向右流动，即先执行左侧的函数，再执行右侧的函数。就像 Unix 中的管道操作符一样：`|`，器数据流向就是从左向右。
+
+2. 从左向右处理数据流的过程被称为管道（pipeline）或者序列（sequence）。
+
+### 2. 代码实现
+
+1. pipe() 方法与组合函数的实现方法类似，就是闭包 + reduce()，不同的是不需要对函数列表进行反转。
+
+2. 代码实现：
+   ```js
+      function pipe() {
+          const args = Array.prototype.slice.call(arguments);
+   
+          return (value) => {
+             return args.reduce((acc, fn) => {
+                 return fn(acc);
+             }, value);
+          }
+      }
+   ```
+
+## 4. 偏函数 —— partial
 
 ### 1. 基本说明
 
@@ -142,7 +212,8 @@
               let argIndex = 0;
               for (let i = 0; i < fixedArgs.length && argIndex < fullArguments.length; i++) {
                   if (args[i] === undefined) {
-                      args[i] = fullArguments[argIndex++];
+                      args[i] = fullArguments[argIndex];
+                      argIndex = argIndex + 1;
                   }
               }
 
@@ -165,52 +236,7 @@
        * @param fn
        * @returns {function(): *}
        */
-       const partial = function (fn) {
-
-       // 取出占位的参数
-       const fixedArgs = Array.prototype.slice.call(arguments, 1);
-       return function () {
-           const restArgs = Array.prototype.slice.call(arguments);
-           let length = fixedArgs.length;
-           // 新建一个空数组，用来接收完整的参数
-           // 避免多次调用固定参数后的函数，对 fixedArgs 造成污染
-           const args = Array(length);
-
-           let position = 0;
-
-              for (let i = 0; i < length; i++) {
-                  // 向 args 数值填充数值
-                  // 判断固定的参数中是否有占位参数，如果有，就替换，没有，就直接取固定参数
-                  args[i] = fixedArgs[i] === _ ? restArgs[position++] : fixedArgs[i];
-              }
-        
-
-              while (position < restArgs.length) {
-                  // 固定的参数可能少于 fn 的实际参数个数
-                  // restArgs 中除去填补 _，剩下的参数补上
-                  args.push(restArgs[position++]);
-              }
-
-              return fn.apply(this, args);
-          }
-      }
-     
-      function sub(x, y) {
-         return y - x;
-      }
-      const subFive = partial(sub, 5);
-      const subFrom20 = partial(sub, _, 20);
-      // 15
-      console.log(subFive(20));
-      // 18
-      console.log(subFrom20(2));
-     ```
-   - 实现方式 2：
-     ```js
-
-        // 全局变量
-        const _ = 'PLACEHOLDER';
-        const partial2 = (fn, ...fixedArgs) => {
+       const partial2 = (fn, ...fixedArgs) => {
            return (...restArgs) => {
                // 建立 fixedArgs 的一个副本，使用这个副本接收完整的参数
                // 避免多次调用固定参数后的函数，对 fixedArgs 造成污染
@@ -234,6 +260,23 @@
            }
 
        }
+     
+      function sub(x, y) {
+         return y - x;
+      }
+      const subFive = partial(sub, 5);
+      const subFrom20 = partial(sub, _, 20);
+      // 15
+      console.log(subFive(20));
+      // 18
+      console.log(subFrom20(2));
+     ```
+   - 实现方式 2：
+     ```js
+
+        // 全局变量
+        const _ = 'PLACEHOLDER';
+        
      ```
    
   
