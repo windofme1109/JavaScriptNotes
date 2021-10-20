@@ -3,16 +3,22 @@
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [JavaScript 函数式编程](#javascript-%E5%87%BD%E6%95%B0%E5%BC%8F%E7%BC%96%E7%A8%8B)
-  - [1. 函数柯里化 —— curried](#1-%E5%87%BD%E6%95%B0%E6%9F%AF%E9%87%8C%E5%8C%96--curried)
+  - [1. 参考资料](#1-%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99)
+  - [2. 函数柯里化 —— curried](#2-%E5%87%BD%E6%95%B0%E6%9F%AF%E9%87%8C%E5%8C%96--curried)
     - [1. 基本说明](#1-%E5%9F%BA%E6%9C%AC%E8%AF%B4%E6%98%8E)
     - [2. 代码实现](#2-%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0)
-  - [2. 组合函数 —— compose](#2-%E7%BB%84%E5%90%88%E5%87%BD%E6%95%B0--compose)
+  - [3. 组合函数 —— compose](#3-%E7%BB%84%E5%90%88%E5%87%BD%E6%95%B0--compose)
     - [1. 基本说明](#1-%E5%9F%BA%E6%9C%AC%E8%AF%B4%E6%98%8E-1)
     - [2. 代码实现](#2-%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0-1)
     - [3. 组合的优势](#3-%E7%BB%84%E5%90%88%E7%9A%84%E4%BC%98%E5%8A%BF)
-  - [3. 偏函数 —— partial](#3-%E5%81%8F%E5%87%BD%E6%95%B0--partial)
+  - [4. 管道函数 —— pipe](#4-%E7%AE%A1%E9%81%93%E5%87%BD%E6%95%B0--pipe)
     - [1. 基本说明](#1-%E5%9F%BA%E6%9C%AC%E8%AF%B4%E6%98%8E-2)
     - [2. 代码实现](#2-%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0-2)
+  - [5. 偏函数 —— partial](#5-%E5%81%8F%E5%87%BD%E6%95%B0--partial)
+    - [1. 基本说明](#1-%E5%9F%BA%E6%9C%AC%E8%AF%B4%E6%98%8E-3)
+    - [2. 代码实现](#2-%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0-3)
+  - [6. 函子 —— functor](#6-%E5%87%BD%E5%AD%90--functor)
+    - [1. 基本说明](#1-%E5%9F%BA%E6%9C%AC%E8%AF%B4%E6%98%8E-4)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -39,7 +45,7 @@
 
 9. [JavaScript ES6函数式编程（三）：函子](https://www.cnblogs.com/chenwenhao/p/11742517.html)
 
-## 1. 函数柯里化 —— curried
+## 2. 函数柯里化 —— curried
 
 ### 1. 基本说明
 
@@ -94,7 +100,8 @@
           }
       }
    ```
-## 2. 组合函数 —— compose
+
+## 3. 组合函数 —— compose
 
 ### 1. 基本说明
 
@@ -158,7 +165,7 @@
     `compose(f, compose(g, h)) == compose(compose(f, g), h)`
 2. 优势：允许我们把函数组合到各自所需的 compose() 函数中。换句话说，我们可以不一次性组合所需的函数，我们可以提前组合，实现一些特定的需求，然后将组合的结果同其他函数再度组合，可以得到相同的效果（不提前组合）。
 
-## 3. 管道函数 —— pipe
+## 4. 管道函数 —— pipe
 
 ### 1. 基本说明
 
@@ -183,7 +190,7 @@
       }
    ```
 
-## 4. 偏函数 —— partial
+## 5. 偏函数 —— partial
 
 ### 1. 基本说明
 
@@ -280,3 +287,7 @@
      ```
    
   
+
+## 6. 函子 —— functor
+
+### 1. 基本说明
