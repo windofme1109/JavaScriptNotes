@@ -1,3 +1,28 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [JavaScript 与函数式编程 - 函子](#javascript-%E4%B8%8E%E5%87%BD%E6%95%B0%E5%BC%8F%E7%BC%96%E7%A8%8B---%E5%87%BD%E5%AD%90)
+  - [1. 参考资料](#1-%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99)
+  - [2. monoid](#2-monoid)
+    - [1. 函数组合 - compose](#1-%E5%87%BD%E6%95%B0%E7%BB%84%E5%90%88---compose)
+    - [2. monoid 的用途和优势](#2-monoid-%E7%9A%84%E7%94%A8%E9%80%94%E5%92%8C%E4%BC%98%E5%8A%BF)
+      - [1. 数字相加](#1-%E6%95%B0%E5%AD%97%E7%9B%B8%E5%8A%A0)
+      - [2. 字符串连接](#2-%E5%AD%97%E7%AC%A6%E4%B8%B2%E8%BF%9E%E6%8E%A5)
+      - [3. 组合函数](#3-%E7%BB%84%E5%90%88%E5%87%BD%E6%95%B0)
+      - [4. 异步函数组合](#4-%E5%BC%82%E6%AD%A5%E5%87%BD%E6%95%B0%E7%BB%84%E5%90%88)
+      - [5. 异步控制流](#5-%E5%BC%82%E6%AD%A5%E6%8E%A7%E5%88%B6%E6%B5%81)
+      - [6. monoid 总结](#6-monoid-%E6%80%BB%E7%BB%93)
+  - [3. functor](#3-functor)
+    - [1. Maybe 函子](#1-maybe-%E5%87%BD%E5%AD%90)
+    - [2. Either 函子](#2-either-%E5%87%BD%E5%AD%90)
+    - [3. 组合函子](#3-%E7%BB%84%E5%90%88%E5%87%BD%E5%AD%90)
+    - [4. 引入 chain](#4-%E5%BC%95%E5%85%A5-chain)
+    - [5. 总结](#5-%E6%80%BB%E7%BB%93)
+  - [4. monad](#4-monad)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # JavaScript 与函数式编程 - 函子
 
 ## 1. 参考资料
@@ -84,7 +109,7 @@
 
 ### 2. monoid 的用途和优势
 
-1. 在函数式编程中，当我们操作函数的时候，需要将接收两个参数的函数转换成接收任意数量参数的函数。比如说，上面的 `compose()` 函数接收两个参数，但是我们需要 `compose` 接收不定数量的参数
+1. 在函数式编程中，当我们操作函数的时候，需要将接收两个参数的函数转换成接收任意数量参数的函数。比如说，上面的 `compose()` 函数接收两个参数，但是我们需要 `compose` 接收不定数量的参数。
 
 2. `Monoid` 是这个问题的解决方案，我们使用数组的 `reduce` 方法实现函数接收任意数量的参数。
 
@@ -132,6 +157,15 @@
 
 1. 函数组合也可使用 `reduce` 方法进行扩展。
    ```js
+       /**
+         * 接收两个函数作为参数，并将这两个函数组合成新的函数，并返回这个新函数
+         * 执行顺序是从右向左，即先执行 fn2，再执行 fn2
+         * @param fn1
+         * @param fn2
+         * @returns {function(*=): *}
+         */
+         const compose = (fn1, fn2) => arg => fn1(fn2(arg)); 
+           
        const composeArray = arr => arr.reduce     (compose, v => v);
 
        const functionArr = [resultIs, add5, double];
@@ -790,18 +824,19 @@
    3. Either：代码分支和异常处理
 
 ## 4. monad
-1. Monad，中文译名为单子，定义是：_A monad is just a monoid in the category of endofunctors._
+
+1. `Monad`，中文译名为单子，定义是：_A monad is just a monoid in the category of endofunctors._
 
 2. 通过前面对函子的介绍，现在我们可以引入单子：单子就是使用 chain 方法展开自己的函子。因此，Maybe 函子就是一个单子
 
 3. chain 方法必须遵守下面几个规则：
    1. Left identity
       - `Monad(x).chain(f) === f(x); // f being a function returning a monad`
-      - f 是一个返回 Monad 的函数
+      - f 是一个返回 `Monad` 的函数
       - 向 chain 方法中传入 f，与直接向 f 中传入 x 的结果是一样的，返回的是同一个函子。
    2. Right identity
       - `Monad(x).chain(Monad) === Monad(x);`
-      - 向 chain 方法中传入 Monad，应该返回同样的 Monad，因为 chain 是没有副作用的。
+      - 向 chain 方法中传入 `Monad`，应该返回同样的 `Monad`，因为 chain 是没有副作用的。
    3. Associativity
       - `monad.chain(f).chain(g) == monad.chain(x => f(x).chain(g)); // f and g being functions returning a monad`
       - f 和 g 是返回 monad 的函数
@@ -809,7 +844,7 @@
 
 4. 假设一种情况，就是如果我们在 map 函数中，应用一个返回函子的函数，那么最终得到一个值是函子的函子，这种情况下，我们不能直接访问函子中的值了，必须将函子展开才能访问。因此，我们通过展开函子的方式来移除额外的函子，这个过程被称为 chain。
 
-5. **拥有 chain 方法的函子被称为 Monad**。
+5. **拥有 chain 方法的函子被称为 `Monad`**。
 
 6. 完整的 Maybe 函子：
    ```js
@@ -943,9 +978,9 @@
        Maybe(Right("bar@example.com")).flatten();      // Maybe('bar@example.com')
        Maybe(Left(new Error("Invalid mail"))).flatten(); // Maybe(new Error('Invalid mail'))
     ```
-12. chain 方法存在的问题就是：给定两个不同类型的 Monad，chain 方法会返回调用 chain 方法的 Monad。chain 实际上是调用了 flatten 方法，而 flatten 方法是将嵌套的 Monad 的值提出来，并将这个值放入当前的 Monad 中。
+12. chain 方法存在的问题就是：给定两个不同类型的 `Monad`，chain 方法会返回调用 chain 方法的 `Monad`。chain 实际上是调用了 flatten 方法，而 flatten 方法是将嵌套的 `Monad` 的值提出来，并将这个值放入当前的 `Monad` 中。
 
-13. 这种做法使得我们可以链式组合不同的 Monad，但是，这种做法实际上是不对的。我觉得不对的原因是：这样的转换方法将其他类型的函子都隐式的转换成同一个类型的函子，使用起来不够灵活，会丢失值的上下文信息，无法满足我们任意转换的需求。比如说，前面的例子是将 Either 函子统一转换成 Maybe 函子，如果我们需要将 Either 函子转换成其他类型的函子，使用 chain 方法就做不到了。因此要改变 chain 方法和 flatten 的实现方式。
+13. 这种做法使得我们可以链式组合不同的 `Monad`，但是，这种做法实际上是不对的。我觉得不对的原因是：这样的转换方法将其他类型的函子都隐式的转换成同一个类型的函子，使用起来不够灵活，会丢失值的上下文信息，无法满足我们任意转换的需求。比如说，前面的例子是将 Either 函子统一转换成 Maybe 函子，如果我们需要将 Either 函子转换成其他类型的函子，使用 chain 方法就做不到了。因此要改变 chain 方法和 flatten 的实现方式。
 
 14. 下面就是 Right 函子中的 flatten 和 chain 的新的实现方式：
     ```js
@@ -962,9 +997,9 @@
         }
     ```
 15. 在上面的 Right 函子中，flatten 仅仅返回值，不进行展开
-chain 方法值调用 map 方法，然后调用 flatten 方法。我们不需要知道怎么将嵌套的 Monad 中的值提取出来，我们仅仅返回它即可
+chain 方法值调用 map 方法，然后调用 flatten 方法。我们不需要知道怎么将嵌套的 `Monad` 中的值提取出来，我们仅仅返回它即可
 
-16. 前面使用 Maybe 函子和 Either 函子的方法都失效了，因为 Monad 的类型中途发生了变化，这样我们就不需要展开两个不同类型的函子了。
+16. 前面使用 Maybe 函子和 Either 函子的方法都失效了，因为 `Monad` 的类型中途发生了变化，这样我们就不需要展开两个不同类型的函子了。
 
 17. 虽然不应该展开两个不同类型的函子，像是 Maybe 函子和 Either 函子，但是我们可以展开统一类型的函子。举个例子，如果我们有这样的结构：`Maybe(Either(value))`，如果我们能将其转换成 `Maybe(Maybe(value))`。 那么我们就能展开两个 Maybe 函子，因此我们需要一个函数：eitherToMaybe，进行函子之间的转换，将 Either 函子转换成 Maybe。然后调用方式就变成下面这样：
     ```js
@@ -1027,7 +1062,7 @@ chain 方法值调用 map 方法，然后调用 flatten 方法。我们不需要
        }
     ```
 
-22. 上面的转换过程叫做自然转换，即 `Natural Transformation`。自然转换就是值改变容器，不改变值，比如说对 Monad 类型的转换就是是自然转换。
+22. 上面的转换过程叫做自然转换，即 `Natural Transformation`。自然转换就是值改变容器，不改变值，比如说对 `Monad` 类型的转换就是是自然转换。
 
 23. 如果是自然转换，与顺序无关，比如说：
     ```js
@@ -1145,5 +1180,5 @@ chain 方法值调用 map 方法，然后调用 flatten 方法。我们不需要
        // no email
        console.log(parseEmail({ name: 'foo' }));
     ```
-27. 每一个 Monad 应该提供一个函数用将当前的 Monad 转换成其他类型的 Monad。
+27. 每一个 `Monad` 应该提供一个函数用将当前的 `Monad` 转换成其他类型的 `Monad`。
 

@@ -17,8 +17,6 @@
   - [5. 偏函数 —— partial](#5-%E5%81%8F%E5%87%BD%E6%95%B0--partial)
     - [1. 基本说明](#1-%E5%9F%BA%E6%9C%AC%E8%AF%B4%E6%98%8E-3)
     - [2. 代码实现](#2-%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0-3)
-  - [6. 函子 —— functor](#6-%E5%87%BD%E5%AD%90--functor)
-    - [1. 基本说明](#1-%E5%9F%BA%E6%9C%AC%E8%AF%B4%E6%98%8E-4)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -285,9 +283,3 @@
         const _ = 'PLACEHOLDER';
         
      ```
-   
-  
-
-## 6. 函子 —— functor
-
-### 1. 基本说明
