@@ -2,12 +2,19 @@
 
 ## 1. 参考资料
 
-1. []()
-2. []()
-3. []()
-4. []()
-5. []()
-6. []()
+1. [Babel 配置用法解析](https://www.cnblogs.com/bai1218/p/12392180.html)
+
+2. [面试官(7): 聊一聊 Babel?](https://juejin.cn/post/6844903849442934798)
+
+3. [深入Babel，这一篇就够了](https://juejin.cn/post/6844903746804137991)
+
+4. [面试官: 你了解过Babel吗？写过Babel插件吗? 答: 没有。卒](https://juejin.cn/post/6844903566809759758)
+
+5. [深入浅出 Babel 上篇：架构和原理 + 实战](https://juejin.cn/post/6844903956905197576)
+
+6. [不容错过的 Babel7 知识](https://juejin.cn/post/6844904008679686152)
+
+7. [Babel 官网](https://babeljs.io/docs/en/)
 
 ## 2. Babel 的基本说明
 
