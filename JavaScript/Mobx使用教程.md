@@ -248,12 +248,84 @@
       // ---- or just use function components: ----
        const TodoView = observer(({ todo }) => <div>{todo.title}</div>)
    ```
+4. 什么类型的组件应该使用 `observer` 装饰？
+   - 一句话总结：使可观察的数据进行渲染的组件。
+   
+### 2. Provider 和 inject
 
-### 2. Provider
+1.Provider 是一个组件，接收 store （或者其他内容）作为 props 参数。使用 React 提供的 context 机制，将 store 传入子组件中。可以跨层级使用 store 属性。
 
-### 3. inject
+2. inject 是一个装饰器，也可以作为函数使用。inject 用来获取 store 对象。
 
+3. inject 实际上是一个高阶组件，将其装饰的组件进行包装。接收一系列的字符串作为参数，使得和字符串同名的 store 属性在被包裹的组件中可用。
 
+4. Provider 接收 stores 属性，我们如果想在子组件中使用，需要在 inject 中传入同名的字符串。比如说，传入 Provider 的 stores 对象名称是 user，即：`<Provider user={stores}>...</Provider>`，那么 inject 应该接收 user 这个字符串，即：`@inject('user')`。这样被 inject 装饰的组件通过 `this.props.user` 就能获取 user 这个 store 中的内容了。
+
+5. Provider 和 inject 的使用示例：
+   ```js
+      @inject("color")
+      @observer
+      class Button extends React.Component {
+          render() {
+              return <button style={{ background: this.props.color }}>{this.props.children}</button>
+          }
+      }
+
+       class Message extends React.Component {
+           render() {
+               return (
+                  <div>
+                    {this.props.text} <Button>Delete</Button>
+               </div>
+               )
+           }
+       }
+
+       class MessageList extends React.Component {
+           render() {
+               const children = this.props.messages.map(message => <Message text={message.text} />)
+                return (
+                    <Provider color="red">
+                        <div>{children}</div>
+                    </Provider>
+               )
+           }
+       }
+   ```
+6. 使用 React.useContext 可以读取传入 Provider 的 stores 对象，我们只需要从 Mobx-react 中导入 MobXProviderContext 这个上下文即可。
+
+7. 如果一个组件需要一个 store，并且通过同名的属性接收一个 store。那么会优先使用这个 store 属性。测试的时候可以利用这一点。
+
+8. 同时使用 `@inject` 和 `@observer`，确保使用顺序：`observer` 应该是内层装饰器，`inject` 是外层装饰器，二者之间可以有别的装饰器。
+   ```js
+      @inject()
+      // ... other decorators
+      @observer
+      class Comp extends React.Component {}
+   ```
+9. 被 inject 包装的组件，可以通过 inject 返回的高阶组件的 `wrappedComponent` 属性获得。
+
+10. inject 可以作为函数使用，如下所示：
+    ```js
+       var Button = inject("color")(
+           observer(
+               class Button extends Component {
+                   /* ... etc ... */
+               }
+           )
+       )
+    ```
+    也可以接收函数组件：
+    ```js
+       var Button = inject("color")(
+           observer(({ color }) => {
+              /* ... etc ... */
+           })
+       )
+    ```
+11. 也就是说，inject 和 observer，要么同时为装饰器，要么同时为函数。
+
+12. observer 作为一个函数，接收一个组件，并返回一个组件。将 observer 的返回值传入 inject 函数的返回值中（inject 函数的返回值也是一个高阶组件）。
 ## 4. 基本使用（v5 版本的 Mobx）—— 与 Mobx-react 结合
 
 
@@ -261,14 +333,39 @@
 
 ### 1. 创建 observable
 
+#### 1. observable
+
+1. observable 可以作为函数使用，也可以作为装饰器使用。
+
+2. 作用是：复制一个函数，将其变成可观察的。复制源可以是纯对象、数组、Map 和 Set。默认情况下，observable 是递归使用，即 如果遇到的值是一个对象或者数组，其内部的值也会被传入 observable 中。
+3. 作为函数：`observable(source, overrides?, options?)`  
+
+4. 作为装饰器（annotation）：`@observable` 
+
 ### 2. Actions
+
+#### 1. action
+
+#### 1. runInAction
+
+#### 2. flow
 
 ### 3. Computeds
 
+#### 1. computed
+
 ### 4. Reactions
+
+#### 1. autorun
+
+#### 2. reaction
+
+#### 3. when
+
 
 ### 5. Configuration
 
+#### 1. configure 
 
 ## 6. api 参考 —— 以 v6 版本的 Mobx 为例
 
