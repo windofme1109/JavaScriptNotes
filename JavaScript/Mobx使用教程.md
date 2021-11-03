@@ -1080,8 +1080,172 @@
 
 #### 1. makeObservable
 
-1. 
+1. makeObservable 是一个函数，借助这个函数，我们可以对一个对象的每个属性指定一个声明（annotation），从而将其变成可观察的数据。最重要的声明（annotation）是：
+   - observable：定义一个存储 state 的可追踪的属性。
+   - action：将一个可以改变 state 的函数标记为 action。
+   - computed：标记一个 getter 方法，这个 getter 方法将获得从 state 衍生出新的值，并且这个值会被缓存。
+
+2. 数组、Map 和 Set 也会自动得被转换成可观察的数据。
+
+3. 函数调用形式：`makeObservable(target, annotations?, options?)`
+
+4. 参数说明：
+   - target：一个 js 对象，包括类实例
+   - annotation：可选，将声明映射到每个类成员上，当使用装饰器的时候，这个参数可以省略。
+   - option：可选，配置项，决定 makeObservable 的行为。
+
+5. makeObservable 可以用来追踪已经存在的对象的属性，并且将他们变成可观察的数据。通常来说，makeObservable 在类的构造函数中使用，并且其第一个参数是 this。
+
+6. 在类中使用 makeObservable：
+   ```js
+      import { makeObservable, observable, computed, action, flow } from "mobx"
+
+      class Doubler {
+           value
+
+          constructor(value) {
+              makeObservable(this, {
+                  value: observable,
+                  double: computed,
+                  increment: action,
+                  fetch: flow
+              })
+              this.value = value
+          }
+
+          get double() {
+              return this.value * 2
+          }
+
+          increment() {
+              this.value++
+          }
+
+          *fetch() {
+              const response = yield fetch("/api/value")
+              this.value = response.json()
+          }
+      }
+   ```
 
 #### 2. makeAuthObservable 
 
+1. 函数调用形式：`makeAutoObservable(target, overrides?, options?)`
+
+2. 参数说明：
+   - target：一个 js 对象，包括类实例
+   - overrides：可选，一个对象，用来指定哪些成员会被注解（annotation）或者不被注解（指定这个成员属性为 false），我的理解是：哪些成员变成可观察的。
+   - options：可选，配置项
+
+3. makeAuthObservable 就像 makeObservable 一样，它默认推断所以属性。我们仍然可以通过 overrides 属性来给某个属性指定注解（annotation）来覆写默认的属性。特别是可以使用 false 属性完全排除已经处理过的属性或方法。
+
+4. makeAutoObservable 函数可以使代码变得更紧凑且更易于维护，因为不必明确提及新成员。 但是 makeAutoObservable 不能用于具有超类或子类的类。
+
+5. 示例代码：
+   ```js
+      import { makeAutoObservable } from "mobx"
+
+      function createDoubler(value) {
+           return makeAutoObservable({
+               value,
+               get double() {
+                   return this.value * 2
+               },
+               increment() {
+                   this.value++
+               }
+           })
+      }
+   ```
+6. **注意**：上面的例子使用的是构造函数生成一个类，我们也可以使用在类中使用 makeAutoObservable。
+
+7. 自动推断规则：
+   - 所有类中自有的（非继承）属性变成可观察（observable）的数据。
+   - 使用 `get` 定义的属性，即 getter 变成计算值（computed）。
+   - 使用 `set` 定义的属性，即 setter 变成 action。
+   - 原型（prototype）上所有的函数变成 autoAction。
+   - 原型（prototype）上的所有的 Generator  变成 flow 类型。注意，在一些转译器配置中无法检测到 Generator 函数，如果 flow 没有如预期的那样工作，请确保指定了 flow。
+   - 在 overrides 对象中标记为 false 的类成员将不会被注解。例如，像识别符（identifiers）一类的只读字段。
+
+#### 3. makeObservable 和 makeAuthObservable 中的第三个参数：options
+
+#### 4. makeObservable 和 makeAuthObservable 的限制
+
 ## 7. Mobx v5 版本和 v6 版本的区别
+
+1. Mobx v5 以及之前版本鼓励我们使用 ES 的装饰器（decorator）来标注变量。将对象变成可观测的值使用 `@observable`，计算值使用 `@computed`，而定义 action 使用 `@action`。
+
+2. 由于装饰器现在并不是 ES 的标准语法，并且装饰器进入标准还需要很长时间，而且看起来进入标准的装饰器语法可能和现在的装饰器语法不一样。因此，从适用性上考虑，在 Mobx v6 版本中移除了装饰器语法，推荐我们使用 `makeObservable` / `makeAutoObservable` 来替代之前的装饰器。
+
+3. 许多现存的代码还是使用了装饰器，而且许多文档和教程也使用了装饰器。那么规则就是我们在 `makeObservable` 中也可以使用像 `observable`、`action` 和 `computed` 一类的装饰器。举例如下：
+   ```js
+      import { makeObservable, observable, computed, action } from "mobx"
+
+      class Todo {
+         id = Math.random()
+         @observable title = ""
+         @observable finished = false
+
+          constructor() {
+              makeObservable(this)
+          }
+
+          @action
+          toggle() {
+              this.finished = !finished
+          }
+      }
+
+      class TodoList {
+          @observable todos = []
+
+          @computed
+          get unfinishedTodoCount() {
+              return this.todos.filter(todo => !todo.finished).length
+          }
+
+          constructor() {
+              makeObservable(this)
+          }
+      }
+   ```
+4. Mobx 在 v6 版本之前不会要求在类的构造函数中调用 `makeObservable(this)`。但是由于 `makeObservable` 实现的装饰器的实现更简单，更兼容，现在 Mobx 要求这样做。这使得 MobX 根据装饰器中的信息使实例可观察，装饰器取代了 `makeObservable` 的第二个参数。 
+
+5. Mobx 倾向于以这种形式继续支持装饰器。任何存在的基于 Mobx v4/v5 版本的代码可以通过调用 `makeObservable` 来实现对新版本的兼容。
+
+6. 来自 mobx-react 中的 `observer` 函数，既可以作为高阶组件使用，也可以作为装饰器使用，都可以用在类组件上。
+   ```js
+      @observer
+      class Timer extends React.Component {
+          /* ... */
+      }
+   ```
+
+## 8. 项目中如何启用对装饰器的支持
+
+### 1. TypeScript
+
+1. 在 tsconfig.json 中设置下面两个编译选项为 true：
+   - `experimentalDecorators`
+   - `useDefineForClassFields`
+
+### 1. Babel
+
+1. 安装`@babel/plugin-proposal-class-properties` 和 `@babel/plugin-proposal-decorators babel` 这两个 babel 插件用来对装饰器语法进行编译：`npm i --save-dev @babel/plugin-proposal-class-properties @babel/plugin-proposal-decorators`
+
+2. 在 `babelrc.json` 中进行配置：
+   ```json
+      {
+          "plugins": [
+              ["@babel/plugin-proposal-decorators", { "legacy": true }],
+              ["@babel/plugin-proposal-class-properties", { "loose": false }]
+              // In contrast to MobX 4/5, "loose" must be false!    ^
+              ]
+      }
+   ```
+
+### 3. Create React App
+
+1. create-react-app 在 2.1.1 及以上的版本且使用 TypeScript 为模板的情况下才支持装饰器语法。
+
+2. 旧版本的 create-react-app 或者使用 `npm run eject` 命令将 webpack 配置暴露出来，或者使用 `customize-cra` 这包。
