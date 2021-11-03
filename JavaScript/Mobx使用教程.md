@@ -338,35 +338,750 @@
 1. observable 可以作为函数使用，也可以作为装饰器使用。
 
 2. 作用是：复制一个函数，将其变成可观察的。复制源可以是纯对象、数组、Map 和 Set。默认情况下，observable 是递归使用，即 如果遇到的值是一个对象或者数组，其内部的值也会被传入 observable 中。
-3. 作为函数：`observable(source, overrides?, options?)`  
 
-4. 作为装饰器（annotation）：`@observable` 
+3. 基本数据类型（string、number、boolean、null、undefined）不能被 Mobx 转换成可观察的对象。因为 JavaScript 中的基本数据类型是不可变的。但是可以变成包装类型。
+
+4. 无论是是使用装饰器`@observable`，还是将类实例传入 observable 函数中，类实例都不能被自动地转换成可观察的对象。将类的属性变成可观察的类型是类的构造函数的职责。
+
+5. 作为函数：`observable(source, overrides?, options?)`  
+
+6. 参数说明：
+   - source
+     - 必要参数
+     - 需要被克隆的对象，该对象的所以成员会变成可观察的
+   - overrides
+     - 可选
+     - 是一个 map 结构，用来指定哪些成员会被注解（annotation），我的理解是：哪些成员变成可观察的。
+   - options
+     - 可选
+     - 配置项，用来控制 observable 的行为，是一个对象，有下面几个属性：
+       - `autoBind`：布尔值。为 true 的话默认使用 `action.bound` 或者 `flow.bound`，而不是使用 `action` 或者 `flow`。不会影响不影响带明确注解的类成员。
+       - `deep`：布尔值。为 false 的话默认使用 observable.ref，而不是使用 observable。不会影响不影响带明确注解的类成员。
+       - `name`：字符串，给这个对象赋予一个调试的名字，在错误信息或者反射的 API（reflection API）中，会打印这个调试的名字。
+       - `proxy`：布尔值。为 false的话强制 `observable(thing)` 使用非代理的方式实现代理。如果对象内部的属性保持稳定，不再发生变化，那么此时配置 proxy 为 false，那么这个对象作为一个非代理的对象更容易调试，性能更好。详情可见：[void-proxies](https://mobx.js.org/observable-state.html#avoid-proxies)
+
+7. observable 的返回值是代理对象，这表示被添加到对象中的属性可以被获取同时也会被变成可观察的。
+
+8. observable 作为函数的使用：
+   ```js
+      const {observable, autorun} = require('mobx');
+
+       const todos = observable([
+          { title: "Spoil tea", completed: true },
+          { title: "Make coffee", completed: false }
+       ]);
+       
+       autorun(() => {
+           console.log(
+               "Remaining:",
+                todos
+                    .filter(todo => !todo.completed)
+                    .map(todo => todo.title)
+                    .join(", ")
+           )
+       })
+
+      // 第一次执行
+      // Remaining: Make coffee
+
+      // Remaining: Spoil tea, Make coffee
+      todos[0].completed = false;
+      // Remaining: Spoil tea
+      todos[1].completed = true;
+   ```
+9. observable 还可以作为装饰器（annotation），使用方式如下：`@observable classProperty = value`
+
+10. 使用装饰器形式的 observable 可以在 ES7 或者 TypeScript 类属性中属性使用，将其转换成可观察的。 `@observable` 可以在实例字段和属性 `getter` 上使用。对于对象的哪部分需要成为可观察的，`@observable` 提供了细粒度的控制。
+
+11. observable 作为装饰器的使用：
+    ```js
+       import { observable, computed } from "mobx";
+
+        class OrderLine {
+            @observable price = 0;
+            @observable amount = 1;
+
+             @computed get total() {
+                 return this.price * this.amount;
+             }
+       }
+    ```
 
 ### 2. Actions
 
 #### 1. action
 
-#### 1. runInAction
+1. action 可以作为函数使用，也可以作为装饰器使用。
+
+2. action 用在一个意图改变 state 的函数上。也就是我们定义一个用来修改 state 的函数，使用 action 进行包装，那么返回具有同样签名的函数。实际上是用 transaction、untracked 和 allowStateChanges 将函数包裹起来，尤其是 transaction 的自动应用能够优化性能，action 会分批处理变化并只在（最外层的）action 完成后通知计算属性（computed value）和 reaction。 这将确保在 action 完成之前，在 action 期间生成的中间值或未完成的值对应用的其余部分是不可见的。
+
+3. 所有意图修改 state 的行为（函数）必须使用 action 进行包装。
+
+4. 衍生信息的函数，比如执行查找或筛选数据，不应该使用 action 标记，以允许 MobX 跟踪其调用。
+
+5. 使用 action 包装的函数应该是不可枚举的。
+
+6. action 的使用形式如下：
+   - `action(fn)`
+   - `action(name, fn)`
+   - `@action classMethod() {}`
+   - `@action(name) classMethod () {}`
+   - `@action boundClassMethod = (args) => { body }`
+   - `@action(name) boundClassMethod = (args) => { body }`
+   - `@action.bound classMethod() {}`
+
+7. `action(fn)` 形式的代码示例如下：
+   ```js
+      const {observable, autorun, action} = require('mobx');
+      const increment = action(state => {
+          state.value++
+          state.value++
+      })
+
+      increment(state)
+      // 2
+      console.log(state.value);
+   ```
+8. `action(name, fn)` 形式的代码示例如下：
+   ```js
+      const {observable, autorun, action} = require('mobx');
+      const state = observable({
+          str: ['hello', 'world'],
+          output: ''
+      })
+
+      const join = action('join', function (state, separator) {
+      state.output = state.str.join(separator);
+      })
+
+      join(state, ' ')
+
+      // hello world
+      console.log(state.output);
+   ```
+9. `@action classMethod() {}` 形式的代码示例如下：
+   ```js
+      class Stores {
+          @observable name = 'foo';
+          @observable count = 1;
+    
+          @action increment() {
+              this.count++;
+          }
+      }
+   ```
+
+10. `action.bound` 这个装饰器的作用是用来将函数绑定到当前的实例中，因此函数内部的 this 总是能正确的指向当前实例。`action.bound` 不要和箭头函数一起使用，箭头函数已经是绑定过的并且不能重新绑定。
+
+#### 2. runInAction
+
+1. runInAction 用来创建一个临时的 action，创建后就会被调用。在异步 action中比较有用。
+
+2. runInAction 接收一个函数作为参数，调用 runInAction 会立即将 接收的函数包装为 action，然后执行。
+
+3. 我们需要使用 action 包装一个异步任务，当异步任务完成时，无论是成功还是失败，我们就调用 runInAction，向 runInAction 传入成功或失败的处理函数。
+
+4. runInAction 的用法示例：
+   ```js
+      const {observable, autorun, action, runInAction} = require('mobx');
+
+       /**
+        * 定义一个异步操作
+        * @param num
+        * @returns {Promise<unknown>}
+        */
+        const getData = (num) => {
+            return new Promise((resolve, reject) => {
+                setTimeout(() => {
+                    resolve(num);
+                }, 2000);
+            })
+        }
+
+         async function initData(num, state) {
+             try {
+                 const res = await getData(num);
+                 // 异步任务结束，调用 runInAction
+                 runInAction(() => {
+                     handleNum(res, state);
+                 })
+             } catch (e) {
+
+             }
+         }
+
+         const handleNum = (num, state) => {
+             state.num = num;
+             console.log(state.num);
+         }
+
+         // 使用 action 进行包装
+         const initAction = action(initData);
+         const state = observable({
+             str: ['hello', 'world'],
+             output: '',
+             num: 0
+         });
+         initAction(15, state);
+         // 2s 后，输出 15
+         // 15
+   ```
+
+5. runInAction 还有另外一种调用形式：`runInAction(name, func)`。第一个参数是一个参数，第二个参数是函数。
 
 #### 2. flow
 
+1. flow 这个函数（装饰器）用来在异步操作中取代 `async` / `await`，并且支持取消。
+
+2. flow 作为函数，只接收一个 Generator 作为作为参数，在这个 Generator 内部，通过使用 `yield` 关键字，我们能够链式调用 Promise，即使用 yield 替换 await。flow 函数的机制会保证 Generator 或者继续向下执行，或者得到一个 Promise 的 resolve 的结果。
+
+3. 因此使用 flow 不需要像 `async` / `await` 那样获得异步操作的结果后再执行一个 action（通过 runInAction 实现）。
+4. 应用步骤如下：
+   1. 使用 flow 包装异步函数
+   2. 使用 `function* ` 代替 `async`。
+   3. 使用 `yield` 替代 `await`。
+   
+5. 使用 flow 完成异步代码示例：
+   ```js
+       const {observable, autorun, action, runInAction, flow} = require('mobx');
+
+       /**
+        * 定义一个异步操作
+        * @param num
+        * @returns {Promise<unknown>}
+        */
+         const getData = (num) => {
+             return new Promise((resolve, reject) => {
+                  setTimeout(() => {
+                      resolve(num);
+                  }, 2000);
+             })
+         }
+
+          function* initData(num, state) {
+               try {
+                   const res = yield getData(num);
+                      state.num = res;
+                      console.log(state.num);
+               } catch (e) {
+
+                   }
+               }
+   
+      const initDataFlow = flow(initData);
+      // 2s 输出 15
+      // initDataFlow 的返回值是一个 Promise
+      initDataFlow(15, state)
+   ```
+6. flow 的返回值是一个函数，这个函数接收的参数和 flow 接收的 Generator 函数的参数一致。返回的函数的返回是一个 Promise。如果 Generator 中有返回值，那么会保存在 flow 的返回值函数的返回值 Promise 的 resolve 状态中。示例代码如下：
+      ```js
+       const {observable, autorun, action, runInAction, flow} = require('mobx');
+
+       /**
+        * 定义一个异步操作
+        * @param num
+        * @returns {Promise<unknown>}
+        */
+         const getData = (num) => {
+             return new Promise((resolve, reject) => {
+                  setTimeout(() => {
+                      resolve(num);
+                  }, 2000);
+             })
+         }
+
+          function* initData(num, state) {
+               try {
+                   const res = yield getData(num);
+                      state.num = res;
+                      return res;
+               } catch (e) {
+
+                   }
+               }
+   
+      const initDataFlow = flow(initData);
+      
+      // initDataFlow 的返回值是一个 Promise
+      initDataFlow(15, state).then(res => console.log(res));
+      // 2s 输出 15
+   ```
+7. 使用 flow 的另外一个好处就是可以被取消。flow 返回值函数的返回值是一个 resolve 状态的 Promise，其中的值是 Generator 中最后返回的值。这个返回的 Promise 带有一个 cancel 方法。调用 cancel 方法能中断正在运行的 Generator，并且取消它。`try` / `finally` 能继续执行。
+#### 3. flowResult
+
+1. flowResult 是为 TypeScript 用户准备的。能将 flow 函数返回的 Generator 函数转换成 Promise。 
+
+2. 使用 flow 装饰一个 Generator，会使用 Promise 包装返回的 Generator。但是，TypeScript 不会意识到这种转换，因此 flowResult 将使 TypeScript 识别出这种转换。
+
 ### 3. Computeds
+
+1. 计算值（computed value）可以用来从其他的可观察的数据中衍生信息。
 
 #### 1. computed
 
+1. computed 既可以作为函数使用，也可以作为装饰器使用。
+
+2. computed 的作用是将一个可观察的值变成另外一个可观察的值，但是不会重复进行计算除非其所依赖的可观察的值发生了变化。
+
+3. 从概念上来说，计算值很像 excel 中的公式，同时减少了我们必须存储的 state 的数量。计算值经过了高度优化，因此 Mobx 非常推荐我们使用计算值。
+
+4. 将 computed 作为装饰器使用：
+   ```js
+      import {observable, computed} from "mobx";
+
+      class OrderLine {
+            @observable price = 0;
+           @observable amount = 1;
+
+          constructor(price) {
+              this.price = price;
+          }
+
+          @computed get total() {
+              return this.price * this.amount;
+          }
+      }
+   ```
+5. `observable.object` 和 `extendObservable` 都会自动将 getter 属性推导成计算属性，所以下面这样就足够了:
+    ```js
+       const orderLine = observable.object({
+           price: 0,
+           amount: 1,
+           get total() {
+                return this.price * this.amount
+           }
+       })
+    ```
+6. 还可以为计算值定义 setter。注意这些 setters 不能用来直接改变计算属性的值，但是它们可以用来作“逆向”衍生。
+   ```js
+      class Foo {
+         @observable length = 2;
+         @computed get squared() {
+             return this.length * this.length;
+         }
+         set squared(value) { // 这是一个自动的动作，不需要注解
+             this.length = Math.sqrt(value);
+         }
+     }     
+   ```
+   **注意**：永远在 getter 之后 定义 setter。
+
+7. computed 还可以直接当做函数来调用。computed 函数接收一个函数，在这个函数内部是对可观察的数据进行操作。在返回的对象上使用 `get()` 来获取计算的当前值，或者使用 `observe(callback)` 来观察值的改变。这种形式的 computed 不常使用，但在某些情况下，你需要传递一个在“box”的计算值时，它可能是有用的。
+   ```js
+      const name = observable.box('Rose');
+
+      const nameUppercase = computed(() => {
+          // get 方法从可观察的 name 中拿到值
+          // 对可观察的值操作完以后，要记得将其返回
+          return name.get().toUpperCase();
+      })
+      // observe 是可观察对象的一个方法，接收一个回调函数作为参数
+      // 观察当前的对象，对象的属性出现添加、更新、删除操作时分别触发 add、update 和 delete 事件，然后就会调用 observe 中的回调函数
+      const output = nameUppercase.observe(change => console.log(change.newValue));
+
+      name.set('Jack')
+
+      // JACK
+   ```
+8. `computed` 装饰器装饰的函数不需要接收参数。如果你想创建一个能进行结构比较的计算属性时，请使用 `@computed.struct`。
+
+9. 使用计算值的几个实践规则：
+   1. 不应该拥有副作用或者是更新其他的可观察的数据
+   2. 避免创建和返回新的可观察的值
+
+10. 当使用 computed 作为函数使用时，它接收的第二个选项为配置对象，当然，computed 作为装饰器也可以接收配置对象。配置对象有如下可选参数:
+    - name: 字符串, 在 spy 和 MobX 开发者工具中使用的调试名称。
+    - context: 在提供的表达式中使用的 this。
+    - set: 要使用的 setter 函数。 没有 setter 的话无法为计算值分配新值。 如果传递给 computed 的第二个参数是一个函数，那么就把会这个函数作为 setter。
+    - equals: 默认值是 comparer.default。它充当比较前一个值和后一个值的比较函数。如果这个函数认为前一个值和后一个值是相等的，那么观察者就不会重新评估。这在使用结构数据和来自其他库的类型时很有用。例如，一个 computed 的 moment 实例可以使用 (a, b) => a.isSame(b) 。如果想要使用结构比较来确定新的值是否与上个值不同 （并作为结果通知观察者），comparer.deep 十分便利。
+    - requiresReaction: 对于非常昂贵的计算值，推荐设置成 true 。如果你尝试读取它的值，但某些观察者没有跟踪该值（在这种情况下，MobX 不会缓存该值），则会导致计算结果丢失，而不是进行昂贵的重新评估。
+    - keepAlive: 如果没有任何人观察到，则不要使用此计算值。 请注意，这很容易导致内存泄漏，因为它会导致此计算值使用的每个 observable ，并将计算值保存在内存中！
+
 ### 4. Reactions
+
+1. Reaction 是一个需要理解的重要概念，因为它是 MobX 中所有东西结合在一起的地方。Reaction 的目标是模拟自动发生的副作用。它们的意义在于为我们的可观察状态创建消费者，并在相关内容发生变化时自动运行副作用。
+
+2. 实际上，**用于实现 Reaction 的 API 很少用**。它们通常被抽象到其他库（如 mobx-react）或特定于您的应用程序的抽象中。
 
 #### 1. autorun
 
+1. autorun 接收一个副作用函数作为参数，只要 autorun 观察的数据发生变化，其就自动运行，就是执行其接收的函数。当我们创建 autorun 的时候，也会运行一次。只有被 observable 或者 computed 包装的值发生变化，autorun 才会做出相应。
+
+2. autorun 通过在响应式上下文中（reactive context）运行副作用（effect）来工作。在执行所提供的函数期间，MobX 会跟踪所有可观察值和计算值，这些值直接或间接被副作用直读取。函数完成执行完成后，MobX 将收集并订阅所有已读取的可观察的值，并等待它们中的任何一个再次更改。一旦他们这样做，autorun 将再次触发，重复整个过程。
+
+3. 如果在 autorun 接收地回调函数中，观察了某个可观察的值，那么在初始化的时候，autorun 会运行一次，然后只要这个可观察的值发生了变化，autorun 会再次被触发。
+
+4. autorun 的返回值是一个函数，手动调用这个返回值函数，可以终止 autorun 运行。
+
+5. autorun 接收第二个参数，它是一个配置对象，有如下可选的参数:
+   - delay: 可用于对效果函数进行去抖动的数字 （以毫秒为单位）。如果是 0（默认值）的话，那么不会进行去抖。
+   - name: 字符串，用于在例如像 spy 这样事件中用作此 reaction 的名称。
+   - onError: 用来处理 reaction 的错误，而不是传播它们。
+   - scheduler: 设置自定义调度器以决定如何调度 autorun 函数的重新运行。
+
+6. 整个过程如下图所示：
+   ![](./img/autorun.png)
+
+7. autorun 的用法示例：
+   ```js
+      const {observable, autorun, action, runInAction, flow, computed} = require('mobx');
+      const todos = observable([
+          { title: "Spoil tea", completed: true },
+          { title: "Make coffee", completed: false }
+      ])
+      autorun(() => {
+          console.log(
+              "Remaining:",
+              todos
+                  .filter(todo => !todo.completed)
+                  .map(todo => todo.title)
+                  .join(", ")
+          )
+      })
+      // 第一次执行
+      // Remaining: Make coffee
+
+
+      // 第二次执行
+      // Remaining: Spoil tea, Make coffee
+      todos[0].completed = false;
+      // 第三次次执行
+      // // Remaining: Spoil tea
+      todos[1].completed = true;
+   ```
+8. autorun 的用法示例 - 2：
+   ```js
+      const numbers = observable([1,2,3]);
+
+
+       // 通过 computed 包装的是 numbers 这个可观察的数组，我们对这个数组进行求和
+       // sum 就是计算值
+       const sum = computed(() => numbers.reduce((a, b) => a + b, 0));
+       // 观察的是计算值 sum，只要计算值 sum 发生变化，autorun 就自动运行
+       // 返回值是一个函数，手动调用这个返回值函数，可以终止 autorun 运行
+       const disposer = autorun(() => console.log(sum.get()));
+       // 第一次运行，输出 6
+       // 添加元素 4，输出 10
+       numbers.push(4);
+       // 添加元素 5，输出 15
+       numbers.push(5);
+       // 添加元素 6，输出 21
+       numbers.push(6);
+
+       // 调用 disposer 函数，终止 autorun 运行
+       disposer();
+       numbers.push(5);
+       console.log(numbers)
+   ```
+
 #### 2. reaction
+
+1. reaction 类似于 autorun，但提供了更细粒度的控制，可以跟踪具体的可观察的值。它接收两个函数：第一个是 data 函数，这个函数被跟踪并返回这个 data 用作第二个 effect 函数输入的数据。需要注意的是，副作用只对 data 函数中访问的数据起作用，这些数据可能比 effect 函数中实际使用的数据少。
+
+2. 典型的模式是，您在 data 函数的副作用中生成所需的内容，并以这种方式更精确地控制触发效果的时间。默认情况下，必须更改数 data 函数的结果才能触发 effect 函数。与 autorun 不同，副作用不会在初始化时运行，但仅在数据表达式第一次返回新值后才会运行。
+
+3. 示例 1：
+   ```js
+      const {observable, reaction, autorun} = require('mobx');
+
+       const todos = observable([
+          {
+             title: '睡觉',
+             finish: false
+          },
+          {
+          title: '吃饭',
+          finish: false
+          },
+          {
+          title: '学习',
+          finish: true
+          },
+          ]);
+
+         /**
+          * reaction 接收两个函数作为参数：第一个函数是 data 函数，第二个是 effect 函数
+          * 其中，data 函数的返回值是 effect 函数的参数
+          * 通常 data 函数中，我们跟踪的是可观察的数据，一旦可观察的数据发生变化，就会触发 effect 函数
+          * 因此，data 函数必须有返回值
+          *
+          * 与 autorun 不同，reaction 在初始化的时候不会运行，只要观察的数据发生变化才会运行
+          *
+          */
+
+
+          /**
+           * reaction1 中的 data 函数只观察 todos 的长度，只有 todos 的长度发生变化，才能触发 effect 函数
+           * @type {IReactionDisposer}
+           */
+           const reaction1 = reaction(() => {
+               return todos.length;
+           }, (length) => {
+               console.log("reaction 1:", todos.map(todo => todo.title).join(", "));
+           });
+
+          /**
+           * reaction2 中的 data 函数只观察 todos 的中每一项的 title 属性，只有 title 发生变化，才能触发 effect 函数
+           * @type {IReactionDisposer}
+           */
+          const reaction2 = reaction(() => {
+              return todos.map(item => item.title);
+          }, (titles) => {
+              console.log("reaction 2:", titles.join(", "));
+          });
+
+     /**
+      * reaction3 中的 data 函数只观察 todos 的中每一项的 finish 属性，只有 finish 发生变化，才能触发 effect 函数
+     * @type {IReactionDisposer}
+       */
+       const reaction3 = reaction(() => {
+          return todos.filter(item => item.finish);
+       }, (finish) => {
+          console.log("reaction 3:", finish.map(item => item.title).join(', '));
+        });
+
+      /**
+      * autorun 的回调函数观察的是 todos 中的 title 属性，只要 title 属性发生变化，那么就会触发
+      * @type {IReactionDisposer}
+        */
+        const disposer = autorun(() => {
+           const titles = todos.map(item => item.title).join(', ');
+           console.log(titles);
+        })
+
+      // 向 todos 中添加一个 todo，todos 的长度发生变化，同时 todo 中包含 title 和 finish
+      // 因此可以认为是是 title 和 finish 都发生了变化
+      // 所以会触发 reaction1、reaction2、reaction3 和 autorun
+      // 睡觉, 吃饭, 学习
+      // reaction 1: 睡觉, 吃饭, 学习, 打游戏
+      // reaction 2: 睡觉, 吃饭, 学习, 打游戏
+      // reaction 3: 学习
+      // 睡觉, 吃饭, 学习, 打游戏
+      // todos.push({
+      //     title: '打游戏',
+      //     finish: false
+      // });
+
+      // 只改变 title 属性，那么只会触发 autorun 和 reaction2
+      // 睡觉, 吃饭, 学习
+      // reaction 2: 打篮球, 吃饭, 学习
+      // 打篮球, 吃饭, 学习
+      // todos[0].title = '打篮球';
+
+      // 只改变 finish 属性，那么只会触发 autorun 和 reaction3
+      // 睡觉, 吃饭, 学习
+      // reaction 3: 吃饭, 学习
+      todos[1].finish = true;
+   ```
+   在上面的示例中，reaction1、reaction2、 reaction3和 autorun 都会对 todos 数组中的 todo 的添加、删除或替换作出反应。但只有 reaction2 reaction3 和 autorun 会对某个 todo 的 title 或 finish 属性的变化作出反应，因为在 reaction2 和 reaction3 中data 函数中使用了 title 和 finish 属性，而 reaction1 的数据表达式没有使用。autorun 追踪完整的副作用，因此它将始终正确触发，但也更容易意外地访问相关数据。
+
+4. 示例 2：
+   ```js
+      const counter = observable({
+          count: 0
+      })
+
+      /**
+       * reaction 的第二个参数 effect 函数还可以除了接收 data 函数返回值作为参数，还接收第二参数，这个参数可以调用 dispose() 方法，可以终止reaction 函数的执行
+       * @type {IReactionDisposer}
+       */
+        const reaction4 = reaction(() => {
+            return counter.count;
+        }, (count, reaction) => {
+            console.log("reaction 4: invoked. counter.count = " + count);
+        reaction.dispose();
+
+      });
+
+      // reaction 4: invoked. counter.count = 1
+      counter.count = 1;
+      // 没有输出
+      // 因为调用一次 reaction 函数后，在 其内部的 effect 函数内部，因为又调用了 dispose 函数，reaction 就被清理了
+      // 所以后面 count 再发生变化，reaction 也不再做出响应
+      counter.count = 2;
+
+      // 2
+      console.log(counter.count);
+   ```
+   在上面的示例中，reaction4 会对 counter 中的 count 作出反应。 当调用 reaction 时，第二个参数会作为清理函数使用。执行 effect 函数后，dispose 函数也被执行，所以 reaction 被清理，所以，当 count 变为 2 的时候，reaction 也不会做出响应。
+
+5. 粗略地讲，reaction 是 `computed(expression).observe(action(sideEffect))` 或 `autorun(() => action(sideEffect)(expression))` 的语法糖。
+
+6. reaction 接收第三个参数，它是一个参数对象，用来对 reaction 进行配置。有如下可选的参数:
+   - fireImmediately: 布尔值，用来标识效果函数是否在数据函数第一次运行后立即触发。默认值是 false。
+   - delay: 可用于对效果函数进行去抖动的数字（以毫秒为单位）。如果是 0（默认值） 的话，那么不会进行去抖。
+   - equals: 默认值是 comparer.default。如果指定的话，这个比较器函数被用来比较由数据函数产生的前一个值和后一个值。只有比较器函数返回 false 效果函数才会被调用。此选项如果指定的话，会覆盖 compareStructural 选项。
+   - name: 字符串，用于在例如像 spy 这样事件中用作此 reaction 的名称。
+   - onError: 用来处理 reaction 的错误，而不是传播它们。
+   - scheduler: 设置自定义调度器以决定如何调度 autorun 函数的重新运行。
 
 #### 3. when
 
+1. when 观察并运行给定的 predicate 函数，直到返回 true。 一旦返回 true，给定的 effect 函数就会被执行，然后 autorunner（自动运行程序） 会被清理。 
+
+2. when 函数返回一个清理器函数，允许我们手动地取消取消自动运行程序。
+
+3. 示例 1：
+   ```js
+      class MyResource {
+          constructor() {
+              when(
+                  // 一旦...
+                  () => !this.isVisible,
+                  // ... 然后
+                  () => this.dispose()
+             );
+         }
+
+          @computed get isVisible() {
+              // 标识此项是否可见
+          }
+
+          dispose() {
+              // 清理
+          }
+      }
+
+   ```
+4. 如果没提供 effect 函数，when 会返回一个 Promise。它与 `async` / `await` 可以完美结合。
+   ```js
+      async function test() {
+          await when(() => that.isVisible)
+          // 等等..
+      }
+   ```
 
 ### 5. Configuration
 
+1. Configuration 用来微调我们的 Mobx 实例。
+
 #### 1. configure 
 
+1. configure 是一个函数，接收一个配置对象作为参数。这个配置对象用来配置全局活动的 Mobx 实例。
+
+##### 1. 代理设置（Proxy support）
+
+1. 默认情况下，Mobx 使用 ES6 提供的 Proxy 机制将数组和纯对象变成可观察的数据。代理模式提供了最好的性能和跨环境的一致性。但是，如果我们的目标环境不支持代理，我们就需要禁用 Mobx 中的代理模式。
+
+2. 通过配置项 `useProxies` 来决定是否启用代理：
+   ```js
+      import { configure } from "mobx"
+
+      configure({
+           useProxies: "never"
+      })
+   ```
+3. `useProxies` 有下面几个值：
+   - `always`：默认值，在支持代理的环境中使用。如果在不支持的环境中使用这个配置项会报错。
+   - `never`：不使用代理模式，Mobx 将会回退到一个非代理模式上。适用于所有的 ES5 的环境。
+   - `ifavailable`：实验性质，在支持代理的环境中使用代理模式，不支持代理的环境中回退到非代理模式。
+
+##### 2. 装饰器支持（Decorator support）
+
+1. Mobx 支持装饰器模式。我们需要启用对装饰器的支持才能在项目中使用装饰器，一般情况下使用 TypeScript 或者 Babel 就能实现对装饰器的支持。
+
+2. 为了使我们在开发过程中采用 MobX 提倡的模式，我们需要严格划分 actions、state 和 derivations。Mobx 能够通过在运行时检查代码限制我们的编码模式。为了确保 Mobx 尽可能严格，我需要进行下面的配置：
+   ```js
+      import { configure } from "mobx"
+
+      configure({
+         enforceActions: "always",
+         computedRequiresReaction: true,
+         reactionRequiresObservable: true,
+         observableRequiresReaction: true,
+         disableErrorBoundaries: true
+      })
+   ```
+3. 常用的配置项是 `enforceActions`。
+
+###### 1. `enforceActions`
+
+1. 这个配置项的作用是我们必须使用 action 包裹我们的事件处理程序。也就是更新 state 只能通过 action 完成。
+
+2. 可选值：
+   - observed：默认值。所有可观察的值通过 action 进行改变。这是 Mobx 推荐的严格模式。
+   - never：state 可以在任何地方更改。即不通过 action 也可以改变 state。
+   - always：state 只能通过 action 进行更改。在实际运用上也包括创建。
+   
+3. observed 的优势是：允许我们在 action 之外创建可观察的数据，并且能自由的更改他们。只要他们不会到处使用。也就是小范围内，我们可以自由改变可观察的数据，不受 action 的限制。
+
+4. 原则上，state 应该从一些事件处理程序中创建，我们使用 action 包装事件处理程序，那么 always 模式适用于这种情况。但是在单元测试中不建议使用这个模式。
+
+###### 2. `computedRequiresReaction`
+
+1. 这个配置项的作用是禁止从 action 或者 reaction 外访问任何不可观察的计算值。这样保证了你不会使用 Mobx 不想缓存的计算值。
+
+2. 默认值是 false。设置为 true 开启。
+
+###### 3. `observableRequiresReaction` 
+
+1. 访问任何不可观察的值会发出警告。如果我们想检查在不使用 Mobx 上下文的基础上是否在使用可观察的值，那么就启用这个配置项。
+
+2. 这个配置项会找到任何我们在使用却没有用 observer 包装的值。
+
+3. 默认值是 false，设置为 true 开启。
+
+###### 4. `reactionRequiresObservable`  
+
+1. 这个配置项的作用是：当创建一个 reaction 的时候，如 autorun，如果没有访问任何可观察的值，那么就会发出警告。
+
+2. 使用的这个配置项的目的是：检查我们是否不必要地使用 observer 包装 React 组件、使用 action 包装函数。或者是找到只是忘记让某些数据结构或属性可变成可观察地数据的情况。
+
+3. 默认值是 false，设置为 true 开启。
+
+###### 5. `disableErrorBoundaries` 
+
+1. 默认情况下，Mobx 会捕获并且重新抛出我们代码中的异常。这样可以确保 一个异常中的 reaction 不会阻止其他的可能不相关的 reaction 的计划执行。我理解的意思是，抛出异常，不会阻止其他的不相关的 reaction 的运行。
+
+2. 这种情况会导致异常不会回到原始的出错的代码的地方，导致我们不能使用 try / catch 进行捕获。
+
+3. 通过禁用异常边界，异常可以逃避衍生（exceptions can escape derivations）。我的理解是：不会再衍生过程中捕获异常，而是让异常继续抛出。
+4. 这样做这可能会简化调试，但可能会使 MobX 和扩展程序处于不可恢复的中断状态。
+
+5. 这个配置项用于单元测试。
+
+6. 默认是 false，设置为 true 开启这个选项。
+
+###### 6. `safeDescriptors`  
+
+1. Mobx 会使一些字段使不可配置或者使不可写的，这样可以阻止我们做一些Mobx 不支持的事情或者有可能中断代码的行为。但是也可能阻止我们 spying / mocking / stubbing（和测试相关）。
+
+2. 这个配置项 默认是 true，因此我们可以设置其为 true 来禁用这个安全措施。使得一切都是可配置的和可写的。这个不会影响已经存在的可观察的数据。仅仅是配置这个选项后创建的可观察数据会被影响。
+
+3. 注意，只有需要的时候才能被开启，而且不要全局启用这个选项。
+
+##### 3. 其他配置
+
+###### 1. isolateGlobalState
+
+1. 这个配置项的作用是：当同一个环境下，有多个 Mobx 实例在活动的时候，Mobx 会将全局的 state 进行隔离。
+
+2. 当我们使用一个封装了 Mobx 的库，同时我们又在页面中引入了 Mobx，这样同一个页面会有多个 Mobx 实例，此时这个配置项就起了作用。当我们从库中调用：`configure({ isolateGlobalState: true })`，库中的 Mobx 的活动将保持独立。
+
+3. 如果没有此选项，如果多个 MobX 实例处于活动状态，则它们的内部状态将共享。好处是两个实例的可观察数据会一起工作，缺点是它们的 MobX 版本必须匹配。
+
+4. 默认值是 false，设置为 true 开启。
+
+###### 2. reactionScheduler
+
+1. 这个配置项的作用是：设置一个新的函数，用来执行所有 MobX 的 reaction。默认情况下，reactionScheduler 只运行 f reaction （f 为 reactionScheduler 函数接收的值，也是一个函数），没有任何其他行为。这对于基本调试或减缓可视化应用程序更新的 reaction 非常有用。
+
+2. 这个配置项是一个函数：`f => f()`，其接收一个函数作为参数，如下所示：
+   ```js
+      configure({
+          reactionScheduler: (f) => {
+              console.log("Running an event after a delay:", f)
+              setTimeout(f, 100)
+          }
+      })
+   ```
+
 ## 6. api 参考 —— 以 v6 版本的 Mobx 为例
+
+#### 1. makeObservable
+
+1. 
+
+#### 2. makeAuthObservable 
 
 ## 7. Mobx v5 版本和 v6 版本的区别
