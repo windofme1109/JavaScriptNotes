@@ -206,7 +206,11 @@
 
 1. observer 函数（装饰器）将一个React 组件定义、类组件或者函数组件转换为响应式组件（reactive component）。
 
-2. 转换后的组件将会追踪在副作用函数 render 中使用的可观察的数据，当可观察的数据变化的时候，能自动重新渲染组件。
+2. observer 调用形式 - 函数：`observer(component)`
+   - `component`：react 组件
+3. observer 调用形式 - 装饰器：`@observer`
+
+4. 转换后的组件将会追踪在副作用函数 render 中使用的可观察的数据，当可观察的数据变化的时候，能自动重新渲染组件。
 
 #### 1. 函数组件
 
@@ -222,7 +226,19 @@
 
 1. observer 可以作为函数使用，也可以作为装饰器使用。
 
-2. 对于类组件，既可以使用 `@observer` 对类组件进行装饰，也是将类组件作为参数传入 observer 函数中。如下所示：
+2. observer 的调用形式 - 装饰器：
+   ```js
+      @observer
+      class Comp extends React.Component {
+         // ...
+      }
+   ```
+
+3. observer 的调用形式 - 函数：`observer(component)`
+   - `component`：函数组件或者类组件
+   - 返回值一个观察者组件，可以检测被观察的数据
+
+4. 对于类组件，既可以使用 `@observer` 对类组件进行装饰，也是将类组件作为参数传入 observer 函数中。如下所示：
    ```js
       import { observer } from "mobx-react"
 
@@ -243,25 +259,35 @@
            }
       }
    ```
-3. 对于函数组件，只能将其作为参数传入 observer 函数中。
+5. 对于函数组件，只能将其作为参数传入 observer 函数中。
    ```js
       // ---- or just use function components: ----
        const TodoView = observer(({ todo }) => <div>{todo.title}</div>)
    ```
-4. 什么类型的组件应该使用 `observer` 装饰？
+6. 什么类型的组件应该使用 `observer` 装饰？
    - 一句话总结：使可观察的数据进行渲染的组件。
    
 ### 2. Provider 和 inject
 
 1.Provider 是一个组件，接收 store （或者其他内容）作为 props 参数。使用 React 提供的 context 机制，将 store 传入子组件中。可以跨层级使用 store 属性。
 
-2. inject 是一个装饰器，也可以作为函数使用。inject 用来获取 store 对象。
+2. Provider 调用形式：`<Provider store={strore}> ... </Provider>`
 
-3. inject 实际上是一个高阶组件，将其装饰的组件进行包装。接收一系列的字符串作为参数，使得和字符串同名的 store 属性在被包裹的组件中可用。
+3. inject 是一个装饰器，也可以作为函数使用。inject 用来获取 store 对象。
 
-4. Provider 接收 stores 属性，我们如果想在子组件中使用，需要在 inject 中传入同名的字符串。比如说，传入 Provider 的 stores 对象名称是 user，即：`<Provider user={stores}>...</Provider>`，那么 inject 应该接收 user 这个字符串，即：`@inject('user')`。这样被 inject 装饰的组件通过 `this.props.user` 就能获取 user 这个 store 中的内容了。
+4. inject 的调用形式 - 装饰器：`@inject(storeName)`
+   - `storeName`：Provider 组件接收的 store 的名字
 
-5. Provider 和 inject 的使用示例：
+5. inject 的调用形式 - 函数：`inject(storeName)(ObserverComponent)`
+   - `storeName`：Provider 组件接收的 store 的名字
+   - `ObserverComponent`：经过 Observer 函数包装过的组件
+   - 返回值仍旧是一个组件
+
+6. inject 实际上是一个高阶组件，将其装饰的组件进行包装。接收一系列的字符串作为参数，使得和字符串同名的 store 属性在被包裹的组件中可用。
+
+7. Provider 接收 stores 属性，我们如果想在子组件中使用，需要在 inject 中传入同名的字符串。比如说，传入 Provider 的 stores 对象名称是 user，即：`<Provider user={stores}>...</Provider>`，那么 inject 应该接收 user 这个字符串，即：`@inject('user')`。这样被 inject 装饰的组件通过 `this.props.user` 就能获取 user 这个 store 中的内容了。
+
+8. Provider 和 inject 的使用示例：
    ```js
       @inject("color")
       @observer
@@ -292,20 +318,20 @@
            }
        }
    ```
-6. 使用 React.useContext 可以读取传入 Provider 的 stores 对象，我们只需要从 Mobx-react 中导入 MobXProviderContext 这个上下文即可。
+9. 使用 React.useContext 可以读取传入 Provider 的 stores 对象，我们只需要从 Mobx-react 中导入 MobXProviderContext 这个上下文即可。
 
-7. 如果一个组件需要一个 store，并且通过同名的属性接收一个 store。那么会优先使用这个 store 属性。测试的时候可以利用这一点。
+10. 如果一个组件需要一个 store，并且通过同名的属性接收一个 store。那么会优先使用这个 store 属性。测试的时候可以利用这一点。
 
-8. 同时使用 `@inject` 和 `@observer`，确保使用顺序：`observer` 应该是内层装饰器，`inject` 是外层装饰器，二者之间可以有别的装饰器。
-   ```js
-      @inject()
-      // ... other decorators
-      @observer
-      class Comp extends React.Component {}
-   ```
-9. 被 inject 包装的组件，可以通过 inject 返回的高阶组件的 `wrappedComponent` 属性获得。
+11. 同时使用 `@inject` 和 `@observer`，确保使用顺序：`observer` 应该是内层装饰器，`inject` 是外层装饰器，二者之间可以有别的装饰器。
+    ```js
+       @inject()
+       // ... other decorators
+       @observer
+       class Comp extends React.Component {}
+    ```
+12. 被 inject 包装的组件，可以通过 inject 返回的高阶组件的 `wrappedComponent` 属性获得。
 
-10. inject 可以作为函数使用，如下所示：
+13. inject 可以作为函数使用，如下所示：
     ```js
        var Button = inject("color")(
            observer(
@@ -323,9 +349,10 @@
            })
        )
     ```
-11. 也就是说，inject 和 observer，要么同时为装饰器，要么同时为函数。
+14. 也就是说，inject 和 observer，要么同时为装饰器，要么同时为函数。
 
-12. observer 作为一个函数，接收一个组件，并返回一个组件。将 observer 的返回值传入 inject 函数的返回值中（inject 函数的返回值也是一个高阶组件）。
+15. observer 作为一个函数，接收一个组件，并返回一个观察者组件。将 observer 的返回值（观察者组件）传入 inject 函数的返回值中（inject 函数的返回值也是一个高阶组件），最终得到一个注入了 store 的组件。
+
 ## 4. 基本使用（v5 版本的 Mobx）—— 与 Mobx-react 结合
 
 
@@ -341,7 +368,7 @@
 
 3. 基本数据类型（string、number、boolean、null、undefined）不能被 Mobx 转换成可观察的对象。因为 JavaScript 中的基本数据类型是不可变的。但是可以变成包装类型。
 
-4. 无论是是使用装饰器`@observable`，还是将类实例传入 observable 函数中，类实例都不能被自动地转换成可观察的对象。将类的属性变成可观察的类型是类的构造函数的职责。
+4. 无论是是使用装饰器 `@observable`，还是将类实例传入 observable 函数中，类实例都不能被自动地转换成可观察的对象。将类的属性变成可观察的类型是类的构造函数的职责。
 
 5. 作为函数：`observable(source, overrides?, options?)`  
 
@@ -351,7 +378,7 @@
      - 需要被克隆的对象，该对象的所以成员会变成可观察的
    - overrides
      - 可选
-     - 是一个 map 结构，用来指定哪些成员会被注解（annotation），我的理解是：哪些成员变成可观察的。
+     - 是一个 map 结构，用来指定哪些成员会被注解（annotation），b我的理解是：哪些成员变成可观察的。可一个给某个类成员指定注解（annotation），包括：observable、action、computed、flow 等。还可以指定为布尔值，特别是如果为 false，会将某个已经完全处理过的属性或方法排除在外，即不会装饰这个属性。
    - options
      - 可选
      - 配置项，用来控制 observable 的行为，是一个对象，有下面几个属性：
@@ -477,11 +504,15 @@
 
 1. runInAction 用来创建一个临时的 action，创建后就会被调用。在异步 action中比较有用。
 
-2. runInAction 接收一个函数作为参数，调用 runInAction 会立即将 接收的函数包装为 action，然后执行。
+2. runInAction 的调用形式：`runInAction(name?, thunk)`
+   - name：可选，表示 Action 的名字
+   - thunk：用来处理异步请求结果的函数
+   
+4. runInAction 接收一个函数作为参数，调用 runInAction 会立即将 接收的函数包装为 action，然后执行。
 
-3. 我们需要使用 action 包装一个异步任务，当异步任务完成时，无论是成功还是失败，我们就调用 runInAction，向 runInAction 传入成功或失败的处理函数。
+5. 我们需要使用 action 包装一个异步任务，当异步任务完成时，无论是成功还是失败，我们就调用 runInAction，向 runInAction 传入成功或失败的处理函数。
 
-4. runInAction 的用法示例：
+6. runInAction 的用法示例：
    ```js
       const {observable, autorun, action, runInAction} = require('mobx');
 
@@ -527,21 +558,24 @@
          // 15
    ```
 
-5. runInAction 还有另外一种调用形式：`runInAction(name, func)`。第一个参数是一个参数，第二个参数是函数。
 
 #### 2. flow
 
 1. flow 这个函数（装饰器）用来在异步操作中取代 `async` / `await`，并且支持取消。
 
-2. flow 作为函数，只接收一个 Generator 作为作为参数，在这个 Generator 内部，通过使用 `yield` 关键字，我们能够链式调用 Promise，即使用 yield 替换 await。flow 函数的机制会保证 Generator 或者继续向下执行，或者得到一个 Promise 的 resolve 的结果。
+2. flow 的调用形式：
+   - 函数形式：`flow(fn)`，fn 是 Generator
+   - 装饰器形式：`flow` 
 
-3. 因此使用 flow 不需要像 `async` / `await` 那样获得异步操作的结果后再执行一个 action（通过 runInAction 实现）。
-4. 应用步骤如下：
+4. flow 作为函数，只接收一个 Generator 作为作为参数，在这个 Generator 内部，通过使用 `yield` 关键字，我们能够链式调用 Promise，即使用 yield 替换 await。flow 函数的机制会保证 Generator 或者继续向下执行，或者得到一个 Promise 的 resolve 的结果。
+
+5. 因此使用 flow 不需要像 `async` / `await` 那样获得异步操作的结果后再执行一个 action（通过 runInAction 实现）。
+6. 应用步骤如下：
    1. 使用 flow 包装异步函数
    2. 使用 `function* ` 代替 `async`。
    3. 使用 `yield` 替代 `await`。
    
-5. 使用 flow 完成异步代码示例：
+7. 使用 flow 完成异步代码示例：
    ```js
        const {observable, autorun, action, runInAction, flow} = require('mobx');
 
@@ -573,7 +607,7 @@
       // initDataFlow 的返回值是一个 Promise
       initDataFlow(15, state)
    ```
-6. flow 的返回值是一个函数，这个函数接收的参数和 flow 接收的 Generator 函数的参数一致。返回的函数的返回是一个 Promise。如果 Generator 中有返回值，那么会保存在 flow 的返回值函数的返回值 Promise 的 resolve 状态中。示例代码如下：
+8. flow 的返回值是一个函数，这个函数接收的参数和 flow 接收的 Generator 函数的参数一致。返回的函数的返回是一个 Promise。如果 Generator 中有返回值，那么会保存在 flow 的返回值函数的返回值 Promise 的 resolve 状态中。示例代码如下：
       ```js
        const {observable, autorun, action, runInAction, flow} = require('mobx');
 
@@ -606,12 +640,16 @@
       initDataFlow(15, state).then(res => console.log(res));
       // 2s 输出 15
    ```
-7. 使用 flow 的另外一个好处就是可以被取消。flow 返回值函数的返回值是一个 resolve 状态的 Promise，其中的值是 Generator 中最后返回的值。这个返回的 Promise 带有一个 cancel 方法。调用 cancel 方法能中断正在运行的 Generator，并且取消它。`try` / `finally` 能继续执行。
+9. 使用 flow 的另外一个好处就是可以被取消。flow 返回值函数的返回值是一个 resolve 状态的 Promise，其中的值是 Generator 中最后返回的值。这个返回的 Promise 带有一个 cancel 方法。调用 cancel 方法能中断正在运行的 Generator，并且取消它。`try` / `finally` 能继续执行。
 #### 3. flowResult
 
 1. flowResult 是为 TypeScript 用户准备的。能将 flow 函数返回的 Generator 函数转换成 Promise。 
 
 2. 使用 flow 装饰一个 Generator，会使用 Promise 包装返回的 Generator。但是，TypeScript 不会意识到这种转换，因此 flowResult 将使 TypeScript 识别出这种转换。
+
+3. flowResult 的调用形式：`flowResult(flowFunctionResult)`
+   - flowFunctionResult：是 flow 函数的返回值
+
 
 ### 3. Computeds
 
@@ -623,14 +661,20 @@
 
 2. computed 的作用是将一个可观察的值变成另外一个可观察的值，但是不会重复进行计算除非其所依赖的可观察的值发生了变化。
 
-3. 从概念上来说，计算值很像 excel 中的公式，同时减少了我们必须存储的 state 的数量。计算值经过了高度优化，因此 Mobx 非常推荐我们使用计算值。
+3. 调用形式 —— 函数：`computed(fn, options?)`
+   - fn：getter 函数
+   - options：可选，配置对象
 
-4. 将 computed 作为装饰器使用：
+4. 调用形式 —— 注解：`@computed get fn() {}` 或者 `@computed(options) get fn() {}`
+
+5. 从概念上来说，计算值很像 excel 中的公式，同时减少了我们必须存储的 state 的数量。计算值经过了高度优化，因此 Mobx 非常推荐我们使用计算值。
+
+6. 将 computed 作为装饰器使用：
    ```js
       import {observable, computed} from "mobx";
 
       class OrderLine {
-            @observable price = 0;
+           @observable price = 0;
            @observable amount = 1;
 
           constructor(price) {
@@ -642,7 +686,7 @@
           }
       }
    ```
-5. `observable.object` 和 `extendObservable` 都会自动将 getter 属性推导成计算属性，所以下面这样就足够了:
+7. `observable.object` 和 `extendObservable` 都会自动将 getter 属性推导成计算属性，所以下面这样就足够了:
     ```js
        const orderLine = observable.object({
            price: 0,
@@ -652,7 +696,7 @@
            }
        })
     ```
-6. 还可以为计算值定义 setter。注意这些 setters 不能用来直接改变计算属性的值，但是它们可以用来作“逆向”衍生。
+8. 还可以为计算值定义 setter。注意这些 setters 不能用来直接改变计算属性的值，但是它们可以用来作“逆向”衍生。
    ```js
       class Foo {
          @observable length = 2;
@@ -666,7 +710,7 @@
    ```
    **注意**：永远在 getter 之后 定义 setter。
 
-7. computed 还可以直接当做函数来调用。computed 函数接收一个函数，在这个函数内部是对可观察的数据进行操作。在返回的对象上使用 `get()` 来获取计算的当前值，或者使用 `observe(callback)` 来观察值的改变。这种形式的 computed 不常使用，但在某些情况下，你需要传递一个在“box”的计算值时，它可能是有用的。
+9. computed 还可以直接当做函数来调用。computed 函数接收一个函数，在这个函数内部是对可观察的数据进行操作。在返回的对象上使用 `get()` 来获取计算的当前值，或者使用 `observe(callback)` 来观察值的改变。这种形式的 computed 不常使用，但在某些情况下，你需要传递一个在“box”的计算值时，它可能是有用的。
    ```js
       const name = observable.box('Rose');
 
@@ -683,13 +727,13 @@
 
       // JACK
    ```
-8. `computed` 装饰器装饰的函数不需要接收参数。如果你想创建一个能进行结构比较的计算属性时，请使用 `@computed.struct`。
+10. `computed` 装饰器装饰的函数不需要接收参数。如果你想创建一个能进行结构比较的计算属性时，请使用 `@computed.struct`。
 
-9. 使用计算值的几个实践规则：
-   1. 不应该拥有副作用或者是更新其他的可观察的数据
-   2. 避免创建和返回新的可观察的值
+11. 使用计算值的几个实践规则：
+    1. 不应该拥有副作用或者是更新其他的可观察的数据
+    2. 避免创建和返回新的可观察的值
 
-10. 当使用 computed 作为函数使用时，它接收的第二个选项为配置对象，当然，computed 作为装饰器也可以接收配置对象。配置对象有如下可选参数:
+12. 当使用 computed 作为函数使用时，它接收的第二个选项为配置对象，当然，computed 作为装饰器也可以接收配置对象。配置对象有如下可选参数:
     - name: 字符串, 在 spy 和 MobX 开发者工具中使用的调试名称。
     - context: 在提供的表达式中使用的 this。
     - set: 要使用的 setter 函数。 没有 setter 的话无法为计算值分配新值。 如果传递给 computed 的第二个参数是一个函数，那么就把会这个函数作为 setter。
@@ -707,22 +751,26 @@
 
 1. autorun 接收一个副作用函数作为参数，只要 autorun 观察的数据发生变化，其就自动运行，就是执行其接收的函数。当我们创建 autorun 的时候，也会运行一次。只有被 observable 或者 computed 包装的值发生变化，autorun 才会做出相应。
 
-2. autorun 通过在响应式上下文中（reactive context）运行副作用（effect）来工作。在执行所提供的函数期间，MobX 会跟踪所有可观察值和计算值，这些值直接或间接被副作用直读取。函数完成执行完成后，MobX 将收集并订阅所有已读取的可观察的值，并等待它们中的任何一个再次更改。一旦他们这样做，autorun 将再次触发，重复整个过程。
+2. autorun 调用形式：`autorun(() => effect, options?)`
+   - `() => effect`：副作用函数，其内部观察的值发生变化，这个函数就自动运行
+   - options：可选，配置项
+   
+3. autorun 通过在响应式上下文中（reactive context）运行副作用（effect）来工作。在执行所提供的函数期间，MobX 会跟踪所有可观察值和计算值，这些值直接或间接被副作用直读取。函数完成执行完成后，MobX 将收集并订阅所有已读取的可观察的值，并等待它们中的任何一个再次更改。一旦他们这样做，autorun 将再次触发，重复整个过程。
 
-3. 如果在 autorun 接收地回调函数中，观察了某个可观察的值，那么在初始化的时候，autorun 会运行一次，然后只要这个可观察的值发生了变化，autorun 会再次被触发。
+4. 如果在 autorun 接收地回调函数中，观察了某个可观察的值，那么在初始化的时候，autorun 会运行一次，然后只要这个可观察的值发生了变化，autorun 会再次被触发。
 
-4. autorun 的返回值是一个函数，手动调用这个返回值函数，可以终止 autorun 运行。
+5. autorun 的返回值是一个函数，手动调用这个返回值函数，可以终止 autorun 运行。
 
-5. autorun 接收第二个参数，它是一个配置对象，有如下可选的参数:
+6. autorun 接收第二个参数，它是一个配置对象，有如下可选的参数:
    - delay: 可用于对效果函数进行去抖动的数字 （以毫秒为单位）。如果是 0（默认值）的话，那么不会进行去抖。
    - name: 字符串，用于在例如像 spy 这样事件中用作此 reaction 的名称。
    - onError: 用来处理 reaction 的错误，而不是传播它们。
    - scheduler: 设置自定义调度器以决定如何调度 autorun 函数的重新运行。
 
-6. 整个过程如下图所示：
+7. 整个过程如下图所示：
    ![](./img/autorun.png)
 
-7. autorun 的用法示例：
+8. autorun 的用法示例：
    ```js
       const {observable, autorun, action, runInAction, flow, computed} = require('mobx');
       const todos = observable([
@@ -749,10 +797,9 @@
       // // Remaining: Spoil tea
       todos[1].completed = true;
    ```
-8. autorun 的用法示例 - 2：
+9. autorun 的用法示例 - 2：
    ```js
       const numbers = observable([1,2,3]);
-
 
        // 通过 computed 包装的是 numbers 这个可观察的数组，我们对这个数组进行求和
        // sum 就是计算值
@@ -778,9 +825,14 @@
 
 1. reaction 类似于 autorun，但提供了更细粒度的控制，可以跟踪具体的可观察的值。它接收两个函数：第一个是 data 函数，这个函数被跟踪并返回这个 data 用作第二个 effect 函数输入的数据。需要注意的是，副作用只对 data 函数中访问的数据起作用，这些数据可能比 effect 函数中实际使用的数据少。
 
-2. 典型的模式是，您在 data 函数的副作用中生成所需的内容，并以这种方式更精确地控制触发效果的时间。默认情况下，必须更改数 data 函数的结果才能触发 effect 函数。与 autorun 不同，副作用不会在初始化时运行，但仅在数据表达式第一次返回新值后才会运行。
+2. reaction 的调用形式：`reaction(() => data, data => effect, options?)`
+   - `() => data`：data 函数
+   - `data => effect`：effect 函数
+   - `options`：可选，配置项
+   
+3. 典型的模式是，我们在 data 函数的副作用中生成所需的内容，并以这种方式更精确地控制触发效果的时间。默认情况下，必须更改数 data 函数的结果才能触发 effect 函数。与 autorun 不同，副作用不会在初始化时运行，但仅在数据表达式第一次返回新值后才会运行。
 
-3. 示例 1：
+4. 示例 1：
    ```js
       const {observable, reaction, autorun} = require('mobx');
 
@@ -875,7 +927,7 @@
    ```
    在上面的示例中，reaction1、reaction2、 reaction3和 autorun 都会对 todos 数组中的 todo 的添加、删除或替换作出反应。但只有 reaction2 reaction3 和 autorun 会对某个 todo 的 title 或 finish 属性的变化作出反应，因为在 reaction2 和 reaction3 中data 函数中使用了 title 和 finish 属性，而 reaction1 的数据表达式没有使用。autorun 追踪完整的副作用，因此它将始终正确触发，但也更容易意外地访问相关数据。
 
-4. 示例 2：
+5. 示例 2：
    ```js
       const counter = observable({
           count: 0
@@ -905,9 +957,9 @@
    ```
    在上面的示例中，reaction4 会对 counter 中的 count 作出反应。 当调用 reaction 时，第二个参数会作为清理函数使用。执行 effect 函数后，dispose 函数也被执行，所以 reaction 被清理，所以，当 count 变为 2 的时候，reaction 也不会做出响应。
 
-5. 粗略地讲，reaction 是 `computed(expression).observe(action(sideEffect))` 或 `autorun(() => action(sideEffect)(expression))` 的语法糖。
+6. 粗略地讲，reaction 是 `computed(expression).observe(action(sideEffect))` 或 `autorun(() => action(sideEffect)(expression))` 的语法糖。
 
-6. reaction 接收第三个参数，它是一个参数对象，用来对 reaction 进行配置。有如下可选的参数:
+7. reaction 接收第三个参数，它是一个参数对象，用来对 reaction 进行配置。有如下可选的参数:
    - fireImmediately: 布尔值，用来标识效果函数是否在数据函数第一次运行后立即触发。默认值是 false。
    - delay: 可用于对效果函数进行去抖动的数字（以毫秒为单位）。如果是 0（默认值） 的话，那么不会进行去抖。
    - equals: 默认值是 comparer.default。如果指定的话，这个比较器函数被用来比较由数据函数产生的前一个值和后一个值。只有比较器函数返回 false 效果函数才会被调用。此选项如果指定的话，会覆盖 compareStructural 选项。
@@ -919,9 +971,19 @@
 
 1. when 观察并运行给定的 predicate 函数，直到返回 true。 一旦返回 true，给定的 effect 函数就会被执行，然后 autorunner（自动运行程序） 会被清理。 
 
-2. when 函数返回一个清理器函数，允许我们手动地取消取消自动运行程序。
+2. when 函数的调用形式 - 1：`when(predicate: () => boolean, effect?: () => void, options?)`
+   - `predicate`：一个返回值是 true 的函数
+   - `effect`：可选，副作用函数
+   - `options`：可选，配置
 
-3. 示例 1：
+3. when 函数调用形式 - 2：`when(predicate: () => boolean, options?): Promise`
+   - `predicate`：一个返回值是 true 的函数
+   - `options`：可选，配置
+   - 返回值：Promise 对象
+   
+4. when 函数返回一个清理器函数，允许我们手动地取消取消自动运行程序。
+
+5. 示例 1：
    ```js
       class MyResource {
           constructor() {
@@ -943,7 +1005,7 @@
       }
 
    ```
-4. 如果没提供 effect 函数，when 会返回一个 Promise。它与 `async` / `await` 可以完美结合。
+6. 如果没提供 effect 函数，when 会返回一个 Promise。它与 `async` / `await` 可以完美结合。
    ```js
       async function test() {
           await when(() => that.isVisible)
@@ -958,6 +1020,9 @@
 #### 1. configure 
 
 1. configure 是一个函数，接收一个配置对象作为参数。这个配置对象用来配置全局活动的 Mobx 实例。
+
+2. configure 函数调用形式：`configure(options)`
+   - `options`：配置对象
 
 ##### 1. 代理设置（Proxy support）
 
@@ -1128,7 +1193,7 @@
       }
    ```
 
-#### 2. makeAuthObservable 
+#### 2. makeAutoObservable 
 
 1. 函数调用形式：`makeAutoObservable(target, overrides?, options?)`
 
@@ -1137,7 +1202,7 @@
    - overrides：可选，一个对象，用来指定哪些成员会被注解（annotation）或者不被注解（指定这个成员属性为 false），我的理解是：哪些成员变成可观察的。
    - options：可选，配置项
 
-3. makeAuthObservable 就像 makeObservable 一样，它默认推断所以属性。我们仍然可以通过 overrides 属性来给某个属性指定注解（annotation）来覆写默认的属性。特别是可以使用 false 属性完全排除已经处理过的属性或方法。
+3. makeAutoObservable 就像 makeObservable 一样，它默认推断所以属性。我们仍然可以通过 overrides 属性来给某个属性指定注解（annotation）来覆写默认的属性。特别是可以使用 false 属性完全排除已经处理过的属性或方法。
 
 4. makeAutoObservable 函数可以使代码变得更紧凑且更易于维护，因为不必明确提及新成员。 但是 makeAutoObservable 不能用于具有超类或子类的类。
 
@@ -1167,9 +1232,89 @@
    - 原型（prototype）上的所有的 Generator  变成 flow 类型。注意，在一些转译器配置中无法检测到 Generator 函数，如果 flow 没有如预期的那样工作，请确保指定了 flow。
    - 在 overrides 对象中标记为 false 的类成员将不会被注解。例如，像识别符（identifiers）一类的只读字段。
 
-#### 3. makeObservable 和 makeAuthObservable 中的第三个参数：options
+8. 在 overrides 参数中配置某个字段为 false：
+   ```js
+      class Todos {
+          count = 0;
+          todos = [
+              {
+                  title: '打篮球',
+                  finish: true
+              },
+              {
+                  title: '逛街',
+                  finish: false
+              },
+          ];
+          constructor(count) {
 
-#### 4. makeObservable 和 makeAuthObservable 的限制
+              makeAutoObservable(this, {
+                  // double: false,
+                  // 配置 count 为 false，那么就不会装饰 count 属性，使其由可观察的数据变成普通的属性，其他字段也是一样的
+                  count: false
+              });
+
+              this.count = count;
+          }
+          addCount(count) {
+              this.count = count;
+          }
+
+      }
+
+      const todos = new Todos(1);
+
+      const disposer = autorun(() => {
+      console.log('current count is: ', todos.count);
+      });
+   
+      // 第一次运行
+      // current count is:  1
+
+      // 第一次次改变 count
+      // nothing output
+      todos.addCount(5);
+   ```
+   在 overrides 参数中配置 count 为 false，那么 count 由可观察的数据变成普通的字段。所以后面即使我们调用 addCount 这个 action 改变 count，autorun 也不会自动运行。
+
+#### 3. makeObservable 和 makeAutoObservable 中的第三个参数：options
+
+1. makeObservable、makeAutoObservable 和 observable 这个三个函数，均接收第三个参数：options，这个参数用于配置这几个函数。
+
+2. options 是一个对象，有下列几个配置项。
+
+3. `autoBind`：布尔值。为 true 的话默认使用 `action.bound` 或者 `flow.bound`，而不是使用 `action` 或者 `flow`。不会影响不影响带明确注解的类成员。
+
+4. `deep`：布尔值。为 false 的话默认使用 observable.ref，而不是使用 observable。不会影响不影响带明确注解的类成员。
+
+5. `name`：字符串，给这个对象赋予一个调试的名字，在错误信息或者反射的 API（reflection API）中，会打印这个调试的名字。
+
+6. `proxy`：布尔值。为 false 的话强制 `observable(thing)` 使用非代理的方式实现代理。如果对象内部的属性保持稳定，不再发生变化，那么此时配置 proxy 为 false，那么这个对象作为一个非代理的对象更容易调试，性能更好。详情可见：[void-proxies](https://mobx.js.org/observable-state.html#avoid-proxies)
+
+#### 4. makeObservable 和 makeAutoObservable 的限制
+
+1. makeObservable 和 makeAutoObservable 仅仅支持已经定义的属性。确保我们的 [编译配置](https://mobx.js.org/installation.html#use-spec-compliant-transpilation-for-class-properties) 是正确的或者是正常工作，在 makeObservable 或 makeAutoObservable 使用一个属性之前，已经被赋值了。如果没有正确配置，字段只能被声明却不会被初始化，例如 `class X { y;}`，这种情况下，字段不会正确地被获取到。
+
+2. makeObservable 只能给那些在自己类中定义的数据添加注解（annotation）。子类或者是父类中也存在需要被观察的数据，那么只能是在子类或者父类中使用 makeObservable。
+
+3. options 参数只能设置一次。比如说，存在继承的情况下，如果在父类的 makeObservable 或者 makeAutoObservable 配置了 options，那么在子类的 makeObservable 或者 makeAutoObservable 就不能继续传入 options 参数了。
+
+4. 每个字段只能被添加一次注解（annotation），使用 override 的除外。不能在子类中更改字段注解或者是配置。
+
+5. 在不是纯对象，即类中添加注解的字段，是不可配置的。
+6. 所有不可观察的数据（无状态的）即注解为 action 和 flow 的字段，是不可写的。
+7. 只有定义在原型（prototype）上的 action、computed、flow、action.bound 才能在子类中被覆写。
+8. 默认情况下，TypeScript 不允许我们给 私有字段添加注解。我们可以通过给 makeObservable 传入同私有字段相关的泛型来解决这个问题，举例如下：`makeObservable<MyStore, "privateField" | "privateField2">(this, { privateField: observable, privateField2: observable })`
+9. 必须无条件地调用 makeObservable 或 makeAutoObservable 并提供注解，因为这样可以缓存推断结果。
+10. Mobx 不支持在 makeObservable 或 makeAutoObservable 被调用后改变原型。
+11. ES 的私有字段（field）语法：`#field` 还没有被支持。如果使用 TypeScript，推荐使用 private 关键字定义私有字段。 
+12. Mobx 不支持在单继承链中使用混合注解和装饰器。就是不能在父类中使用装饰器而在子类中使用注解。
+13. makeObservable 和 makeAutoObservable 不能用在其他的内建的可观察的类型上，如 `ObservableMap`，`ObservableSet`，`ObservableArray`。
+14. makeObservable(Object.create(prototype)) 将属性从原型复制到创建的对象，并使其变成可观察的数据。这种用法是错误的，Mobx 不希望我们使用这种语法，并且可能在未来废弃这种方式。**不要使用这种方式**。
+
+#### 5. 其他的 api
+
+1. Mobx v6 版本的其他 api 和 v5 版本的类似，这里就不再详细叙述。
 
 ## 7. Mobx v5 版本和 v6 版本的区别
 
