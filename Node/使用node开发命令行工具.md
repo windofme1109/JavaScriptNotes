@@ -483,15 +483,65 @@
 ### 1. command
 
 1. `command` 方法用来指定一个命令或者子命令。其第一个参数接收一个字符串。例如传入的是 `new <word>`，其中 `new` 就是命令的名称，`<word>`指代这个命令的参数，使用尖括号（`<>`）表示这个参数是必选的。
-
+    
 2. 有两种方式实现响应 command 函数定义的命令：
    - 附在 command 方法后面的 action 函数，接收一个回调函数，在这个回调函数内部处理相关逻辑。
    - 执行一个单独的可执行的 js 文件。
 
-3. command 方法可以接收第二个参数，用来描述第一个参数指定的命令的作用。 当我们指定了command 方法的第二个 description 参数，并调用 command 方法时，这会告诉 Commander 您将为子命令使用独立的可执行文件。Commander 将以子命令（如 pm-install、pm-search）为可执行文件的名称在入口脚本的目录（如 `./examples/pm` 下）中的搜索可执行文件。我们可以使用executableFile 配置选项指定自定义名称。示例如下：
+3. command 方法与 action 方法一起使用：
    ```js
+      #!/usr/bin/env node
 
+       const { Command } = require('commander');
+       const program = new Command();
+
+       program.version('1.0.0').usage('[options] [arguments]');
+
+       program
+          .command('clone <source> [destination]')
+          .description('clone a repository into a newly created directory')
+          .action((source, destination) => {
+               console.log('clone command called');
+          });
+
+       // 必须使用 parse 函数解析我们输入的命令
+       program.parse(process.argv);
    ```
+#### 1. 单独的可执行文件
+
+4. command 方法可以接收第二个参数，用来描述第一个参数指定的命令的作用。当我们指定了 command 方法的第二个 description 参数，并调用 command 方法时，这会告诉 Commander 我们将为子命令使用独立的可执行文件。Commander 将以 program-subcommand（如 pm-install、pm-search）为可执行文件的名称，并在入口脚本的目录（如 `./examples/pm` 下）中的搜索可执行文件。我们可以使用executableFile 配置选项指定自定义名称。
+5. 上面这样一段话是什么意思呢，首先要明白的是，command 方法中配置的命令是子命令。而我们在 package.json 的 bin 字段配置的是命令名（executable），例如 git 就是 命令名，`git config` 中的 config 就是子命令。所以，当我们配置 command 的第二个 description 参数时，Commander 将为这个子命令去找独立的可执行的文件，寻找的范围是命令名（executable）指定的目录下。例如：
+    ```json
+       bin: {
+          "pm": "./bin/pm.js"
+       }
+    ```
+    `pm` 这个命令名指定的目录是 `bin`，那么 Commander 就会去 bin 目录下找名为 program-subcommand 的可执行的 js 文件。program 就是 pm 这个命令指定的可执行文件：`pm.js` 的名称，而 subcommand 就是 command 方法的第一个参数指定的子命令。举个例子：
+    ```js
+       program
+           .command('clone <source> [destination]', 'clone files')
+    ```
+    指定了 command 的第二个参数，没有指定 action 方法，那么 Commander 就会在 bin 目录下去寻找名为 pm-clone 的 js 文件。
+    此时，我们有两种方式去建立 pm-clone 这个 js 文件。
+    1. 直接在 bin 目录下建立名为 pm-clone.js 的文件，内容如下：
+       ```js
+          // bin/pm-clone.js
+          console.log('pm bin clone file');
+       ```
+       执行命令：`pm clone file`，得到的输出是：
+      ![img.png](img/pm-clone.png)
+    2. 直接在 bin 目录下新建 pm-clone 的文件夹，然后在 pm-clone 下新建 index.js，内容如下所示：
+       ```js
+          // bin/pm-clone/index.js
+          console.log('pm-clone index clone file');
+       ```
+       执行命令：`pm clone file`，得到的输出如下：
+       ![img.png](img/pm-clone-index.png)
+    3. 两种方式都可以使得 Commander 找到可执行的文件。
+
+##### 2. 使用 argument 函数接收子命令参数
+
+
 ### 2. option
 
 1. `option` 方法用来定义命令的选项。而且也作为选项的说明。每个选项可以有一个段格式（short flag），即以单个连字符开头的单个字母，例如 `-a`、`-l`。或者是一个长格式（long name），即以 2 个连字符开头的完整单词，多个单词使用一个连字符连接，例如：`--save`、`--save-dev`。
@@ -501,6 +551,11 @@
    - 第二个参数是描述这个选项的作用。
    - 第三个参数这个选项的默认值。
 
+#### 1. 普通的选项类型、布尔值和普通值
+#### 2. 默认值
+#### 3. 其他的选项类型、可否定的布尔值和 布尔值以及普通值
+#### 4. 必输的选项
+#### 5. 可变选项
 ### 3. action
 
 1. `action` 方法来监听用户输入，当用户输入 command 方法指定的命令后会触发回调函数，回调函数的第一个参数是命令的值，第二个参数是上面的选项对象，第三个参数是 command 对象本身。我们可以根据我们输入的命令，来决定执行什么内容。
