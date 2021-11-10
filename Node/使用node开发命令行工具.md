@@ -294,7 +294,7 @@
       program.parse(process.argv);
    ```
    - `on` 方法用来监听命令（command）和选项（option）事件，来执行自定义操作。第一个参数是监听的命令或者选项，第二个参数是回调函数，当指定的命令或者选项被输入时，就会执行回调函数。
-   - `chalk.green` 会将其接收的字符串以红色格式进行输出。
+   - `chalk.green` 会将其接收的字符串以绿色格式进行输出。
 
 4. 在终端中输入 `word2img --help`，输出如下：
    ![img.png](img/word2img--help.png)
@@ -488,7 +488,15 @@
    - 附在 command 方法后面的 action 函数，接收一个回调函数，在这个回调函数内部处理相关逻辑。
    - 执行一个单独的可执行的 js 文件。
 
-3. command 方法与 action 方法一起使用：
+#### 1. 指定 action 作为命令的执行器
+
+1. 我们在 package.json 中配置的命令名（executable）是：
+   ```json
+       bin: {
+          "pm": "./bin/pm.js"
+       }
+    ```
+2. command 方法与 action 方法一起使用：
    ```js
       #!/usr/bin/env node
 
@@ -507,70 +515,494 @@
        // 必须使用 parse 函数解析我们输入的命令
        program.parse(process.argv);
    ```
-#### 1. 单独的可执行文件
+3. 在终端输入 `pm clone test`，控制台输出：`clone command called`。
 
-4. command 方法可以接收第二个参数，用来描述第一个参数指定的命令的作用。当我们指定了 command 方法的第二个 description 参数，并调用 command 方法时，这会告诉 Commander 我们将为子命令使用独立的可执行文件。Commander 将以 program-subcommand（如 pm-install、pm-search）为可执行文件的名称，并在入口脚本的目录（如 `./examples/pm` 下）中的搜索可执行文件。我们可以使用executableFile 配置选项指定自定义名称。
-5. 上面这样一段话是什么意思呢，首先要明白的是，command 方法中配置的命令是子命令。而我们在 package.json 的 bin 字段配置的是命令名（executable），例如 git 就是 命令名，`git config` 中的 config 就是子命令。所以，当我们配置 command 的第二个 description 参数时，Commander 将为这个子命令去找独立的可执行的文件，寻找的范围是命令名（executable）指定的目录下。例如：
+#### 2. 单独的可执行文件
+
+1. command 方法可以接收第二个参数，用来描述第一个参数指定的命令的作用。当我们指定了 command 方法的第二个 description 参数，并调用 command 方法时，这会告诉 Commander 我们将为子命令使用独立的可执行文件。Commander 将以 program-subcommand（如 pm-install、pm-search）为可执行文件的名称，并在入口脚本的目录（如 `./examples/pm` 下）中的搜索可执行文件。我们可以使用executableFile 配置选项指定自定义名称。
+
+2. 上面这样一段话是什么意思呢，首先要明白的是，command 方法中配置的命令是子命令。而我们在 `package.json` 的 `bin` 字段配置的是命令名（executable），例如 git 就是命令名，`git config` 中的 config 就是子命令。所以，当我们配置 command 的第二个 description 参数时，Commander 将为这个子命令去找独立的可执行的文件，寻找的范围是命令名（executable）指定的目录下。例如：
     ```json
        bin: {
           "pm": "./bin/pm.js"
        }
     ```
-    `pm` 这个命令名指定的目录是 `bin`，那么 Commander 就会去 bin 目录下找名为 program-subcommand 的可执行的 js 文件。program 就是 pm 这个命令指定的可执行文件：`pm.js` 的名称，而 subcommand 就是 command 方法的第一个参数指定的子命令。举个例子：
+3. `pm` 这个命令名指定的目录是 `bin`，那么 Commander 就会去 bin 目录下找名为 program-subcommand 的可执行的 js 文件。program 就是 pm 这个命令指定的可执行文件 `pm.js` 的名称，而 subcommand 就是 command 方法的第一个参数指定的子命令。举个例子：
     ```js
        program
            .command('clone <source> [destination]', 'clone files')
     ```
-    指定了 command 的第二个参数，没有指定 action 方法，那么 Commander 就会在 bin 目录下去寻找名为 pm-clone 的 js 文件。
-    此时，我们有两种方式去建立 pm-clone 这个 js 文件。
-    1. 直接在 bin 目录下建立名为 pm-clone.js 的文件，内容如下：
-       ```js
-          // bin/pm-clone.js
-          console.log('pm bin clone file');
-       ```
-       执行命令：`pm clone file`，得到的输出是：
-      ![img.png](img/pm-clone.png)
-    2. 直接在 bin 目录下新建 pm-clone 的文件夹，然后在 pm-clone 下新建 index.js，内容如下所示：
-       ```js
-          // bin/pm-clone/index.js
-          console.log('pm-clone index clone file');
-       ```
-       执行命令：`pm clone file`，得到的输出如下：
-       ![img.png](img/pm-clone-index.png)
-    3. 两种方式都可以使得 Commander 找到可执行的文件。
+4. 指定了 command 的第二个参数，没有指定 action 方法，那么 Commander 就会在 bin 目录下去寻找名为 pm-clone 的 js 文件。
 
-##### 2. 使用 argument 函数接收子命令参数
+5. 我们有两种方式去建立 pm-clone 这个 js 文件。
+   1. 直接在 bin 目录下建立名为 pm-clone.js 的文件，内容如下：
+   ```js
+      // bin/pm-clone.js
+      console.log('pm bin clone file');
+   ```
+   执行命令：`pm clone file`，得到的输出是：
+  ![img.png](img/pm-clone.png)
+   2. 直接在 bin 目录下新建 pm-clone 的文件夹，然后在 pm-clone 下新建 index.js，内容如下所示：
+      ```js
+         // bin/pm-clone/index.js
+         console.log('pm-clone index clone file');
+      ```
+      执行命令：`pm clone file`，得到的输出如下：
+      ![img.png](img/pm-clone-index.png)
 
+6. 两种方式都可以使得 Commander 找到可执行的文件。
 
+7. 如果使用的是可执行文件，那么怎么能获得我们输入的命令的选项、参数呢？
+   1. 在可执行文件中，同样引入 Commander 这个局部对象：
+      ```js
+         const {Command} = require('commander');
+
+         const program = new Command();
+      ```
+   2. 在可执行文件中使用 program.option 方法设置同这个子命令相关的选项。
+      ```js
+         program
+             .option('-f, --force', 'force installation')
+             .option('-v, --version <version>', 'specify a version')
+             .option('--source <source>', 'specify download source')
+      ```
+   3. 使用 `program.parse(process.argv)` 来解析 `process.argv`，将不是传给选项（option）的参数解析出来，传递给 `program.args` 数组。
+   4. 使用 program.opts 方法获得命令中的选项及传给选项的值。program.opts 的返回值是一个对象，其 key 是选项，与 key 对应的 value 是传递给选项的值。
+   5. 示例代码如下：
+      ```js
+         // pm-install.js
+      
+         #!/usr/bin/env node
+
+         const {Command} = require('commander');
+
+         const program = new Command();
+
+          program
+              .option('-f, --force', 'force installation')
+              .option('-v, --version <version>', 'specify a version')
+              .option('--source <source>', 'specify download source')
+
+         program.parse(process.argv);
+
+         // program.parse 函数对 process.argv 进行解析，将不是传给选项（option）的参数解析出来，传递给 program.args 数组
+         // 例如我们输入的命令是：pm install node typescript react -v 2.5.0 --source official
+         // 其中 -v 后面跟的是参数是传给 -v 这个选项的，而 --source 后面跟的参数是传递给 --official 的
+         // 所以 program.args 只接收 node、typescript 和 react 这个三个参数，并将其组成一个数组：[ 'node', 'typescript', 'react' ]
+
+         const pkgs = program.args;
+
+         const opts = program.opts();
+
+         // 命令是： pm install node typescript react -v 2.5.0 --source official
+         // options { version: '2.5.0', source: 'official' }
+         console.log('options', program.opts());
+         // args [ 'node', 'typescript', 'react' ]
+         console.log('args', program.args);
+      ```
+   6. 假设我们输入的命令是：`pm install node typescript react -v 2.5.0 --source official`，那么 `program.opts()` 的返回值是：`{ version: '2.5.0', source: 'official' }`，而 `program.args` 则是：`[ 'node', 'typescript', 'react' ]`。
+   7. 这样我们就在子命令的可执行文件中实现对子命令的选项、参数的解析，由此可以进一步实现其他的逻辑处理。
+
+#### 3. 自定名称的可执行文件 - 使用 `executableFile`
+
+1. 前面说的使用可执行文件来响应子命令，这个可执行文件的名字是有固定格式的：program-subcommand。
+
+2. 实际是，我们可以通过配置 command 方法的第三个参数，实现对可执行文件的自定义名称：即使用 `executableFile` 配置项。
+
+3. `executableFile` 配置项的用法如下：
+   ```js
+      program
+         .command('update <package>', 'update a package', {executableFile: 'updatePkgs'})
+   ```
+4. 配置的可执行文件的名称为 `updatePkgs`，那么 Commander 就会去 `bin` 目录下去找 `updatePkgs.js` 这个文件（或者是 `bin` 下的 `updatePkgs` 目录下的 `index.js` 文件）。
+
+5. updatePkgs.js 的内容如下：
+   ```js
+      #!/usr/bin/env node
+
+      const { Command } = require('commander');
+      const program = new Command();
+
+      program.parse(process.argv);
+
+      console.log('update packages list: ', program.args);
+   ```
+6. 输入命令：`pm update node`，则输出是：`update packages list:  [ 'node' ]`。
+
+##### 4. 使用 argument 函数接收子命令参数
+
+1. 我们可以使用 argument 方法给子命令添加参数（argument）。使用 argument 方法给子命令添加任何我们希望的命令参数。
+
+2. argument 方法一共有三个参数：
+  - 第一个参数是一个定义参数名称的字符串，形式是`<required>` （必选）或者是 `[optional]` （可选）。
+  - 第二个参数是可选的，是一个用来描述这个参数作用的字符串。
+  - 第三个参数也是可选的，用来给这个参数设置默认值。
+
+4. 如果 command 方法与 action 方法合用，那么我们就能使用 argument 方法指定参数。如果是响应命令的是单独的可执行文件，那么久不能使用 argument 方法。
+
+5. 示例：
+   ```js
+      program
+          .command('login')
+          .argument('<username>', 'user to login')
+          .argument('[password]', 'password for user, if required', 'not required')
+          .argument('[flag]', 'login pattern', 'sk2')
+          .action((username, password, flag) => {
+              console.log('username: ', username);
+              console.log('password: ', password);
+              console.log('flag: ', flag);
+          })
+
+      // 必须使用 parse 函数解析我们输入的命令
+      program.parse(process.argv);
+   ```
+   1. 子命令是 login，参数 username 是必输入的参数，而 password 是可选的，还设置了默认值为 `not required`，同理可见参数 flag。
+   2. 此时的 action 接收的回调函数的参数实际上就是上面定义的子命令的参数。
+   3. 输入命令： `pm login curry`，输出是：
+      ```js
+         username:  curry
+         password:  not required
+         flag:  sk2
+      ```
+   4. 输入命令：`pm login curry 123456`，输出：
+      ```js
+         username:  curry
+         password:  123456
+         flag:  sk2
+
+      ```
+   5. 输入命令：`pm login curry 123456 sky`，输出：
+      ```js
+         username:  curry
+         password:  123456
+         flag:  sky
+
+      ```
+
+6. 还可以使用 arguments 方法一次添加多个参数，缺点是每个参数不能添加描述信息。
+   ```js
+       program
+           .arguments('<username> <password>');
+   ```
 ### 2. option
 
 1. `option` 方法用来定义命令的选项。而且也作为选项的说明。每个选项可以有一个段格式（short flag），即以单个连字符开头的单个字母，例如 `-a`、`-l`。或者是一个长格式（long name），即以 2 个连字符开头的完整单词，多个单词使用一个连字符连接，例如：`--save`、`--save-dev`。
-2. 
-3. option 方法的参数：
+
+2. option 方法的参数：
    - 第一个参数是字符串形式的选项的名字，我们可以使用逗号（`,`） 空格（` `）和竖线（`|`）来分隔长格式和短格式的选项，例如：`"-w --width"`，`-s,--save` 或者 `-a|-all`。第一个参数的最后的内容是这个选项的接收的参数（arguments）。如 `-w --width <width>`，最后的`<width>` 就表示 `-w` 这个选项接收的参数，使用尖括号（`<>`）表示这个参数是必要的，也就是如果我们在命令中使用 `-w` 这个选项，那么就必须加上参数。最后字符串中的这个参数也要和前面的选项名称用空格分开。
    - 第二个参数是描述这个选项的作用。
    - 第三个参数这个选项的默认值。
 
-#### 1. 普通的选项类型、布尔值和普通值
-#### 2. 默认值
-#### 3. 其他的选项类型、可否定的布尔值和 布尔值以及普通值
-#### 4. 必输的选项
-#### 5. 可变选项
+3. 如何获得我们配置的选项呢，有两种方式：
+   - 通过 opts 方法获取
+   - 通过 action 方法获取
+
+4. opts 方法是 program 提供的方法，作用是收集在命令中输入的选项。其返回值是一个对象，key 是命令中输入的选项，value 是选项的参数，如果没有在命令中输入某个选项，那么 opts 方法的返回值对象中就没有这个选项。如果在 option 方法中，没有给选项设置必输入的参数，那么 opts 方法返回的对象中的这个选项对应的 value 就是 true。
+
+5. action 方法与 command 方法连用，也就是调用 command 方法，就需要和 action 连用，那么 action 的回调函数中的第二个参数就是 option 对象，这个 option 对象和 program.opts 方法的返回值类似。
+
+6. 我们在 package.json 中的 bin 字段，配置一个新的命令：
+   ```json
+      {
+          "bin": {
+               "pm": "bin/pm.js",
+               "pizza": "bin/pizza-option.js"
+           }
+      }
+   ```
+
+#### 1. opts 方法获取 option 对象
+
+1. opts 方法是 program 提供的方法，作用是收集在命令中输入的选项。其返回值是一个对象，key 是命令中输入的选项，value 是选项的参数，如果没有在命令中输入某个选项，那么 opts 方法的返回值对象中就没有这个选项。如果在 option 方法中，没有给选项设置必输入的参数，那么 opts 方法返回的对象中的这个选项对应的 value 就是 true。
+
+2. opts 返回的 option 对象中，选项就变成了对象的 key。这个key 的形式和我们在 option 设置的选项形式有关。
+
+3. 如果我们在 option 方法中只设置了短格式的选项，那么 option 对象中的 key 就是短格式。如 `option('-a')`，option 对象中的 key 就是 `a`。
+
+4. 如果我们在 option 方法中同时设置了短格式和长格式的选项，那么 option 对象中的 key 就是长格式。如 `option('-s, --save')`，option 对象中的 key 就是 `save`。
+
+5. 如果我们在 option 方法中设置了长格式的选项，而长格式选项由多个单词通过连字符链接组成，那么 option 对象中的 key 就是这些单词的小驼峰形式。如 `option('-S, --save-development')`，option 对象中的 key 就是 `saveDevelopment`。
+
+6. opts 方法的用法示例：
+   ```js
+      // pizza-option.js
+      program
+        .option('-d', 'output extra debugging')
+        .option('-s, --small', 'small pizza size')
+        .option('-p, --pizza-type <type>', 'flavour of pizza')
+      program.parse(process.argv);
+
+      const options = program.opts();
+
+      console.log('options - 1: ', program.opts());
+   ```
+   1. 终端输入：`pizza -d`，输出如下图所示：
+      ![img.png](img/pizza-d.png)
+   2. 终端输入：`pizza -d -s`，输出如下图所示：
+      ![img.png](img/pizza-d-s.png)
+   3. 终端输入：`pizza -s -p`，输出如下图所示：
+      ![img.png](img/pizza-s-p-error.png)
+   4. 终端输入：`pizza -d -s -p vegetarian`，输出如下图所示：
+      ![img.png](img/pizza-d-s-p.png)
+   5. 终端输入：`pizza -d -s --pizza-type=vegetarian`，输出如下图所示：
+      ![img.png](img/pizza-d-s--pizza-type.png)
+
+#### 2. 普通的选项类型、布尔值和普通值
+
+1. 最常用的选项类型是布尔类型和接收参数的选项（将跟在选项后面的值作为选项的参数），选项的参数通过尖括号声明，例如：`--expect <value>`，value 就作为 `--expect` 选项的必输入的参数跟在 `--expect` 后面，中间隔着一个空格。如果没有在输入命令时指定选项参数，那么就会提示报错。
+
+2. 如果在设置选项时，没有给选项设置必输项，即通过 option 方法仅仅配置一个选项，如：`option('-s, --save')` 那么通过 opts 方法获得的选项对象中，这个选项对应的 value 就是 true。如果没有在命令中输入这个选项，那么 opts 方法返回的对象就没有这个选项对应的属性。
+
+3. 示例代码：
+   ```js
+      program
+          .option('-d, --debug', 'output extra debugging')
+          .option('-s, --small', 'small pizza size')
+          .option('-p, --pizza-type <type>', 'flavour of pizza')
+
+      program.parse(process.argv);
+
+      const options = program.opts();
+
+      // console.log('options - 1: ', program.opts());
+
+      if (options.debug) {
+           console.log('options - 2: ', options);
+      }
+
+      console.log('pizza details: ');
+
+      if (options.small) {
+         console.log('- small pizza size');
+      }
+
+      if (options.pizzaType) {
+         console.log(`- ${options.pizzaType}`);
+      }
+   ```
+    1. 终端输入：`pizza -p`，输出如下图所示：
+       ![img.png](img/pizza-p-error.png)
+    2. 终端输入：`pizza -d -s`，输出如下图所示：
+       ![img.png](img/pizza-d-s-2.png)
+    3. 终端输入：`pizza -d -s -p vegetarian`，输出如下图所示：
+       ![img.png](img/pizza-d-s-p-vegetarian-2.png)
+    4. 终端输入：`pizza --pizza-type=cheese`，输出如下图所示：
+       ![img.png](img/pizza--pizza-type-cheese.png)
+
+#### 3. 默认值
+
+1. 我们可以给选项设置默认值：option 方法指定第三个参数，即可为第一个参数的选项设置默认值。
+
+2. 一般情况下，在设置了选项有必输入的参数时，需要设置一个默认值。
+
+3. 在终端输入命令时，如果我们不写这个选项，那么这个选项就会采用默认值，如果写了这个选项，没有写参数，那么会报错。在写了选项和参数的情况下，这个参数就会取代选项的默认值。
+
+4. 代码示例：
+   ```js
+      program
+          .option('-c, --cheese <type>', 'add the specified type of cheese', 'blue');
+
+      program.parse(process.argv);
+
+      const options = program.opts();
+
+      console.log('options - 1: ', program.opts());
+      console.log('cheese type: ', options.cheese);
+
+   ```
+   1. 终端输入：`pizza`，输出如下图所示：
+      ![img.png](img/pizza.png)
+   2. 终端输入：`pizza --cheese stilton`，输出如下图所示：
+      ![img.png](img/pizza-cheese-stilton.png)
+
+#### 4. 其他的选项类型、可否定的布尔值、布尔值以及普通值
+
+1. 有些情况下，我们需要将布尔类型的选项设置为 false。这种情况下，我们在 `option` 方法中设置命令的选项的时候，选项名称需要以 `no-` 开头。
+
+2. 假如我们首先定义了 `--foo` 这个选项，`--no-foo` 并不会改变 `--foo` 这个选项的默认值。因此，我们可以给一个布尔类型的选项定义一个默认的布尔值，并且我们在终端输入的选项参数能覆盖这个默认值。
+
+3. 设置以 `no-` 开头的否定类型的选项，例如：`--no-use`，只有在命令中显示调用这个 `--no-use` 选项，`option` 对象中的 `use` 属性才会变成 `false`。
+
+4. 示例代码如下：
+   ```js
+      program
+          .option('--no-sauce', 'Remove sauce')
+          .option('--cheese <flavour>', 'cheese flavour', 'mozzarella')
+          .option('--no-cheese', 'plain with no cheese')
+      
+
+      program.parse(process.argv);
+
+      const options = program.opts();
+
+      console.log('options: ', options);
+
+      const sauceStr = options.sauce ? 'sauce' : 'no sauce';
+      const cheeseStr = (options.cheese === false) ? 'no cheese' : `${options.cheese} cheese`;
+      console.log(`You ordered a pizza with ${sauceStr} and ${cheeseStr}`);
+   ```
+   1. 在第一个 option 方法中配置了 `--no-sauce` 这个选项，那么同时也配置了 `--sauce` 这个选项，并设置其默认值为 `true`。而在第二个 option 方法中，配置了 `--cheese` 这个选项，并设置其默认值为 `mozzarella`。所以，在命令行中，我们不输入任何参数，查看 `--sauce` 和 `--cheese` 的默认值：
+      ![img.png](img/pizza-sauce.png)
+   2. 因为我们没有显示定义 `--sauce` 命令，在终端输入命令是，如果指定 `--sauce` 这个选项，会报错：
+      ![img.png](img/pizza-sauce-error.png)
+   3. 在输入命令时，给选项设置参数：`pizza --cheese blue`，那么 `--cheese` 选项原本的默认值会被覆盖。如下所示：
+      ![img.png](img/pizza-cheese-blue.png)
+   4. 在命令中，显示设置 `--no-sauce` 和 `--no-cheese`，那么会将 `--sauce` 和 `--cheese` 的值设置为 false。如下所示：
+      ![img.png](img/pizza-no-sauce-no-cheese.png)
+
+#### 5. 给选项设置可选的输入参数
+
+1. 一个选项可以设置可选的输入参数。在 option 方法接收的第一个参数中，在选项名称后面跟着一个用方括号包裹的内容，二者之间用空格隔开，如：`--use [value]`，表示 `--use` 的输入参数就是可选的。
+
+2. 一个选项设置可选的输入参数后，如果在命令中没有写这个选项，那么最后的 option 对象中这个选项对应的属性的值就是 undefined。
+写了选项，但是没有设置参数， option 对象中这个选项对应的属性的值就是 true。
+
+3. 示例代码：
+   ```js
+      program
+         .option('-t, --type [value]', 'pizza type')
+
+      program.parse(process.argv);
+
+      const options = program.opts();
+
+      console.log('options: ', options);
+      if (options.type === undefined) {
+          console.log('no cheese');
+      } else if (options.type === true) {
+          console.log('add cheese');
+      } else {
+          console.log(`add cheese type ${options.type}`);
+      }
+   ```
+   1. 不写选项：`pizza`，那么 option 对象中 `type` 就是 `undefined`，结果如下图所示：
+      ![img.png](img/pizza-no-type.png)
+   2. 只写选项，不写输入参数：`pizza --type`，option 对象中 `type` 就是 `true`，结果如下图所示：
+      ![img.png](img/pizza-type.png)
+   3. 同时写选项和参数：`pizza --type blue`，option 对象中 `type` 就是写入的参数：`blue`。结果如下图所示：
+      ![img.png](img/pizza-type-blue.png)
+
+#### 6. 必输的选项
+
+1. 使用 requiredOption 这个方法可以指定一个必要选项。设置了必要选项后，我们在写命令的时候，就必须写这个选项，同时还要给选项设置参数（选项有默认值的情况下不用在命令行中写），
+
+2. requiredOption 的示例用法：
+   ```js
+      program
+         .requiredOption('-c, --cheese <type>', 'pizza must have cheese');
+
+      program.parse(process.argv);
+
+      const options = program.opts();
+
+      console.log('options: ', options);
+   ```
+   1. 只输入命令，没有指定选项：`pizza`，会提示报错：
+      ![img.png](img/pizza-no-required-cheese.png)
+   2. 输入选项，不写选项参数：`pizza -c`，还是会提示报错：
+      ![img.png](img/pizza-required-cheese.png)
+   3. 即输入选项，也写选项参数：`pizza -c blue`，此时不会报错，输出如下：
+      ![img.png](img/pizza-required-cheese-blue.png)
+
+#### 7. 可变选项
+
+1. 正常情况下，一个选项只能接收一个选项参数。如果想要接收多个选项参数，我们可以在 option 方法中进行配置，配置方法就是在选项名后面的参数占位符后面添加 `...`，例如：`'-s, --size <value...>'`，`value` 后面跟着的 `...` 就表示 `--size` 可以接收多个选项参数。
+
+2. 指定了可变选项后，Commander 会将传入的多个选项参数解析，并放入一个数组中。
+
+3. Commander 怎么知道哪些参数是属于某个选项的呢，Commander 在解析某个选项的参数的时候，当遇到一个以单个连字符（`-`）开头的参数，解析就停止了，这个参数前面的参数会作为这个选项的参数。如果是两个单个连字符（`--`）这样的特殊参数（后面没有任何参数），解析过程会完全停止，即使后面有参数，Commander 也不会将其作为选项参数。
+
+4. 示例：
+   ```js
+      program
+          .option('-n, --number <numbers...>', 'specify numbers')
+          .option('-l, --letter [letters...]', 'specify letters');
+
+       program.parse(process.argv);
+
+       console.log('Options: ', program.opts());
+
+       // 除去选项参数后，剩下的参数，可以认为是命令参数
+       console.log('Remaining arguments: ', program.args);
+   ```
+   1. 在终端输入：`pizza --number 1 2 3 -l a b c`，完全被解析，结果如下：
+      ![img.png](img/pizza-l-n.png)
+   2. 在终端输入：`pizza --number 1 2 3 --letter a b c`，完全被解析，结果如下：
+      ![img.png](img/pizza-letter-number.png)
+   3. 在终端输入：`pizza -n10 1 2 3 --letter a b c`，部分解析，10 会作为选项 `-n` 的参数，而 1、2、3 会被解析为命令的参数。结果如下：
+      ![img.png](img/pizza-n10-letter.png)
+   4. 在终端输入：`pizza -n10 --letter=A operand`，10 会被解析为 `-n` 的参数，而 A 会被解析为 `--letter` 的参数，operand 会被解析为命令参数。结果如下所示：
+      ![img.png](img/pizza-n10-letterA-operand.png)
+   5. 在终端输入：`pizza --letter -n 1 -n 2 3 -- operand`，使用了特殊参数 `--`，那么对选项参数的解析就到此为止，后面的参数就被解析为命令参数。结果如下：
+      ![img.png](img/pizza-n10-letterA-operand-2.png)
+
+5. 通过上面的例子，我觉得还是使用 `--` 作为选项参数和命令参数的分隔符比较好。
+
+#### 6. 总结
+
+1. 布尔类型的选项，默认值为 true：`option('-s, --save', 'save option')`
+2. 存在必输入参数的选项：`option('-w, --width <width>')`
+3. 有默认值的选项：`option('-w, --width <width>', 'image width', 100)`
+4. 可选参数的选项：`option('-w, --width [width]')`
+5. 可否定的布尔类型选项：`option('--no-cheese', 'no cheese')`
+6. 必输入的选项：`requiredOption('-w, --width <width>')`
+7. 可变选项：`option('-n, --number <value...>')`
+
 ### 3. action
 
-1. `action` 方法来监听用户输入，当用户输入 command 方法指定的命令后会触发回调函数，回调函数的第一个参数是命令的值，第二个参数是上面的选项对象，第三个参数是 command 对象本身。我们可以根据我们输入的命令，来决定执行什么内容。
+1. `action` 方法来监听用户输入，当用户输入 command 方法指定的命令后会触发回调函数。
 
+2. 回调函数的参数与和哪个函数一起调用有关。如果是附在 option 方法的后面，那么其第一个参数是命令的值，第二个参数是上面的选项对象，第三个参数是 command 对象本身。我们可以根据我们输入的命令，来决定执行什么内容。
+
+3. 如果是附在 argument 方法的后面，那么回调函数的参数就是前面的通过 argument 方法设置的命令的参数。示例如下：
+   ```js
+      program
+          .command('login')
+          .argument('<username>', 'user to login')
+          .argument('[password]', 'password for user, if required', 'not required')
+          .argument('[flag]', 'login pattern', 'sk2')
+          .action((username, password, flag) => {
+              console.log('username: ', username);
+              console.log('password: ', password);
+              console.log('flag: ', flag);
+          })
+
+      // 必须使用 parse 函数解析我们输入的命令
+      program.parse(process.argv);
+   ```
 ### 7. description
 
 1. `description` 方法接收一个字符串用来简要描述这个命令的作用。一般附在 command 方法后面。
 
-### 3. usage
+### 3. name 和 usage
 
-1.  `usage` 方法用来输出这个命令的使用方式的相关内容。接收一个字符串作为参数，字符串是命令的描述内容。命令的选项是 `-h` 或者是 `--help`。
+1. `usage` 方法用来输出这个命令的使用方式的相关内容。接收一个字符串作为参数，字符串是命令的描述内容。命令的选项是 `-h` 或者是 `--help`。
 
-### 4. name
+2. 这两个方法允许我们自定义帮助第一行中的用法说明。名称是从（完整）程序参数中推导出来的。
+
+3. 示例：
+   ```js
+      program
+          .name("my-command")
+          .usage("[global options] command")
+   ```
+   help 命令显示的内容的第一行是：
+   ```js
+      Usage: my-command [global options] command
+   ```  
+### 4. 
 
 ### 5. on
+
+1. 这个方法用来监听命令（command）和选项（option）事件，来执行自定义操作。
+2. on 方法的参数
+   - 第一个参数是监听的命令或者选项，
+   - 第二个参数是回调函数，当指定的命令或者选项被输入时，就会执行回调函数。
+
+3. 示例：
+   ```js
+ 
+   ```
 
 ### 6. version
 
