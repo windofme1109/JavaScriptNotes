@@ -970,15 +970,15 @@
       // 必须使用 parse 函数解析我们输入的命令
       program.parse(process.argv);
    ```
-### 7. description
+### 4. description
 
 1. `description` 方法接收一个字符串用来简要描述这个命令的作用。一般附在 command 方法后面。
 
-### 3. name 和 usage
+### 5. name 和 usage
 
 1. `usage` 方法用来输出这个命令的使用方式的相关内容。接收一个字符串作为参数，字符串是命令的描述内容。命令的选项是 `-h` 或者是 `--help`。
 
-2. 这两个方法允许我们自定义帮助第一行中的用法说明。名称是从（完整）程序参数中推导出来的。
+2. name 方法和 usage 联合起来使用，用来自定义帮助第一行中的说明。名称是从（完整）程序参数中推导出来的。
 
 3. 示例：
    ```js
@@ -987,32 +987,108 @@
           .usage("[global options] command")
    ```
    help 命令显示的内容的第一行是：
-   ```js
+   ```
       Usage: my-command [global options] command
-   ```  
-### 4. 
+   ```
+4. 上面的例子还是看不出来 name 方法和 usage 方法放到一起的作用。我们还是借鉴一下知名的命令行工具，看看人家的帮助是怎么写的。以 npm 为例，输入 `npm -h`，输出如下：
+    ```
+          Usage: npm <command>
 
-### 5. on
+          where <command> is one of:
+               access, adduser, audit, bin, bugs, c, cache, ci, cit,
+               clean-install, clean-install-test, completion, config,
+               create, ddp, dedupe, deprecate, dist-tag, docs, doctor,
+               edit, explore, fund, get, help, help-search, hook, i, init,
+               install, install-ci-test, install-test, it, link, list, ln,
+               login, logout, ls, org, outdated, owner, pack, ping, prefix,
+               profile, prune, publish, rb, rebuild, repo, restart, root,
+               run, run-script, s, se, search, set, shrinkwrap, star,
+               stars, start, stop, t, team, test, token, tst, un,
+               uninstall, unpublish, unstar, up, update, v, version, view,
+               whoami
+
+          npm <command> -h  quick help on <command>
+          npm -l            display full usage info
+          npm help <term>   search for help on <term>
+          npm help npm      involved overview
+
+          Specify configs in the ini-formatted file:
+          C:\Users\qmr\.npmrc
+          or on the command line via: npm <command> --key value
+          Config info can be viewed via: npm help config
+
+          npm@6.14.15 C:\Program Files\nodejs\node_modules\npm
+
+    ```
+5. 在 npm 命令的帮助中，可以发现，第一行是 npm 命令的基本用法。对比我们上面使用 name 方法和 usage 方法自定义的第一行，name 方法接收的东西实际就是等同于 npm ，也就是命令名（Executable）。
+
+6. 因此，我们可以这样自定义帮助内容的第一行（假设主命令是 `pizza`）：
+   ```js
+      program
+          .name('pizza')
+          .usage('<command> [option]')
+      // ...
+   
+   ```
+7. 在终端输入：`pizza -h`，输出如下：
+   ```
+      Usage: pizza <command> [option]
+   ```
+
+### 6. on
 
 1. 这个方法用来监听命令（command）和选项（option）事件，来执行自定义操作。
+
 2. on 方法的参数
-   - 第一个参数是监听的命令或者选项，
+   - 第一个参数是监听的命令或者选项。
    - 第二个参数是回调函数，当指定的命令或者选项被输入时，就会执行回调函数。
 
 3. 示例：
    ```js
- 
-   ```
+      program
+          .command('set <type>')
+          .description('set pizza size');
+   
+      program
+          .option('-d, --debug', 'output extra debugging')
+          .option('-s, --small', 'small pizza size')
+      // 监听触发指定的 option
+      program
+          .on('option:debug', function() {
+              console.log('debug option event was emitted', this.opts());
+          })
 
-### 6. version
+      program
+          .on('option:small', function() {
+               console.log('small option event was emitted', this.opts());
+      })
+      
+      program
+          .on('command:set', function() {
+              console.log('command set event was emitted', this.args);
+        
+    })
+   ```
+   1. 终端输入：`pizza -d`，终端输出：  
+      `debug option event was emitted { debug: true }`
+   2. 终端输入：`pizza -s`，终端输出：  
+       `small option event was emitted { small: true }`
+   3. 终端输入：`pizza set big`，终端输出：
+      `command set event was emitted [ 'set', 'big' ]`
+
+4. 根据文档的示例，`on` 方法监听的选项或者子命令，不能直接写相应的名称，而是要加入前缀，如果是选项，就使用 `option:optionName` 的形式，子命令则是 `command:cammandName` 的形式。可以看一看 `on` 方法实现的源码来探究监听的事件名称。
+
+5. 目前有一个小问题，就是只要输入 `pizza` 开头额命令，终端也会输出帮助内容。这个需要解决一下。
+
+### 7. version
 
 1. `version` 方法是 commander 提供的一个输出版本号的方法，接收一个字符串作为参数，这个字符串就是版本信息。命令的选项是 `-V` 或者是 `--version`。
-
 
 ### 8. parse
 
 1. `parse` 方法接收的第一个参数是等待解析的字符串数组。那么我们可以传入 `process.argv` 作为参数。这样就可以解析我们的命令。
 
+### 9. 书写命令说明（`-h` \ `--help`）
 
 ## 8. chalk
 
@@ -1021,3 +1097,7 @@
 2. 安装 chalk：`npm install chalk`
 
 3. chalk 官方文档：[官方文档](https://github.com/chalk/chalk#readme)
+
+## 9. inquirer
+
+1. inquirer 用于实现和命令行进行交互。
