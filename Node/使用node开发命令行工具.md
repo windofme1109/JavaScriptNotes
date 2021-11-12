@@ -1,3 +1,63 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [使用 Node 开发命令行工具](#%E4%BD%BF%E7%94%A8-node-%E5%BC%80%E5%8F%91%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%B7%A5%E5%85%B7)
+  - [1. 参考资料](#1-%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99)
+  - [2. GNU 和 Linux 命令规范](#2-gnu-%E5%92%8C-linux-%E5%91%BD%E4%BB%A4%E8%A7%84%E8%8C%83)
+    - [1. GNU 命令规范](#1-gnu-%E5%91%BD%E4%BB%A4%E8%A7%84%E8%8C%83)
+    - [2. Linux 命令](#2-linux-%E5%91%BD%E4%BB%A4)
+    - [3. GNU 与 Linux 命令规范在开发命令行工具中的作用](#3-gnu-%E4%B8%8E-linux-%E5%91%BD%E4%BB%A4%E8%A7%84%E8%8C%83%E5%9C%A8%E5%BC%80%E5%8F%91%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%B7%A5%E5%85%B7%E4%B8%AD%E7%9A%84%E4%BD%9C%E7%94%A8)
+  - [3. Node 开发基础的命令行工具](#3-node-%E5%BC%80%E5%8F%91%E5%9F%BA%E7%A1%80%E7%9A%84%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%B7%A5%E5%85%B7)
+  - [4. 引入 commander 和 chalk](#4-%E5%BC%95%E5%85%A5-commander-%E5%92%8C-chalk)
+    - [1. 常用 npm 命令](#1-%E5%B8%B8%E7%94%A8-npm-%E5%91%BD%E4%BB%A4)
+    - [2. 一般命令行工具中的命令使用方式总结](#2-%E4%B8%80%E8%88%AC%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%B7%A5%E5%85%B7%E4%B8%AD%E7%9A%84%E5%91%BD%E4%BB%A4%E4%BD%BF%E7%94%A8%E6%96%B9%E5%BC%8F%E6%80%BB%E7%BB%93)
+  - [5. commander 和 chalk 的初步使用](#5-commander-%E5%92%8C-chalk-%E7%9A%84%E5%88%9D%E6%AD%A5%E4%BD%BF%E7%94%A8)
+    - [1. 增加版本信息和命令使用说明 - 使用 commander 实现](#1-%E5%A2%9E%E5%8A%A0%E7%89%88%E6%9C%AC%E4%BF%A1%E6%81%AF%E5%92%8C%E5%91%BD%E4%BB%A4%E4%BD%BF%E7%94%A8%E8%AF%B4%E6%98%8E---%E4%BD%BF%E7%94%A8-commander-%E5%AE%9E%E7%8E%B0)
+    - [2. 给输出的文字添加颜色 - 使用 chalk 实现](#2-%E7%BB%99%E8%BE%93%E5%87%BA%E7%9A%84%E6%96%87%E5%AD%97%E6%B7%BB%E5%8A%A0%E9%A2%9C%E8%89%B2---%E4%BD%BF%E7%94%A8-chalk-%E5%AE%9E%E7%8E%B0)
+  - [6. 继续完善我们的命令行工具](#6-%E7%BB%A7%E7%BB%AD%E5%AE%8C%E5%96%84%E6%88%91%E4%BB%AC%E7%9A%84%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%B7%A5%E5%85%B7)
+    - [1. 使用 command 方法和 option 方法完成基本的命令与选项的配置](#1-%E4%BD%BF%E7%94%A8-command-%E6%96%B9%E6%B3%95%E5%92%8C-option-%E6%96%B9%E6%B3%95%E5%AE%8C%E6%88%90%E5%9F%BA%E6%9C%AC%E7%9A%84%E5%91%BD%E4%BB%A4%E4%B8%8E%E9%80%89%E9%A1%B9%E7%9A%84%E9%85%8D%E7%BD%AE)
+    - [2. 添加业务逻辑 —— 生成图片](#2-%E6%B7%BB%E5%8A%A0%E4%B8%9A%E5%8A%A1%E9%80%BB%E8%BE%91--%E7%94%9F%E6%88%90%E5%9B%BE%E7%89%87)
+  - [7. chalk](#7-chalk)
+    - [1. 基本使用](#1-%E5%9F%BA%E6%9C%AC%E4%BD%BF%E7%94%A8)
+    - [2. API](#2-api)
+      - [1. chalk.level](#1-chalklevel)
+      - [2. 检测终端对颜色的支持](#2-%E6%A3%80%E6%B5%8B%E7%BB%88%E7%AB%AF%E5%AF%B9%E9%A2%9C%E8%89%B2%E7%9A%84%E6%94%AF%E6%8C%81)
+      - [3. 支持的颜色](#3-%E6%94%AF%E6%8C%81%E7%9A%84%E9%A2%9C%E8%89%B2)
+      - [4. 支持的修饰符](#4-%E6%94%AF%E6%8C%81%E7%9A%84%E4%BF%AE%E9%A5%B0%E7%AC%A6)
+      - [5. 支持的背景颜色](#5-%E6%94%AF%E6%8C%81%E7%9A%84%E8%83%8C%E6%99%AF%E9%A2%9C%E8%89%B2)
+      - [6. 自定义颜色](#6-%E8%87%AA%E5%AE%9A%E4%B9%89%E9%A2%9C%E8%89%B2)
+        - [1. `hex`](#1-hex)
+        - [2. `rgb`](#2-rgb)
+  - [8. Commander](#8-commander)
+    - [1. command](#1-command)
+      - [1. 指定 action 作为命令的执行器](#1-%E6%8C%87%E5%AE%9A-action-%E4%BD%9C%E4%B8%BA%E5%91%BD%E4%BB%A4%E7%9A%84%E6%89%A7%E8%A1%8C%E5%99%A8)
+      - [2. 单独的可执行文件](#2-%E5%8D%95%E7%8B%AC%E7%9A%84%E5%8F%AF%E6%89%A7%E8%A1%8C%E6%96%87%E4%BB%B6)
+      - [3. 自定名称的可执行文件 - 使用 `executableFile`](#3-%E8%87%AA%E5%AE%9A%E5%90%8D%E7%A7%B0%E7%9A%84%E5%8F%AF%E6%89%A7%E8%A1%8C%E6%96%87%E4%BB%B6---%E4%BD%BF%E7%94%A8-executablefile)
+      - [4. 使用 argument 函数接收子命令参数](#4-%E4%BD%BF%E7%94%A8-argument-%E5%87%BD%E6%95%B0%E6%8E%A5%E6%94%B6%E5%AD%90%E5%91%BD%E4%BB%A4%E5%8F%82%E6%95%B0)
+    - [2. option](#2-option)
+      - [1. opts 方法获取 option 对象](#1-opts-%E6%96%B9%E6%B3%95%E8%8E%B7%E5%8F%96-option-%E5%AF%B9%E8%B1%A1)
+      - [2. 普通的选项类型、布尔值和普通值](#2-%E6%99%AE%E9%80%9A%E7%9A%84%E9%80%89%E9%A1%B9%E7%B1%BB%E5%9E%8B%E5%B8%83%E5%B0%94%E5%80%BC%E5%92%8C%E6%99%AE%E9%80%9A%E5%80%BC)
+      - [3. 默认值](#3-%E9%BB%98%E8%AE%A4%E5%80%BC)
+      - [4. 其他的选项类型、可否定的布尔值、布尔值以及普通值](#4-%E5%85%B6%E4%BB%96%E7%9A%84%E9%80%89%E9%A1%B9%E7%B1%BB%E5%9E%8B%E5%8F%AF%E5%90%A6%E5%AE%9A%E7%9A%84%E5%B8%83%E5%B0%94%E5%80%BC%E5%B8%83%E5%B0%94%E5%80%BC%E4%BB%A5%E5%8F%8A%E6%99%AE%E9%80%9A%E5%80%BC)
+      - [6. 必输的选项](#6-%E5%BF%85%E8%BE%93%E7%9A%84%E9%80%89%E9%A1%B9)
+      - [7. 可变选项](#7-%E5%8F%AF%E5%8F%98%E9%80%89%E9%A1%B9)
+      - [8. 总结](#8-%E6%80%BB%E7%BB%93)
+    - [3. action](#3-action)
+    - [4. description](#4-description)
+    - [5. name 和 usage](#5-name-%E5%92%8C-usage)
+    - [6. on](#6-on)
+    - [7. version](#7-version)
+    - [8. parse 和 parseAsync](#8-parse-%E5%92%8C-parseasync)
+    - [9. 书写命令说明（`-h` \ `--help`）](#9-%E4%B9%A6%E5%86%99%E5%91%BD%E4%BB%A4%E8%AF%B4%E6%98%8E-h-%5C---help)
+      - [1. 自定义帮助内容](#1-%E8%87%AA%E5%AE%9A%E4%B9%89%E5%B8%AE%E5%8A%A9%E5%86%85%E5%AE%B9)
+      - [2. 在发生错误之后展示帮助信息](#2-%E5%9C%A8%E5%8F%91%E7%94%9F%E9%94%99%E8%AF%AF%E4%B9%8B%E5%90%8E%E5%B1%95%E7%A4%BA%E5%B8%AE%E5%8A%A9%E4%BF%A1%E6%81%AF)
+    - [10. 总结](#10-%E6%80%BB%E7%BB%93)
+  - [9. inquirer](#9-inquirer)
+  - [10. shelljs](#10-shelljs)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # 使用 Node 开发命令行工具
 
 ## 1. 参考资料
@@ -14,9 +74,22 @@
 
 6. [Linux 命令格式](https://blog.csdn.net/liang19890820/article/details/52512744)
 
-7. []()
+7. [手把手教你使用nodejs编写cli(命令行)](https://juejin.cn/post/6844903702453551111)
 
-8. []()
+8. [Node 命令行工具实战](https://juejin.cn/post/7026180708720721957)
+
+9. [commander编写Node命令行工具(cli)](https://juejin.cn/post/6844903831097049096)
+
+10. [Node.js+commander 开发命令行工具](https://juejin.cn/post/6844903445653094414)
+
+11. [用 nodejs 写一个命令行工具 ：创建 react 组件的命令行工具](https://juejin.cn/post/6844903740944695310)
+
+12. [node命令行小工具开发【翻译小工具】](https://segmentfault.com/a/1190000008714075)
+
+13. [Node.js+commander开发命令行工具](https://www.jianshu.com/p/2cae952250d1)
+14. [动手制作nodejs命令行工具 iconfont-cli](https://juejin.cn/post/6844903683457548295)
+
+15. [从零开始开发一个Node交互式命令行应用](https://juejin.cn/post/6844903790122909709)
 
 ## 2. GNU 和 Linux 命令规范
 
@@ -301,11 +374,14 @@
 
 5. 使用 chalk 这个工具，我们实现了对输出的部分文件进行着色。
 
+
 ## 6. 继续完善我们的命令行工具
 
 1. 下面的内容更多的是参考 [从零开始编写一个node命令行工具](https://juejin.cn/post/6948330334085709855)
 
-2. 我们现在的需求是接收用户输入的字符串，把它转化成一张纯色背景文字居中的图片，那么我们可以大致确定出需要的来自外部的变量有哪些：
+### 1. 使用 command 方法和 option 方法完成基本的命令与选项的配置
+
+1. 我们现在的需求是接收用户输入的字符串，把它转化成一张纯色背景文字居中的图片，那么我们可以大致确定出需要的来自外部的变量有哪些：
    - word：将要被转化成图片的字符串
    - width：图片的宽度
    - height：图片的高度
@@ -316,7 +392,7 @@
    - filename：要下载的图片的文件名
    - filepath：图片保存的路径
 
-3. 上面的变量中，word 实际上是命令的参数（argument），其他值都是选项（options）。参数的内容不是固定的，而用户不一定会输入选项，所以选项应该具有默认值。借助 commander，我们可以这样配置：
+2. 上面的变量中，word 实际上是命令的参数（argument），其他值都是选项（options）。参数的内容不是固定的，而用户不一定会输入选项，所以选项应该具有默认值。借助 commander，我们可以这样配置：
    ```js
       program
           .command('new <word>')
@@ -342,14 +418,16 @@
      - 第三个参数这个选项的默认值。
    - `action` 方法来监听用户输入，当用户输入 `new` 命令后会触发回调函数，回调函数的第一个参数是命令的值，第二个参数是上面的选项对象，第三个参数是 command 对象本身。我们可以根据我们输入的命令，来决定执行什么内容。
 
-4. 在终端输入：`word2img new 'hello world'`，终端的输出如下：
+3. 在终端输入：`word2img new 'hello world'`，终端的输出如下：
    ![img.png](img/word2imgnew.png)
 
-5. 接下来实现生成图片的功能。因为这里的重点是实现命令行工具，如何生成图片不是我们关注的点，因此，我们这里直接贴代码了。
+### 2. 添加业务逻辑 —— 生成图片
 
-6. 安装 `canvas`：`npm install canvas`
+1. 接下来实现生成图片的功能。因为这里的重点是实现命令行工具，如何生成图片不是我们关注的点，因此，我们这里直接贴代码了。
 
-7. 新建 `./utils/newCanvas.js`，内容如下：
+2. 安装 `canvas`：`npm install canvas`
+
+3. 新建 `./utils/newCanvas.js`，内容如下：
    ```js 
       const { createCanvas } = require('canvas')
 
@@ -374,7 +452,7 @@
       }
 
    ```
-8. 新建 `./utils/canvas2img.js`，内容如下：
+4. 新建 `./utils/canvas2img.js`，内容如下：
    ```js
       const fs = require('fs')
       const path = require('path')
@@ -395,47 +473,19 @@
           })
       }
    ```
-9. 继续修改 `./bin/word2img.js`，内容如下：
+5. 继续修改 `./bin/word2img.js`，内容如下：
    ```js
       #!/usr/bin/env node
-      // 创建一个局部的 Command 对象
-      const { Command } = require('commander');
-      const chalk = require('chalk');
-      const path = require('path');
-
-
+      // 只显示新添加的内容
+      // ...
       const { newCanvas } = require('../utils/newCanvas');
       const { canvas2img } = require('../utils/canvas2img');
 
       // console.log('hello world');
       const program = new Command();
 
-      program.version(require('../package.json').version).usage('<command> [options]');
-
-       program.on('--help', () => {
-           console.log();
-
-            console.log(
-                ` Run ${chalk.green(
-                    `word2img <command> --help`
-                )} for detailed usage of given command.
-                `
-            );
-
-           console.log();
-       })
-
        program
-           .command('new <word>')
-           .description('generate a new image use the input word')
-           .option('-w --width <width>', 'Set width of the image', 600)
-           .option('--height <heihgt>', 'Set height of the image', 200)
-           .option('--bgColor <bgColor>', 'Set background-color of the image', '#fff')
-           .option('--color <color>', 'Set color of the word', '#000')
-           .option('--size <size>', 'Set font-size of the word', 48)
-           .option('--family <family>', 'Set font-family of the word', 'Arial')
-           .option('--filename <filename>', 'Set filename of the image')
-           .option('--filepath <filepath>', 'Set file path to save the image' + "(note that the path doesn\'t contain the file name)", path.join(process.cwd(), 'imgs'))
+           //... command and options
            .action((word, options) => {
                // console.log(word);
                // console.log(options);
@@ -443,19 +493,293 @@
               canvas2img(canvas, options.filename, options.filepath);
            })
 
-
-
       program.parse(process.argv);
    ```
-10. 此时，我们在终端输入 `word2img new 'hello-word'`，成功在项目根目录生成了图片，并且终端会提示文件的位置信息。
+
+6. 此时，我们在终端输入 `word2img new 'hello-word'`，成功在项目根目录生成了图片，并且终端会提示文件的位置信息。  
    ![img.png](img/wor2img-newimg.png)
 
-11. 添加一些选项：` word2img new 'JavaScript' --bgColor 'green' --color '#666' --filename 'javascript.png'`，终端输出的信息如下：
+7. 添加一些选项：` word2img new 'JavaScript' --bgColor 'green' --color '#666' --filename 'javascript.png'`，终端输出的信息如下：  
    ![img.png](img/word2imgnew-2.png)
 
-12. 至此我们基本实现了一个简单的生成图片的命令行工具。
+8. 至此我们基本实现了一个简单的生成图片的命令行工具。
 
-## 7. commander
+## 7. chalk
+
+1. chalk 这个包可以给终端的文字添加样式，使得我们在终端输出的信息更加明显，更加具有提示效果。
+
+2. 安装 chalk：`npm install chalk`
+
+3. chalk 官方文档：[官方文档](https://github.com/chalk/chalk#readme)
+
+4. chalk 的特性
+   - Expressive API
+   - Highly performant
+   - Ability to nest styles
+   - 256/Truecolor color support
+   - Auto-detects color support
+   - Doesn't extend `String.prototype`
+   - Clean and focused
+   - Actively maintained
+   - Used by ~76,000 packages as of October 26, 2021
+
+### 1. 基本使用
+
+1. chalk 非常容易使用。它将每个常用的颜色封装成函数。我们需要将为宗旨设置成什么颜色，就调用哪个颜色的方法，将字符串传入这个颜色函数即可。举例如下：
+   ```js
+      const chalk = require('chalk');
+
+      const log = console.log;
+
+      log(chalk.red('hello world'));
+   ```
+   输出如下：
+   ![img.png](img/chalk-red.png)
+
+2. chalk 可以链式调用，即组合样式。如对文字进行加粗，设置成斜体等。
+
+3. 基本组合：
+   ```js
+      log(chalk.blue('Hello') + ' World' + chalk.red('!'));
+
+   ```
+   输出如下：
+   ![img.png](img/chalk-blue-red.png)
+4. 链式调用 api，组合样式。将 hello word 字体加粗，颜色设置为蓝色，背景色设置为 红色：
+   ```js
+      log(chalk.blue.bgRed.bold('Hello world!'));
+   ```
+   输出如下：
+   ![img.png](img/chalk-bule-bg-red.png)
+5. 传入多个参数：
+   ```js
+      log(chalk.blue('Hello', 'World!', 'Foo', 'bar', 'biz', 'baz'));
+   ```
+   输出如下：
+   ![img.png](img/chalk-blue.png)
+6. 嵌套样式：
+   ```js
+      log(chalk.red('Hello', chalk.underline.bgBlue('world') + '!'));
+   ```
+   输出如下：
+   ![img.png](img/chalk-red-nest-underline.png)
+7. 使用同种类型的嵌套样式（可以嵌套 color，underline，background）：
+   ```js
+      log(chalk.green(
+         'I am a green line ' +
+         chalk.blue.underline.bold('with a blue substring') +
+         ' that becomes green again!'
+         ));
+   ```
+   输出如下：
+   ![img.png](img/chalk-nest-style.png)
+8. 使用模板字符串：
+   ```js
+      log(`
+         CPU: ${chalk.red('90%')}
+         RAM: ${chalk.green('40%')}
+         DISK: ${chalk.yellow('70%')}
+      `);      
+   ```
+   输出如下：
+   ![img.png](img/chalk-template-literal.png)
+9. 在终端支持的情况下，使用 rgb 函数指定颜色：
+   ```js
+       log(chalk.rgb(123, 45, 67).underline('Underlined reddish color'));
+      log(chalk.hex('#DEADED').bold('Bold gray!'));
+   ```
+   ![img.png](img/chalk-rgb-hex.png)
+
+10. 定义自己的主题：
+    ```js
+       const chalk = require('chalk');
+       const error = chalk.bold.red;
+       const warning = chalk.hex('#FFA500'); // Orange color
+
+       console.log(error('Error!'));
+       console.log(warning('Warning!'));
+    ```
+    输出为：
+    ![img.png](img/chalk-theme.png)
+### 2. API
+
+1. 基本调用形式：`chalk.<style>[.<style>...](string, [string...])`
+
+2. 链式调用样式函数，并将字符串参数传入最后一个函数中。
+
+3. 不用在意样式的顺序，如果样式出现冲突，那么以后面的样式为准。如`chalk.red.yellow.green('hello world')`，最终取的是 `green`，所以字符串的颜色就是绿色，等同于：`chalk.green('hello world')`
+
+#### 1. chalk.level
+
+1. chalk.level 方法用来指定颜色支持的颜色的级别。
+
+2. chalk 会自动检测对颜色级别的支持的程度。但是我们可以通过设置 level 属性来覆盖默认的颜色级别。注意，我们应该只在自己的代码中取改变颜色的级别，因为这种改变是全局的。
+
+3. 如果我们需要在一个可复用的模块中改变颜色级别，我们需要创建一个新的 chalk 实例：
+   ```js
+      import {Chalk} from 'chalk';
+      const customChalk = new Chalk({level: 0});
+   ```
+4. `chalk.level` 函数接收的参数是一个对象，里面由一个 level 属性，level 属性支持的值如下表所示：
+
+    Level|描述
+    :---:|:---:
+     0|禁用所有颜色
+     1|支持基本的颜色（16 种颜色）
+     2|支持 256 种颜色
+     3|支持真彩色（truecolor），大约 1600 万种颜色
+
+#### 2. 检测终端对颜色的支持
+
+1. chalk 会自动检测终端支持的颜色，chalk 在内部完成了整个检测过程，但是为了方便我们使用，还是对外暴露了配置方法。
+
+2. 使用 `--color` 或者 `--no-color` 来覆盖默认的配置。对于不能使用 `--color` 的情况，我们可以使用环境变量 `FORCE_COLOR` 来解决。`FORCE_COLOR` 可以设置以下几个值：
+   - `FORCE_COLOR = 1`，等同于前面的 level 属性为 1 的情况
+   - `FORCE_COLOR = 2`，等同于前面的 level 属性为 2 的情况
+   - `FORCE_COLOR = 3`，等同于前面的 level 属性为 3 的情况
+   - `FORCE_COLOR = 0`，强制禁用颜色
+
+3. 使用环境变量 `FORCE_COLOR` 会覆盖所有的对颜色支持程度的检测。
+
+4. 使用 `--color=256` 标志启用 256 种颜色的模式。
+
+5. 使用 `--color=16m` 标志启用真色彩模式。
+
+#### 3. 支持的颜色
+
+1. `black`
+
+2. `red`
+
+3. `green`
+
+4. `yellow`
+
+5. `blue`
+
+6. `magenta`
+
+7. `cyan`
+
+8. `white`
+
+9. `blackBright` （别名: `gray`，`grey`）
+
+10. `redBright`
+
+11. `greenBright`
+
+12. `yellowBright`
+
+13. `blueBright`
+
+14. `magentaBright`
+
+15. `cyanBright`
+
+16. `whiteBright`
+
+
+#### 4. 支持的修饰符
+
+1. `reset`
+   - 重置当前的样式。
+
+2. `bold`
+   - 加粗
+   
+3. `dim`
+   - 降低文本的透明度。
+   
+4. `italic`
+   - 文本变成斜体。部分终端支持。
+   
+5. `underline`
+   - 在文本下面增加一个下划线。部分终端支持。
+   
+6. `overline`
+   - 在文本上面增加一个横线。部分终端支持。
+   
+7. `inverse`
+   - 反转背景色和前景色。
+   
+8. `hidden`
+   - 打印文本并使之不可见。
+   
+9. `strikethrough`
+   - 添加一个删除线。部分终端支持。
+   
+10. `visible`
+    - 当设置 chalk 的颜色级别为 0 的时候，打印文本。对于纯粹是装饰性的东西是有用的。
+
+
+#### 5. 支持的背景颜色
+
+1. `bgBlack`
+
+2. `bgRed`
+
+3. `bgGreen`
+
+4. `bgYellow`
+
+5. `bgBlue`
+
+6. `bgMagenta`
+
+7. `bgCyan`
+
+8. `bgWhite`
+
+9. `bgBlackBright`（别名: bgGray，bgGrey）
+
+10. `bgRedBright`
+
+11. `bgGreenBright`
+
+12. `bgYellowBright`
+
+13. `bgBlueBright`
+
+14. `bgMagentaBright`
+
+15. `bgCyanBright`
+
+16. `bgWhiteBright`
+
+
+#### 6. 自定义颜色
+
+1. 在支持 256 颜色和真彩色（1600 万种颜色）的终端上，Chalk 也支持这两种颜色模式。
+
+2. Chalk 会对 RGB 颜色进行降采样，将原来的 RGB 格式的颜色转换终端支持的 ANSI 格式的颜色。举个例子，如果我们配置 level 为 1（支持基本的 16 种颜色），chalk 会将 `RGB` 格式的 `#FF0000` （红色）降采样为 ANSI 格式的 31（ANSI 对于红色的转义）。
+
+##### 1. `hex`
+
+1. `hex` 函数用来指定 16 进制形式的 RGB 颜色。
+
+2. 用法示例：
+   ```js
+      chalk.hex('#DEADED').underline('hello world');
+   ```
+3. bgHex 方法用来指定背景颜色。用法如下：
+   ```js
+      chalk.bgHex('#DEADED').underline('Hello, world!')
+   ```
+##### 2. `rgb`
+
+1. `rgb` 函数用来指定 RGB 形式的 RGB 颜色。即分别指定红色（Red）、绿色（Green）和蓝色（Blue）这三个颜色的值，每个颜色的取值范围是 `0 - 255`。
+
+2. 用法示例：
+   ```js
+      chalk.rgb(15, 100, 204).inverse('Hello!')
+   ```
+3. bgRgb 方法用来指定背景颜色。用法如下：
+   ```js
+      chalk.bgRgb(15, 100, 204).inverse('Hello!')
+   ```
+
+## 8. Commander
 
 1. commander 是一个用来解析处理命令行参数的一个工具。功能非常强大，很多知名的命令行工具都使用了 commander。
 
@@ -629,7 +953,7 @@
    ```
 6. 输入命令：`pm update node`，则输出是：`update packages list:  [ 'node' ]`。
 
-##### 4. 使用 argument 函数接收子命令参数
+#### 4. 使用 argument 函数接收子命令参数
 
 1. 我们可以使用 argument 方法给子命令添加参数（argument）。使用 argument 方法给子命令添加任何我们希望的命令参数。
 
@@ -638,9 +962,9 @@
   - 第二个参数是可选的，是一个用来描述这个参数作用的字符串。
   - 第三个参数也是可选的，用来给这个参数设置默认值。
 
-4. 如果 command 方法与 action 方法合用，那么我们就能使用 argument 方法指定参数。如果是响应命令的是单独的可执行文件，那么久不能使用 argument 方法。
+3. 如果 command 方法与 action 方法合用，那么我们就能使用 argument 方法指定参数。如果是响应命令的是单独的可执行文件，那么久不能使用 argument 方法。
 
-5. 示例：
+4. 示例：
    ```js
       program
           .command('login')
@@ -679,7 +1003,7 @@
 
       ```
 
-6. 还可以使用 arguments 方法一次添加多个参数，缺点是每个参数不能添加描述信息。
+5. 还可以使用 arguments 方法一次添加多个参数，缺点是每个参数不能添加描述信息。
    ```js
        program
            .arguments('<username> <password>');
@@ -879,7 +1203,7 @@
       ![img.png](img/pizza-no-type.png)
    2. 只写选项，不写输入参数：`pizza --type`，option 对象中 `type` 就是 `true`，结果如下图所示：
       ![img.png](img/pizza-type.png)
-   3. 同时写选项和参数：`pizza --type blue`，option 对象中 `type` 就是写入的参数：`blue`。结果如下图所示：
+   3. 同时写选项和参数：`pizza --type blue`，option 对象中 `type` 就是写入的参数：`blue`。结果如下图所示：  
       ![img.png](img/pizza-type-blue.png)
 
 #### 6. 必输的选项
@@ -922,7 +1246,7 @@
 
        console.log('Options: ', program.opts());
 
-       // 除去选项参数后，剩下的参数，可以认为是命令参数
+       // 除去选项参数后，剩下的参数
        console.log('Remaining arguments: ', program.args);
    ```
    1. 在终端输入：`pizza --number 1 2 3 -l a b c`，完全被解析，结果如下：
@@ -938,14 +1262,20 @@
 
 5. 通过上面的例子，我觉得还是使用 `--` 作为选项参数和命令参数的分隔符比较好。
 
-#### 6. 总结
+#### 8. 总结
 
 1. 布尔类型的选项，默认值为 true：`option('-s, --save', 'save option')`
+
 2. 存在必输入参数的选项：`option('-w, --width <width>')`
+
 3. 有默认值的选项：`option('-w, --width <width>', 'image width', 100)`
+
 4. 可选参数的选项：`option('-w, --width [width]')`
+
 5. 可否定的布尔类型选项：`option('--no-cheese', 'no cheese')`
+
 6. 必输入的选项：`requiredOption('-w, --width <width>')`
+
 7. 可变选项：`option('-n, --number <value...>')`
 
 ### 3. action
@@ -970,6 +1300,8 @@
       // 必须使用 parse 函数解析我们输入的命令
       program.parse(process.argv);
    ```
+4. 如果设置了子命令，那么一定要使用 action 或者单独的可执行文件来响应命令，进行逻辑处理。
+
 ### 4. description
 
 1. `description` 方法接收一个字符串用来简要描述这个命令的作用。一般附在 command 方法后面。
@@ -1043,12 +1375,9 @@
    - 第一个参数是监听的命令或者选项。
    - 第二个参数是回调函数，当指定的命令或者选项被输入时，就会执行回调函数。
 
-3. 示例：
+3. 示例 - 监听选项事件：
    ```js
-      program
-          .command('set <type>')
-          .description('set pizza size');
-   
+      
       program
           .option('-d, --debug', 'output extra debugging')
           .option('-s, --small', 'small pizza size')
@@ -1063,41 +1392,383 @@
                console.log('small option event was emitted', this.opts());
       })
       
+      
+   ```
+   1. 终端输入：`pizza -d`，`option:debug` 被触发，终端输出：
+      ```
+         debug option event was emitted { debug: true }
+      ```
+      
+   2. 终端输入：`pizza -s`，`option:small` 被触发，终端输出：
+      ```
+         small option event was emitted { small: true }
+         Usage: pizza-option [options] [command]
+
+         Options:
+         -d, --debug     output extra debugging
+         -s, --small     small pizza size
+         -h, --help      display help for command
+
+         Commands:
+         set [type]      set pizza size
+         help [command]  display help for command
+      ```
+4. 示例 - 监听子命令：
+   ```js
+      program
+          .command('set <type>')
+          .description('set pizza size');
       program
           .on('command:set', function() {
               console.log('command set event was emitted', this.args);
         
-    })
+      });
+      
    ```
-   1. 终端输入：`pizza -d`，终端输出：  
-      `debug option event was emitted { debug: true }`
-   2. 终端输入：`pizza -s`，终端输出：  
-       `small option event was emitted { small: true }`
-   3. 终端输入：`pizza set big`，终端输出：
-      `command set event was emitted [ 'set', 'big' ]`
+   1. 终端输入：`pizza set big`，终端输出：
+   `command set event was emitted [ 'set', 'big' ]`
 
-4. 根据文档的示例，`on` 方法监听的选项或者子命令，不能直接写相应的名称，而是要加入前缀，如果是选项，就使用 `option:optionName` 的形式，子命令则是 `command:cammandName` 的形式。可以看一看 `on` 方法实现的源码来探究监听的事件名称。
+5. 如果我们同时定义了子命令（command）和选项（option），即 option 与 command 是链式调用的，如下所示：
+   ```js
+      program
+          .command('set <type>')
+          .description('set pizza size')
+          .option('-d, --debug <d>', 'output extra debugging')
+          .option('-s, --small <s>', 'small pizza size')
+   
+      program
+          .on('option:debug', function() {
+              console.log('debug option event was emitted', this.opts());
+          })
 
-5. 目前有一个小问题，就是只要输入 `pizza` 开头额命令，终端也会输出帮助内容。这个需要解决一下。
+      program
+          .on('option:small', function() {
+               console.log('small option event was emitted', this.opts());
+      });
+   
+      program
+          .on('command:set', function() {
+              console.log('command set event was emitted', this.args);
+        
+      });
+   ```
+   这种情况下，我们不输入子命令，只输入选项，会报错。不会触发选项事件。如输入命令：`pizza -d`，终端提示如下：
+   ![img.png](img/pizza-no-command.png)
+   也就是说，选项和命令是绑定在一起的，可以单独使用子命令，不能单独使用选项。使用的话，选项必须跟在子命令后面。如输入命令：`pizza set big -d debugger`，终端输出如下：
+   ![img.png](img/pizza-set-debug.png)
+
+6. 如果我们同时定义了子命令（command）和选项（option），但是是分开定义的，如下所示：
+   ```js
+      program
+          .command('set <type>')
+          .description('set pizza size')
+      program
+          .option('-d, --debug <d>', 'output extra debugging')
+          .option('-s, --small <s>', 'small pizza size')
+   
+      program
+          .on('option:debug', function() {
+              console.log('debug option event was emitted', this.opts());
+          })
+
+      program
+          .on('option:small', function() {
+               console.log('small option event was emitted', this.opts());
+      });
+   
+      program
+          .on('command:set', function() {
+              console.log('command set event was emitted', this.args);
+        
+      });
+   ```
+   这种情况下，我们可以单独使用选项，但是不能传入选项参数，因为这个参数会被解析为子命令，从而报错，选项事件还是会被触发。例如我们输入得命令是：`pizza -d debugger`，终端输出如下：
+   ![img.png](img/pizza-d-debugger-error.png)
+   如果只输入选项，不输入选项参数，那么不会报错，能够触发选项事件，但是也会输出选项得帮助内容。例如我们输入命令：`pizza -s`，终端输出如下：
+   ![img.png](img/pizza-small-help.png)
+   单独使用子命令，不使用选项，只触发子命令事件。例如我们输入命令：`pizza set big`，终端输出如下：
+   ![img.png](img/pizza-set-big.png)
+   使用子命令和选项，那么会同时触发选项事件和子命令事件。例如我们输入命令：`pizza set big -s small -d debugger`，终端输出如下：
+   ![img.png](img/pizza-set-big-d-s.png)
+
+7. 根据文档的示例，`on` 方法监听的选项或者子命令，不能直接写相应的名称，而是要加入前缀，如果是选项，就使用 `option:optionName` 的形式，子命令则是 `command:cammandName` 的形式。`on` 方法实现的源码也是使用这种形式来触发方法。
+
+8. **注意**：`on` 方法使用的情况比较复杂，尤其是子命令和选项一起定义的时候，这种情况下，我们还是使用 `action` 方法或者独立得可执行文件来处理子命令参数和选项参数。
 
 ### 7. version
 
 1. `version` 方法是 commander 提供的一个输出版本号的方法，接收一个字符串作为参数，这个字符串就是版本信息。命令的选项是 `-V` 或者是 `--version`。
 
-### 8. parse
+2. 示例如下：
+   ```js
+      program.version('1.0.0');
+   ```
+3. 终端输入命令：`pizza -V`，则输出为：`1.0.0`。
+
+### 8. parse 和 parseAsync
 
 1. `parse` 方法接收的第一个参数是等待解析的字符串数组。那么我们可以传入 `process.argv` 作为参数。这样就可以解析我们的命令。
 
+2. parse 方法用来设置选项，在子命令定义后负责调用。
+
+3. 在定义完子命令和选项后，我们必须调用 parse 方法，并传入 `process.argv`，这样才能解析我们在终端传入的内容。
+
+4. 如果我们传入 action 的回调函数是一个异步函数，那么我们必须使用 parseAsync 方法去解析 `process.argv`。parseAsync 方法返回一个 Promise，因此可以使用 `async` / `await` 语法。示例如下：
+   ```js
+      async function run() { /* code goes here */ }
+
+      async function main() {
+          program
+              .command('run')
+              .action(run);
+          await program.parseAsync(process.argv);
+      }
+   ```
+5. parseAsync 和 parse 的用法和作用一样。只不过一个用于异步情况，一个用于同步情况。
+
 ### 9. 书写命令说明（`-h` \ `--help`）
 
-## 8. chalk
+1. 一般情况下，帮助信息是 Commander 根据我们已经定义的子命令和选项信息自动生成的。默认的帮助选项是：`-h`，`--help`。
 
-1. chalk 这个包可以给终端的文字添加样式，使得我们在终端输出的信息更加明显，更加具有提示效果。
+2. 如果我们定义了子命令的话，Commander 会默认添加一个 `help` 命令。`help` 命令可以单独使用，也可以单独和其他子命令一起使用以展示更多的关于这个子命令的信息。
 
-2. 安装 chalk：`npm install chalk`
+3. 示例如下：
+   ```js
+      program
+          .command('set <type>')
+          .description('set pizza size')
+   ```
+   1. 以选项的形式使用：`pizza set --help`，输出如下：
+      ```
+         Usage: pizza-option set [options] <type>
 
-3. chalk 官方文档：[官方文档](https://github.com/chalk/chalk#readme)
+         set pizza size
+
+         Options:
+         -h, --help  display help for command
+
+      ```
+   2. 以命令的形式使用：`pizza help set`，输出如下：
+      ```
+         Usage: pizza-option set [options] <type>
+
+         set pizza size
+
+         Options:
+         -h, --help  display help for command
+
+      ```
+4. 这两种形式，使用哪种形式都可以。
+
+#### 1. 自定义帮助内容
+
+1. 我们可以在内建的帮助信息的基础上，自定义一些额外的内容以展示更加丰富的命令使用说明。
+
+2. 使用 addHelpText 方法来添加自定义帮助信息。
+
+3. 参数说明：
+   - 第一个参数是一个位置参数，表示我们的自定义信息的插入位置。一共有四个可选的值：
+     - `beforeAll`：将额外的信息添加到全局的 banner 或者 header
+     - `before`：将额外的信息添加到内建帮助信息的前面
+     - `after`：将额外的信息添加到内建帮助信息的末尾
+     - `afterAll`：将额外的信息添加到全局的 footer  
+     `beforeAll` 和 `afterAll` 可以应用在所有的命令及其子命令上。  
+       `beforeAll` 和 `before` 、`afterAll` 和 `after` 的区别见下面的示例代码。
+   - 第二个参数是内容，可以是一个字符串，也可是一个返回字符串的函数。如果是函数，这个函数接收一个对象，这个对象包含两个属性：
+     - `error`：布尔值，是否这个信息在发生错误之后展示
+     - `command`：展示帮助信息的命令
+
+4. 代码示例：
+   ```js
+      program
+          .command('set <type>')
+          .description('set pizza size');
+      program
+         .option('-f, --foo', 'enable some foo');
+   ```
+5. 位置参数为 `after`：
+   ```js
+      const content = `
+
+          for detail usage of one command:
+               $ pizza <command> --help
+      `
+
+      program.addHelpText('after', content);
+   ```
+   输入命令：`pizza --help`，输出如下：
+   ![img.png](img/pizza-help-custom-text-after.png)
+
+6. 位置参数为 `before`：
+   ```js
+      const content = `
+
+          for detail usage of one command:
+               $ pizza <command> --help
+      `
+
+      program.addHelpText('before', content);
+   ```
+   输入命令：`pizza --help`，输出如下：
+   ![img.png](img/pizza-help-custom-text-before.png)
+
+7. 位置参数为 `beforeAll`：
+   ```js
+      const content = `
+
+          for detail usage of one command:
+               $ pizza <command> --help
+      `
+
+      program.addHelpText('beforeAll', content);
+   ```
+   1. 输入 `pizza --help`，输出如下：
+      ![img.png](img/pizza-help-before-all-1.png)
+      和 `before` 没有什么区别。
+   2. 输入 `pizza set --help`，输出如下：
+      ![img.png](img/pizza-help-set-beforeAll.png)
+      当我们对子命令使用 `--help` 选项的时候，我们插入的内容依旧在内建帮助信息的最面。这就是 `beforeAll` 的作用，就是只要使用 `--help`、`-h` 或者 `help` 命令的时候，就可以在帮助信息中展示我们的自定义内容。而 `before` 只能在 `pizza -h` 或者 `pizza --help` 中展示自定义信息。
+8. 位置参数为 `afterAll` 的情况和 `beforeAll` 类似，只不过自定义信息的位置在内建的帮助信息的下面。这里就不展示 `afterAll` 的用法了。
+
+
+#### 2. 在发生错误之后展示帮助信息
+
+1. 默认情况下，命令出错时，只展示一条简短的错误信息。我们可以通过调用 showHelpAfterError 方法展示完整的帮助信息或者自定义的帮助信息。
+
+2. showHelpAfterError 方法接收一个字符串作为参数，这个字符串是命令错误时展示的信息。
+   
+3. showHelpAfterError 方法使用示例：
+   ```js
+      program.showHelpAfterError('(add --help for additional information)');
+   ```
+4. 在终端输入命令：`pizza unknown`，终端输出：
+   ![img.png](img/pizza-unknow-help.png)
+
+5. 对于未知的命令和选项，我们可以展示一个建议信息。这个功能可以通过 showSuggestionAfterError 方法实现。
+
+6. showSuggestionAfterError 方法的使用示例：
+   ```js
+      program.showSuggestionAfterError();
+   ```
+7. 在终端输入命令：`pizza --hepl`，终端输出：
+   ![img.png](img/pizza-help-suggestion-error.png)
+
+### 10. 总结
+
+1. 使用 command 定义一个子命令。定义命令的形式是：`command <required>`。或者 `command [optional]`。`<required>` 表示这个命令参数必传，`[optional]` 表示这个命令参数可选。第一个参数用来定义子命令。
+
+2. command 的第二参数用于定义对子命令的描述。一旦定义了这个描述信息，对于子命令的处理就必须使用指定名称的可执行文件。指定名称的格式是：`program-command`，其中，`program` 指的是`package.json` 中的命令名（Executable）所指向的文件名，`command` 指定是子命令名。
+
+3. command 的第三个参数用于自定义可执行文件的名称。形式是：`{executableFile: fileName}`。
+
+4. option 方法用于定义选项。第一个参数是选项名，有两种形式：长格式（以 `--` 开头）和短格式（以 `-` 开头）。一般情况下，长格式和短格式一起定义。还可以给选项定义是否传入参数，尖括号（`<>`）包围的是必传参数，方括号（`[]`）包围的是可选参数。举例：
+   - `-w, --width <width>`
+   - `-h, --height`
+   - `-s, --size [size]`
+
+5. option 的第二个参数用于描述这个选项的作用。
+
+6. option 的第三个用于给选项设置默认值，一般用于选项参数必传的情况。
+
+7. 在 option 定义了选项，如果没有定义选项参数，那么在命令中使用这个选项，这个选项在 option 对象中对应的值就是布尔值。
+
+8. 通过 option.opts 方法获得 option 对象。key 是定义的选项（有长格式的使用长格式，长格式由多个单词组成，使用小驼峰命名），value 是传入的选项参数。
+
+9. action 方法用于执行对子命令的处理。action 方法接收一个回调，这个回调内部是对命令的一个处理逻辑。当指定命令被输入，Commander 就会执行 action 中定义的回调函数。
+
+10. 使用 action 时， command 不能定义第二个、第三个参数。
+
+11. action 方法接收的回调函数接收的参数和 action 的调用形式有关：
+    - 如果是：`command(...).argument(...).argument(...).action(()=>{})` 这种形式，那么回调函数接收的参数，就是 argument 定义的子命令参数。调用命令时，传入的命令参数救火传入回调函数组。
+    - 如果是：`command(...).option(...).option(...).action(()=>{})` 这种形式，那么回调函数接收的参数，第一个时子命令参数，第二个是 option 对象，第三个是 command 对象。
+
+12. `option.args` 获得子命令参数。
+
+13. `--help` 和 `-h`，`-V` 和 `--version` 是 Commander 自带的选项，无需我们定义。
+
+14. version 方法用于定义版本信息，和 `-V` 和 `--version` 配合使用。
+
+15. addHelpText 反方法用于自定义帮助内容，
+
+16. showSuggestionAfterError 方法用于在命令出错时展示提示信息。
+
+17. showHelpAfterError 方法用于命令出错时展示帮助信息。
+
+18. parse 方法用来解析 process.argv，即我们在命令行中输入的内容。
+
+19. description 方法用来描述子命令内容，一般跟在 command 方法后面。
+
+20. 如果 option 方法跟在某个 command 方法后面，那么这些 option 是和这个子命令一起使用的。
+
+21. 如果 option 方法单独定义，那么可以单独使用。
+
 
 ## 9. inquirer
 
 1. inquirer 用于实现和命令行进行交互。
+
+2. 安装：`npm install inquirer`
+
+3. inquirer 官方文档：[官方文档](https://github.com/SBoudrias/Inquirer.js#readme)
+
+4. 基本使用：
+   ```js
+       const inquirer = require('inquirer');
+       inquirer
+            .prompt([
+                 /* Pass your questions in here */
+            ])
+            .then((answers) => {
+                // Use user feedback for... whatever!!
+            })
+             .catch((error) => {
+                if (error.isTtyError) {
+                    // Prompt couldn't be rendered in the current environment
+                } else {
+                    // Something else went wrong
+                }
+            });
+   ```
+
+## 10. shelljs
+
+1. ShellJS 是一个基于 Node.js API 的、可移植（Windows/Linux/macOS）的 Unix shell命令实现。我们可以使用 ShellJS 消除 shell 脚本对 Unix 的依赖性，同时仍然保留其熟悉且强大的命令。可以全局安装 ShellJS，这样就可以在项目之外运行 ShellJS - 告别那些粗糙的Bash脚本吧！
+
+2. 如果我们跨平台使用 UNIX 命令，可以使用一个新的 ShellJS 项目：`shelljs/shx`，一个将 ShellJS 暴露到命令行的工具，也就是能在命令行使用 UNIX 命令。举例如下：
+   ```shell
+      $ shx mkdir -p foo
+      $ shx touch foo/bar.txt
+      $ shx rm -rf foo
+   ```
+3. ShellJS 官方文档：[ShellJS](https://github.com/shelljs/shelljs)
+
+4. 安装：`$ npm install [-g] shelljs`
+
+5. 示例：
+   ```js
+      var shell = require('shelljs');
+
+      if (!shell.which('git')) {
+          shell.echo('Sorry, this script requires git');
+          shell.exit(1);
+      }
+
+      // Copy files to release dir
+      shell.rm('-rf', 'out/Release');
+      shell.cp('-R', 'stuff/', 'out/Release');
+
+      // Replace macros in each .js file
+      shell.cd('lib');
+      shell.ls('*.js').forEach(function (file) {
+      shell.sed('-i', 'BUILD_VERSION', 'v0.1.2', file);
+      shell.sed('-i', /^.*REMOVE_THIS_LINE.*$/, '', file);
+      shell.sed('-i', /.*REPLACE_LINE_WITH_MACRO.*\n/, shell.cat('macro.js'), file);
+      });
+      shell.cd('..');
+
+      // Run external tool synchronously
+      if (shell.exec('git commit -am "Auto-commit"').code !== 0) {
+      shell.echo('Error: Git commit failed');
+      shell.exit(1);
+      }
+   ```
