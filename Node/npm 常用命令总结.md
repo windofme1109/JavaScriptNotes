@@ -378,7 +378,7 @@
       npm link [<@scope>/]<pkg>[@<version>]
       alias: npm ln
    ```
-4. 比如说，我们在本地开发了一个模块，想要在其他项目中引用一下，进行测试。一种可行的办法是直接上传到 npm 的服务器上，然后使用 npm install 进行安装。但是这种方法需要不断地修改、打包、上传、安装，比较麻烦，因此不推荐使用这种方法。而使用 `npm link` 就可以实现这个目的。
+4. 比如说，我们在本地开发了一个模块，想要在其他项目中引用一下，进行测试。一种可行的办法是直接上传到 npm 的服务器上，然后使用 `npm install` 进行安装。但是这种方法需要不断地修改、打包、上传、安装，比较麻烦，因此不推荐使用这种方法。而使用 `npm link` 就可以实现这个目的。
 
 5. 假设我们现在手里有两个项目，一个是 `npm-link-demo`，是我们开发的 npm 模块，另外一个是 `npm-link-example`，需要引用 `npm-link-demo` 这个模块。
 
@@ -394,9 +394,9 @@
       // output
       C:\Users\Administrator\AppData\Roaming\npm
    ```
-8. 如果项目中的 package.json 中存在 bin 字段，那么也会将 `bin` 指定的执行文件所在的目录链接到 `{prefix}/bin/{name}`。
+8. 如果项目中的 `package.json` 中存在 bin 字段，那么也会将 `bin` 指定的执行文件所在的目录链接到 `{prefix}/bin/{name}`。
 
-9. 由于我使用的是 windows 系统，那么 实际的路径是：`{prefix}/node_modules/<package>`。实际观察，会发现在 `{prefix}/lib/node_modules/<package>` 路径下的 `node-link-demo` 是一个快捷方式，如下图所示：
+9. 由于我使用的是 windows 系统，那么实际的路径是：`{prefix}/node_modules/<package>`。实际观察，会发现在 `{prefix}/node_modules/<package>` 路径下的 `node-link-demo` 是一个快捷方式，如下图所示：
    ![img.png](img/npm-link-demo-2.png)
 
 10. 然后，进入 `npm-link-example` 项目，执行 `npm link npm-link-demo`，命令如下：
@@ -407,16 +407,18 @@
 11. `npm-link-demo` 会被链接到 `npm-link-example/node_modules` 下面，同样也是快捷方式：
      ![img.png](img/npm-link-demo-2.png)
 
-12. 这样我们就可以像使用 npm install 安装的第三方包一样使用 npm-link-demo 这个模块了。
+12. **注意**：`node_modules` 中引入的模块的名字并不是项目的名字，而是项目中 `package.json` 中 `name` 字段指定的包的名字。
 
-13. 我们在 npm-link-demo 是这样写的：
+13. 这样我们就可以像使用 npm install 安装的第三方包一样使用 `npm-link-demo` 这个模块了。
+
+14. 我们在 `npm-link-demo` 是这样写的：
     ```js
        // index.js
        module.exports = (x, y) => {
            return x + y;
        }
     ```
-14. 在 npm-link-example 中引入 npm-link-demo，如下所示：
+15. 在 `npm-link-example` 中引入 `npm-link-demo`，如下所示：
     ```js
        const add = require('npm-link-demo');
        console.log(add(1, 3));
@@ -424,7 +426,40 @@
    输出如下：
    ![img_1.png](img/npm-link-demo-output.png)
    
+16. 我们现在对 `npm-link-demo` 中的内容进行修改：
+    ```js
+        module.exports.add = (x, y) => {
+            return x + y;
+       }
 
+       module.exports.multiply = (x, y) => {
+            return x * y;
+       }
+    ```
+17. 在 `npm-link-example` 中引用：
+    ```js
+       const {add, multiply} = require('npm-link-demo');
+       console.log(add(1, 3));
+       console.log(multiply(5, 6));
+    ```
+    输出如下：
+    ![img.png](img/npm-link-example.png)
+
+18. 我们无需重新构建 `npm-link-demo`，我们修改的内容就同步到了  `npm-link-example` 的 node_modules 下的对应模块中。这就是 npm link 命令的最大意义。
+
+19. npm link 的使用分为两步：
+    - 在需要进行测试的模块 `module-a` 的根目录下（package.json 所在的目录）执行 npm link，在全局文件夹 `{prefix}/lib/node_modules/<package>` 创建一个符号链接到这个测试模块。
+    - 在需要使用 `module-a` 的项目 `module-b` 的根目录下，执行 `npm link package name`，`package name` 指的是需要引入模块的package.json 中指定的模块名称。`npm link package name` 会创建一个从全局文件夹中安装的 `module-a` 到 `node_modules` 的一个符号链接，即在 `module-b` 的 `node_modules` 中安装 `module-a` 这个模块。这样就能在 `module-b` 中使用 `module-a` 导出的内容了。
+
+20. 我们在开发命令行工具的时候，需要使用 npm link 命令将我们开发的命令链接到 `{prefix}/bin/{name}` 下，这样我们能在全局环境下测试、使用我们的命令。由于我目前使用的是 windows 系统，那么实际的路径是：`{prefix}/{name}`。我们可以做一个验证：
+    - 通过 `npm config get prefix` 拿到的 `prefix` 是：`C:\Users\Administrator\AppData\Roaming\npm`
+    - 在 prefix 指定的路径下，我们就能找到链接到的命令文件，如下所示：
+     ![img.png](img/npm-link-bin.png)
+
+21. npm link 命令几个注意的点：
+    - 项目中的 `package.json` 中存在 `bin` 字段，那么也会将 `bin` 指定的执行文件所在的目录链接到 `{prefix}/bin/{name}`。
+    - `npm link package name` 命令中的 `package name` 指的是需要引入模块的 `package.json` 中指定的模块名称。
+    - `prefix` 是一个路径前缀，我们可以通过 `npm config get prefix` 命令获取到 `prefix` 的值。
 
 ## 10. npm update
 
