@@ -1,3 +1,21 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [Babel 转换 TypeScript](#babel-%E8%BD%AC%E6%8D%A2-typescript)
+  - [1. 参考资料](#1-%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99)
+  - [2. 基本用法](#2-%E5%9F%BA%E6%9C%AC%E7%94%A8%E6%B3%95)
+  - [3. 转换 TSX](#3-%E8%BD%AC%E6%8D%A2-tsx)
+  - [4. `@babel/preset-typescript` 的配置说明](#4-babelpreset-typescript-%E7%9A%84%E9%85%8D%E7%BD%AE%E8%AF%B4%E6%98%8E)
+    - [1.  `isTSX`](#1--istsx)
+    - [2. `jsxPragma`](#2-jsxpragma)
+    - [3.  `allExtensions`](#3--allextensions)
+    - [4.  `allowNamespaces`](#4--allownamespaces)
+    - [5.  `allowDeclareFields`](#5--allowdeclarefields)
+    - [6.  `onlyRemoveTypeImports`](#6--onlyremovetypeimports)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # Babel 转换 TypeScript
 
 ## 1. 参考资料

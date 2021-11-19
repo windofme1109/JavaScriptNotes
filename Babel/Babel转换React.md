@@ -1,3 +1,25 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [Babel 打包 React](#babel-%E6%89%93%E5%8C%85-react)
+  - [1. 参考资料](#1-%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99)
+  - [2. 基本用法](#2-%E5%9F%BA%E6%9C%AC%E7%94%A8%E6%B3%95)
+  - [3. `@babel/preset-react` 的配置项说明](#3-babelpreset-react-%E7%9A%84%E9%85%8D%E7%BD%AE%E9%A1%B9%E8%AF%B4%E6%98%8E)
+    - [1. Both Runtimes](#1-both-runtimes)
+      - [1. runtime](#1-runtime)
+      - [2. development](#2-development)
+      - [3. throwIfNamespace](#3-throwifnamespace)
+    - [2. React Automatic Runtime](#2-react-automatic-runtime)
+      - [1. importSource](#1-importsource)
+    - [3. React Classic Runtime](#3-react-classic-runtime)
+      - [1. pragma](#1-pragma)
+      - [2. pragmaFrag](#2-pragmafrag)
+      - [3. useBuiltIns](#3-usebuiltins)
+      - [4. useSpread](#4-usespread)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # Babel 打包 React
 
 ## 1. 参考资料

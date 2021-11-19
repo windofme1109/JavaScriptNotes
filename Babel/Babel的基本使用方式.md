@@ -1,3 +1,28 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [Babel 的基本使用方式](#babel-%E7%9A%84%E5%9F%BA%E6%9C%AC%E4%BD%BF%E7%94%A8%E6%96%B9%E5%BC%8F)
+  - [1. 参考资料](#1-%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99)
+  - [2. Babel 的基本说明](#2-babel-%E7%9A%84%E5%9F%BA%E6%9C%AC%E8%AF%B4%E6%98%8E)
+  - [3. Babel 的基本使用](#3-babel-%E7%9A%84%E5%9F%BA%E6%9C%AC%E4%BD%BF%E7%94%A8)
+    - [1. 安装](#1-%E5%AE%89%E8%A3%85)
+    - [2. 基本编译](#2-%E5%9F%BA%E6%9C%AC%E7%BC%96%E8%AF%91)
+  - [4. `@babel/preset-env` 的说明](#4-babelpreset-env-%E7%9A%84%E8%AF%B4%E6%98%8E)
+    - [1. targets](#1-targets)
+    - [2. modules](#2-modules)
+    - [3. corejs](#3-corejs)
+    - [4. useBuiltIns](#4-usebuiltins)
+  - [5. `@babel/polyfill` 的说明](#5-babelpolyfill-%E7%9A%84%E8%AF%B4%E6%98%8E)
+    - [1. useBuiltIns（presets-env 的配置项）](#1-usebuiltinspresets-env-%E7%9A%84%E9%85%8D%E7%BD%AE%E9%A1%B9)
+      - [1. false](#1-false)
+      - [2. entry](#2-entry)
+      - [3. usage](#3-usage)
+    - [2. corejs（presets-env 的配置项）](#2-corejspresets-env-%E7%9A%84%E9%85%8D%E7%BD%AE%E9%A1%B9)
+    - [1. corejs （@babel/plugin-transform-runtime 的配置项）](#1-corejs-babelplugin-transform-runtime-%E7%9A%84%E9%85%8D%E7%BD%AE%E9%A1%B9)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # Babel 的基本使用方式
 
 ## 1. 参考资料
