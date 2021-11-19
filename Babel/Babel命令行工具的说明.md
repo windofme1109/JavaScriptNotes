@@ -8,8 +8,14 @@
   - [3. Babel 命令行工具的使用](#3-babel-%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%B7%A5%E5%85%B7%E7%9A%84%E4%BD%BF%E7%94%A8)
     - [1. 编译单个文件](#1-%E7%BC%96%E8%AF%91%E5%8D%95%E4%B8%AA%E6%96%87%E4%BB%B6)
       - [1. `npx babel filename`](#1-npx-babel-filename)
+      - [2. `npx babel sourcefile --out-file targetfile`](#2-npx-babel-sourcefile---out-file-targetfile)
+      - [3. `npx babel sourcefile --watch --out-file targetfile`](#3-npx-babel-sourcefile---watch---out-file-targetfile)
+      - [4. 附带着 source map 一起编译](#4-%E9%99%84%E5%B8%A6%E7%9D%80-source-map-%E4%B8%80%E8%B5%B7%E7%BC%96%E8%AF%91)
     - [2. 编译某个文件夹](#2-%E7%BC%96%E8%AF%91%E6%9F%90%E4%B8%AA%E6%96%87%E4%BB%B6%E5%A4%B9)
+      - [1. `npx babel src --out-dir lib`](#1-npx-babel-src---out-dir-lib)
+      - [2. `npx babel src --out-file script-compiled.js`](#2-npx-babel-src---out-file-script-compiledjs)
     - [3. 忽略某些文件](#3-%E5%BF%BD%E7%95%A5%E6%9F%90%E4%BA%9B%E6%96%87%E4%BB%B6)
+      - [1. `npx babel src --out-dir lib --ignore "src/**/*.spec.js","src/**/*.test.js"`](#1-npx-babel-src---out-dir-lib---ignore-srcspecjssrctestjs)
   - [4. 编译命令总结](#4-%E7%BC%96%E8%AF%91%E5%91%BD%E4%BB%A4%E6%80%BB%E7%BB%93)
     - [1. 输出类命令](#1-%E8%BE%93%E5%87%BA%E7%B1%BB%E5%91%BD%E4%BB%A4)
     - [2. 插件和预设类命令](#2-%E6%8F%92%E4%BB%B6%E5%92%8C%E9%A2%84%E8%AE%BE%E7%B1%BB%E5%91%BD%E4%BB%A4)
@@ -196,13 +202,99 @@
 
        //# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIi4uL3NyYy9pbmRleC5qcyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiOzttREFJVSxHOzs7Ozs7Ozs7QUFKVixJQUFNLEVBQUUsR0FBRyxJQUFJLE9BQUosQ0FBWSxVQUFDLE9BQUQsRUFBVSxNQUFWLEVBQXFCLENBQUUsQ0FBbkMsQ0FBWDs7QUFFQSxJQUFNLEdBQUcsR0FBRyxTQUFOLEdBQU0sQ0FBQyxDQUFELEVBQUksQ0FBSjtBQUFBLFNBQVUsQ0FBQyxHQUFHLENBQWQ7QUFBQSxDQUFaOztBQUVBLFNBQVUsR0FBVixDQUFjLENBQWQsRUFBaUIsQ0FBakI7QUFBQTtBQUFBO0FBQUE7QUFBQTtBQUFBO0FBQUE7QUFDYyxpQkFBTSxDQUFDLEdBQUcsQ0FBVjs7QUFEZDtBQUNVLFVBQUEsQ0FEVjtBQUFBLDJDQUVXLENBRlg7O0FBQUE7QUFBQTtBQUFBO0FBQUE7QUFBQTtBQUFBO0FBQUE7O0FBTUEsSUFBTSxHQUFHLEdBQUcsSUFBSSxHQUFKLEVBQVo7QUFFQSxJQUFNLEdBQUcsR0FBRyxJQUFJLEdBQUosRUFBWiIsImZpbGUiOiJpbmRleC1jb21waWxlZC5qcyIsInNvdXJjZXNDb250ZW50IjpbImNvbnN0IHAxID0gbmV3IFByb21pc2UoKHJlc29sdmUsIHJlamVjdCkgPT4ge30pXHJcblxyXG5jb25zdCBhZGQgPSAoeCwgeSkgPT4geCArIHk7XHJcblxyXG5mdW5jdGlvbiogZ2VuKHgsIHkpIHtcclxuICAgIGNvbnN0IHogPSB5aWVsZCB4ICsgeTtcclxuICAgIHJldHVybiB6O1xyXG5cclxufVxyXG5cclxuY29uc3QgbWFwID0gbmV3IE1hcCgpO1xyXG5cclxuY29uc3Qgc2V0ID0gbmV3IFNldCgpO1xyXG5cclxuIl19
    ```
+
 ### 2. 编译某个文件夹
+
+#### 1. `npx babel src --out-dir lib`
 
 1. 如果我们需要编译整个项目，那么一个文件一个文件的手动编译肯定不可以，因此，我们需要编译整个文件夹，并将编译后的内容输出到一个新的文件夹。
 
-2. 使用 `--out-dir` 或者 `-d`，可以将整个文件夹的内容进行编译，然后将编译后的文件输入操目标文件夹中，目标文件夹的组织结构后源文件夹相同。
+2. 使用 `--out-dir` 或者 `-d` 选项，可以将整个文件夹的内容进行编译，然后将编译后的文件输入操目标文件夹中，目标文件夹的组织结构后源文件夹相同。
+
+3. 我们在 src 目录下增加几个文件夹，新的 src 目录结构如下：
+   ```
+      5-cli
+      |--package.json   
+      |--dist
+      |--src
+         |--index.js
+         |--common
+            |--common.js
+         |--math
+            |--math.js
+         |--utils
+            |--utils.js
+   ```
+4. 在终端输入：`npx babel src --out-dir lib`，将 src 下面的内容输出到 lib 目录下。lib 下的目录结构和 src 下的一样：
+   ![img.png](imgs/babel-out-dir.png)
+
+5. 以 common 下的 common.js 为例，我们看看编译后的内容：
+   ```js
+      // lib/common/common.js
+       import "core-js/modules/es6.array.is-array.js";
+       import "core-js/modules/es6.symbol.js";
+       import "core-js/modules/es6.string.iterator.js";
+       import "core-js/modules/es6.object.to-string.js";
+       import "core-js/modules/es6.array.iterator.js";
+       import "core-js/modules/web.dom.iterable.js";
+       import "core-js/modules/es6.array.from.js";
+       import "core-js/modules/es6.array.slice.js";
+       import "core-js/modules/es6.function.name.js";
+
+       function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
+
+       function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+       function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+       function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter); }
+
+        function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
+
+        function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
+        var curried = function curried(fn, args) {
+              return function () {
+                 var innerArgs = arguments;
+
+                   if (args !== undefined) {
+                        innerArgs = [].concat(_toConsumableArray(args), _toConsumableArray(innerArgs));
+                   }
+
+                   if (innerArgs.length === fn.length) {
+                     return fn.apply(this, innerArgs);
+                   }
+
+                   return curried(fn, innerArgs);
+          };
+      };
+
+      module.exports = {
+          curried: curried
+      };
+   ```
+
+#### 2. `npx babel src --out-file script-compiled.js`
+
+1. 如果我们希望将某个文件夹下的所有文件编译后，输出到一个文件中。那么我们可以使用 `--out-file` 这个选项。将某个文件夹下面的内容编译后输出到一个文件中。
+
+2. 在终端输入：`npx babel src --out-file dist/start-compiled.js`，将 src 下的所有内容输出到 dist 目录下的 start.js 文件中，部分内容如下所示：
+   ![img.png](imgs/babel-out-file.png)
 
 ### 3. 忽略某些文件
+
+#### 1. `npx babel src --out-dir lib --ignore "src/**/*.spec.js","src/**/*.test.js"`
+
+1. 在某些情况下，我们不想编译某些文件，比如说用于自动化测试的文件，那么我们就可以使用 `--ignore` 来忽略指定的文件，表示其不需要进行编译。
+
+2. 在终端输入：`npx babel src --out-dir lib --ignore "src/**/*.spec.js","src/**/*.test.js"`，使用了路径通配符的形式，忽略了 src 目录下的以 `.spec.js` 和 `.test.js` 为结尾的文件。
+   - 源文件夹如下所示：
+     ![img.png](imgs/babel-ignore-src.png)
+   - 编译后输出的目标文件夹如下：
+     ![img.png](imgs/babel-ignore-dist.png)
+   - 我们可以发现，babel 并没有编译 `utils.test.js` 这个文件。
+
+
 
 ## 4. 编译命令总结
 
@@ -211,9 +303,9 @@
 
 1. 输出类命令总结如下
 
-   命名名|作用|示例
+   命名名（选项）|作用|示例
    :---:|:---:|---:
-    --out-file|输出文件名称|npx babel script.js --out-file script-compiled.js
+    --out-file|将某个文件夹下的所有文件或者某个单独的文件输入到某个文件中|npx babel src --out-file script-compiled.js / npx babel index.js --out-file index-compiled.js
    --watch|文件监控|npx babel script.js --watch --out-file script-compiled.js
    --source-maps|生成.js.map文件|npx babel script.js --out-file script-compiled.js --source-maps
    --source-maps inline|在生成的文件中插入source.map注释|	npx babel script.js --out-file script-compiled.js --source-maps inline
