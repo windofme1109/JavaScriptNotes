@@ -63,6 +63,9 @@
 
 ## 3. 浏览器中使用 ES6 模块
 
+
+### 1. 基本使用
+
 1. 通常情况下，我们通过 `script` 标签引入 js 文件，或者是在 `script` 标签内部书写 js 代码。`script` 标签有一个 `type` 属性，默认是 `text/javascript`，因为我们通过 `script` 标签引入或者书写的都是 js 代码，因此可以省略 `type` 类型。
 
 2. 在浏览器中使用原生 ES6 模块，也是通过 `script` 引入 js 模块，但是，要显示声明 `type` 为 `module`，这样浏览器才会把相关的代码当作 ES6 的模块来对待。如下所示：
@@ -102,14 +105,14 @@
    - 在浏览器中加载 `index.html`，注意，加载 `index.html` 必须使用 `http` 协议，不能使用 `file` 协议。如果使用 `file` 协议，加载模块时会因为跨域问题而被浏览器阻止。因此我们需要启动一个 `http` 服务器加载 `index.html`。加载成功后，浏览器输出如下：
      ![](./img/browser-module-output.png)
 
-3. 引入多个模块
-   - 在 `index.html` 的同级目录下，新建一个 `index.js`，内容如下：
+### 2. 引入多个模块
+1. 在 `index.html` 的同级目录下，新建一个 `index.js`，内容如下：
      ```js
         // index.js
         import {circleArea} from './my-modules/myMath.js';
         
      ```
-   - 在 index.html 中引入：
+2. 在 index.html 中引入：
      ```html
         <script type="module" src="./index.js"></script>
         <script type="module">
@@ -118,12 +121,16 @@
             console.log(circleArea(15));
         </script>
      ```
-   - 输出如下：
-     ![](./img/browser-modules-output-2.png)
-   - 我们没有像第二个 `script` 标签那样，在 `script` 中的代码中引入别的模块中导出的内容，而是指定了 `script` 的 `src` 属性的值，通过这种方式引入 `index.js`，在 `index.js` 中，我们不仅引入了 `myMath.js` 中对外暴露的 `circleArea()` 方法，还有一个输出语句：`console.log(circleArea(35));`。浏览器不仅引入了 `circleArea()` 这个方法，还运行了 `index.js` 这个文件。
+3. 输出如下：
+   ![](./img/browser-modules-output-2.png)
 
-4. **注意**：我们导入的模块的作用范围是局部作用域，并不是全局作用域。即我们只能在引入这个模块的单独的脚本文件的范围使用这个模块对外暴露的内容，但是这些对外暴露的内容无法在全局获得。因此，我们只能在导入这些功能的脚本文件中使用他们，我们也无法通过 `Javascript` 的 console 中获取到他们。比如，我们仍然可以在  DevTools 中获取到语法错误，但是可能无法像以前一样使用一些 debug 技术。
-   - 举例如下：
+4. 我们没有像第二个 `script` 标签那样，在 `script` 中的代码中引入别的模块中导出的内容，而是指定了 `script` 的 `src` 属性的值，通过这种方式引入 `index.js`，在 `index.js` 中，我们不仅引入了 `myMath.js` 中对外暴露的 `circleArea()` 方法，还有一个输出语句：`console.log(circleArea(35));`。浏览器不仅引入了 `circleArea()` 这个方法，还运行了 `index.js` 这个文件。
+
+### 3. 作用域问题
+
+1. **注意**：我们导入的模块的作用范围是局部作用域，并不是全局作用域。即我们只能在引入这个模块的单独的脚本文件的范围使用这个模块对外暴露的内容，但是这些对外暴露的内容无法在全局获得。因此，我们只能在导入这些功能的脚本文件中使用他们，我们也无法通过 `Javascript` 的 `console` 中获取到他们。比如，我们仍然可以在  `DevTools` 中获取到语法错误，但是可能无法像以前一样使用一些 debug 技术。
+
+2. 举例如下：
      ```html
         <script type="module">
             import {add} from './index.js';
@@ -133,8 +140,9 @@
             console.log(add(4, 7));
         </script>
      ```
-     在第二个 `script` 脚本中，我们使用在第一个脚本中引入的 `add()` 方法，结果报错：`Uncaught ReferenceError: add is not defined`。
-     说明模块的作用范围是局部作用域，在哪里用就在那里引入。
+3. 在第二个 `script` 脚本中，我们使用在第一个脚本中引入的 `add()` 方法，结果报错：`Uncaught ReferenceError: add is not defined`。
+
+4. 说明模块的作用范围是局部作用域，在哪里用就在那里引入。
 
 5. 下面这种引入模块的方式也不是全局作用域的：
    - index.js 的内容如下：
@@ -156,6 +164,18 @@
    - 结果还是报错：
      ![](./img/browser-modules-error.png)
    - 因此，模块化就没有全局作用域，只有局部作用域，那里需要，就将其在那里引入。
+
+### 4. 一个有关 script 标签需要注意的地方
+
+1. **注意**：如果设置了 `src` 属性，`script` 标签内容将会被忽略。即一个单独的 `<script>` 标签不能同时有 `src` 属性和内部包裹的代码。
+
+2. 举个例子：
+   ```html
+      <script src="./index.js">
+           console.log('hello world');
+      </script>
+   ```
+3. 指定了 src 的同时还在其内部书写了代码，那么浏览器会选择加载 index.js 文件，而忽略 script 内部的代码。即不会执行 `console.log('hello world');`。
 
 ## 4. 浏览器中使用 ES6 模块注意的地方
 
@@ -351,7 +371,6 @@
    ```
    此时重新请求 myMath.js，就能顺利加载模块，不报跨域的错了。
    ![](./img/browser-module-cors-2.png)
-   
 
 ### 6. Mime-Type
 

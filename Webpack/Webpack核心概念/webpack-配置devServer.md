@@ -5,9 +5,12 @@
 - [配置 devServer](#%E9%85%8D%E7%BD%AE-devserver)
   - [1. 使用 `npm run watch` 命令](#1-%E4%BD%BF%E7%94%A8-npm-run-watch-%E5%91%BD%E4%BB%A4)
   - [2. 使用 `webpack-dev-server`](#2-%E4%BD%BF%E7%94%A8-webpack-dev-server)
-  - [3. 使用 devServer 实现前端路由转发](#3-%E4%BD%BF%E7%94%A8-devserver-%E5%AE%9E%E7%8E%B0%E5%89%8D%E7%AB%AF%E8%B7%AF%E7%94%B1%E8%BD%AC%E5%8F%91)
-  - [4. 使用 express 手动实现一个 http 服务](#4-%E4%BD%BF%E7%94%A8-express-%E6%89%8B%E5%8A%A8%E5%AE%9E%E7%8E%B0%E4%B8%80%E4%B8%AA-http-%E6%9C%8D%E5%8A%A1)
-  - [5. webpack v5 的变化](#5-webpack-v5-%E7%9A%84%E5%8F%98%E5%8C%96)
+    - [1. 使用 devServer 实现前端路由转发](#1-%E4%BD%BF%E7%94%A8-devserver-%E5%AE%9E%E7%8E%B0%E5%89%8D%E7%AB%AF%E8%B7%AF%E7%94%B1%E8%BD%AC%E5%8F%91)
+      - [1. 配置前端路由转发（只在本地起作用）](#1-%E9%85%8D%E7%BD%AE%E5%89%8D%E7%AB%AF%E8%B7%AF%E7%94%B1%E8%BD%AC%E5%8F%91%E5%8F%AA%E5%9C%A8%E6%9C%AC%E5%9C%B0%E8%B5%B7%E4%BD%9C%E7%94%A8)
+      - [2. 对根路径进行代理](#2-%E5%AF%B9%E6%A0%B9%E8%B7%AF%E5%BE%84%E8%BF%9B%E8%A1%8C%E4%BB%A3%E7%90%86)
+    - [2. 使用 devServer 实现代理转发（转发到后端服务器）](#2-%E4%BD%BF%E7%94%A8-devserver-%E5%AE%9E%E7%8E%B0%E4%BB%A3%E7%90%86%E8%BD%AC%E5%8F%91%E8%BD%AC%E5%8F%91%E5%88%B0%E5%90%8E%E7%AB%AF%E6%9C%8D%E5%8A%A1%E5%99%A8)
+  - [3. 使用 express 手动实现一个 http 服务](#3-%E4%BD%BF%E7%94%A8-express-%E6%89%8B%E5%8A%A8%E5%AE%9E%E7%8E%B0%E4%B8%80%E4%B8%AA-http-%E6%9C%8D%E5%8A%A1)
+  - [4. webpack v5 的变化](#4-webpack-v5-%E7%9A%84%E5%8F%98%E5%8C%96)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -72,7 +75,7 @@
    - `open`  属性为true，表示服务器第一次启动时，自动打开浏览器。
    - `port` 用来设置端口号，默认是 8080。
    - 
-6. 还可以配置 proxy 字段实现代理转发，create-react-app 配置代理就是通过 devServer 实现的。
+6. 还可以配置 `proxy` 字段实现代理转发，create-react-app 配置代理就是通过 devServer 实现的。
    
 7. 还需要配置 package.json 文件。
    ```json
@@ -86,7 +89,6 @@
 8. 这样，我们可以使用 `npm run start` 命令，启动 webpack-dev-server 服务。
 
 9. 使用 webpack-dev-server 不会生成 dist 目录，将打包后的文件放入了内存之中。这样可以加快打包速度。
-
 
 ### 1. 使用 devServer 实现前端路由转发
 
@@ -162,6 +164,7 @@
 1. devServer 使用了 `http-proxy-middleware` 这个包来实现的代理转发。因此，我们可以使用 `http-proxy-middleware` 中的相关配置项来对 devServer 中的代理进行配置。
 
 2. [http-proxy-middleware - github 主页](https://github.com/chimurai/http-proxy-middleware)
+
 3. [http-proxy-middleware 配置项](https://github.com/chimurai/http-proxy-middleware#options) 
 
 4. 基本的代理转发
@@ -231,25 +234,36 @@
      - 返回 `false`，给这次请求返回一个 `404` 错误。
      - 返回一个 `path`，作为新的代理路径。
 
-8. proxy 常用配置项总结：
-   
-   配置项|说明
-   :---:|:---:
-   target|
-   changeOrigin|
-   headers|
-   secure|
-   context|
-   pathRewrite|
-   bypass|
+8. **注意**：需要代理的路径，如果我们将其配置为一个对象，那么必须具有 target 属性，表示代理的目标 host。如下所示：
+   ```js
+      proxy: {
+          '\api': {
+              target: 'http://localhost:8008',
+              // other config
+     
+          }
+      }
+   ```
 
-##  4. 使用 express 手动实现一个 http 服务
+10. proxy 常用配置项总结：
+   
+    配置项|说明
+    :---:|:---:
+    target|配置代理的目标地址。
+    changeOrigin|在进行代理转发的时候，代理会将原始的请求头带上。设置了 `changeOrigin` 为 `true`，则不会携带原始的请求头，一般情况下，都会设置上这个字段。
+    headers|值为对象。配置代理的请求头，代理会带着这个请求头发送到服务器端。
+    secure|布尔值，配置是否对 https 生效。
+    context|数组，如果我有多个接口，都想代理到 `http://localhost:3000` 下，那么将这多个接口放到一个数组中，并将数组赋给 `context`。
+    pathRewrite|用来改写我们我们接口的一些内容。
+    bypass|对代理做一些精细的控制，值为函数。拦截请求或者响应可以访问 `request`、`response`、`proxyOption`。
+
+## 3. 使用 express 手动实现一个 http 服务
 
 1. 结合 express 手动实现一个服务器。可以实现自动打包的功能。
 
 2. webpack 可以在 Node 环境下使用，因为 webpack 提供了一系列在 Node 环境下使用的 API。参考文档：[Node Api](https://v4.webpack.js.org/api/node/#installation)
 
-## 5. webpack v5 的变化
+## 4. webpack v5 的变化
 
 1. `devServer` 的变化：
    ```javascript
