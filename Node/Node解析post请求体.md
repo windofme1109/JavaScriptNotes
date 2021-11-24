@@ -189,6 +189,42 @@
    ```
 3. 对于 json 数据，我们使用 JSON.parse 方法进行解析。
    ```js
+      function parseBody(req: IncomingMessage, res: ServerResponse) {
+          const result: Array<Buffer> = [];
+          const isFormData = mimeType(req) === 'application/www-x-form-urlencoded';
+          const isJson = mimeType(req) === 'application/json';
+          if (hasBody(req)) {
+              req.on('data', function(chunk) {
+                  result.push(chunk);
+              });
 
+              req.on('end', function() {
+                  const postBodyData = Buffer.concat(result).toString();
+                  let bodyData = {};
+                  if (isFormData) {
+                      bodyData = querystring.parse(postBodyData);
+                  } else if (isJson) {
+                      bodyData = JSON.parse(postBodyData)
+                  }
+
+              });
+          }
+
+
+      }
    ```
+
 ### 3. 上传文件 —— `multipart/form-data`
+
+1. 如果在页面中使用表单实现文件的上传，页面的代码如下所示：
+   ```html
+      <form action="/upload" method="post" enctype="multipart/form-data">
+           <input type="file" name="avatar" id="avatar">
+           <input type="submit" />
+      </form>
+   ```
+2. 默认的上传文件使用的请求方法是 post，而请求头中的 `Content-Type` 字段值为 `multipart/form-data`，在 `Content-Type` 中可能还附带如下所示的内容分隔符：
+   ```
+      Content-Type: multipart/form-data; boundary=----WebKitFormBoundary4Hsing01Izo2AHqv
+   ```
+3. 上传文件的时候是要区分文本文件和二进制文件，文本文件是要使用 utf-8 编码，文本文件包括：HTML、CSS、JavaScript 等。而二进制文件是要使用 binary 编码，包括：图片、视频、音频等。
