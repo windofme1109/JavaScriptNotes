@@ -52,6 +52,12 @@
   - [7. http长连接](#7-http%E9%95%BF%E8%BF%9E%E6%8E%A5)
   - [8. 数据协商](#8-%E6%95%B0%E6%8D%AE%E5%8D%8F%E5%95%86)
   - [9. content-type 详解](#9-content-type-%E8%AF%A6%E8%A7%A3)
+    - [1. 基本说明](#1-%E5%9F%BA%E6%9C%AC%E8%AF%B4%E6%98%8E)
+    - [2. 常见的 content-type](#2-%E5%B8%B8%E8%A7%81%E7%9A%84-content-type)
+    - [3. 与 post 请求相关的 content-type](#3-%E4%B8%8E-post-%E8%AF%B7%E6%B1%82%E7%9B%B8%E5%85%B3%E7%9A%84-content-type)
+      - [1.  表单提交的 content-type](#1--%E8%A1%A8%E5%8D%95%E6%8F%90%E4%BA%A4%E7%9A%84-content-type)
+      - [2. 上传文件的 content-type](#2-%E4%B8%8A%E4%BC%A0%E6%96%87%E4%BB%B6%E7%9A%84-content-type)
+      - [3. 访问接口常用的 content-type](#3-%E8%AE%BF%E9%97%AE%E6%8E%A5%E5%8F%A3%E5%B8%B8%E7%94%A8%E7%9A%84-content-type)
   - [10. Redirect（重定向）](#10-redirect%E9%87%8D%E5%AE%9A%E5%90%91)
     - [1. 301](#1-301)
     - [2. 302](#2-302)
@@ -598,26 +604,82 @@ Etag由服务器发送给浏览器。发起请求时，浏览器将Etag的值赋
 
 ## 9. content-type 详解
 
-1. content-type 指 http/https 发送信息至服务器时的内容编码类型，content-type 用于表明发送数据流的类型，服务器根据编码类型使用特定的解析方式，获取数据流中的数据。
+### 1. 基本说明
 
-2. 常见的 content-type
-`text/html`, `text/plain`,` text/css`,` text/javascript`, `image/jpeg`, `image/png`, `image/gif`,
-`application/x-www-form-urlencoded`, `multipart/form-data`, `application/json`, `application/xml`
-   - 其中，`text/html`, `text/plain`,` text/css`,` text/javascript`, `image/jpeg`, `image/png`, `image/gif` 是常见的页面资源类型。
-   - `application/x-www-form-urlencoded`, `multipart/form-data`, `application/json`, `application/xml` 是常见的 ajax 请求的类型。常用设置表单提交或者上传文件的资源类型。
+1. 在 http 协议消息头中，使用 `content-type` 来表示请求和响应中的媒体类型信息。它用来告诉服务端如何处理请求的数据，以及告诉客户端（一般是浏览器）如何解析响应的数据，比如显示图片，解析并展示 html 等。
 
-3. 表单提交的 content-type
-  - `application/x-www-form-urlencoded`  
-  设置了这个值，表示将表单提交的数据格式化，形式是 `key=value` 的形式。多个使用 `&` 相连。
-  - `multipart/form-data` 
-  代表我们这个请求有多个部分。因为我们有时候上传的是文件，文件不能使用字符串的形式，而是使用二进制的形式。因此，需要将文件分块。  
-  在请求头中，Content-Type 的值在 `multipart/form-data` 后面，还会添加 boundary，值是一个字符串，这个字符的含义是用来分隔文件的。服务器接收到请求后，根据 boundary 的值，找打分块的边界，从而将文件拼接起来，形成一个完整的文件。
+2. `content-type` 的格式：
+`content-type：type/subtype ;parameter`
 
-4. post 请求的 content-type 可以设置 `application/x-www-form-urlencoded`, `multipart/form-data`, `application/json`, `application/xml`。其中 `application/json` 用于向接口传递数据。而 `multipart/form-data` 常用于上传文件。
+3. `content-type` 的格式的说明：
+   - `type`：主类型，任意的字符串，如 `text`，如果是 `*` 号代表所有。
+   - `subtype`：子类型，任意的字符串，如 `html`，如果是`*`号代表所有，用 `/` 与主类型隔开。
+   - `parameter`：可选参数，如 `charset`，`boundary`等 。
+
+4. `content-type` 举例：
+   - `content-type: text/html;`
+   - `content-type: application/json;charset=utf-8;`
 
 5. 参考资料
-   - [Content-Type 常用对照表](https://tool.oschina.net/commons?type=5%EF%BC%89)
-   - [HTTP协议：Content-Type](https://www.cnblogs.com/wangyuxing/p/10037470.html)
+    - [Content-Type 常用对照表](https://tool.oschina.net/commons?type=5%EF%BC%89)
+    - [HTTP协议：Content-Type](https://www.cnblogs.com/wangyuxing/p/10037470.html)
+    - [Content-Type 类型浅析汇总](https://blog.csdn.net/qappleh/article/details/89015739)
+
+### 2. 常见的 content-type
+
+1. HTML 文档标记：`text/html` 
+
+2. 文本类型标记：`text/plain`
+
+3. css 样式文件标记：`text/css`
+
+4. JavaScript 文件标记：`text/javascript`、`application/javascript` 
+
+5. jpege 图片标记：`image/jpeg`,
+
+6. gif 图片标记： `image/gif`
+
+7. png 图片标记：`image/png`
+
+8. 表单提交：`application/x-www-form-urlencoded`
+
+9. 上传文件：`multipart/form-data`
+
+10. json 数据：`application/json`
+
+11. xml 文件标识：`application/xml`
+
+12. 其中，`text/html`, `text/plain`,` text/css`,` text/javascript`, `image/jpeg`, `image/png`, `image/gif` 是常见的页面资源类型。
+
+13. `application/x-www-form-urlencoded`, `multipart/form-data`, `application/json`, `application/xml` 是常见的 ajax 请求的类型。常用设置表单提交或者上传文件的资源类型。
+
+### 3. 与 post 请求相关的 content-type
+
+#### 1.  表单提交的 content-type
+
+1. 表单提交的 `content-type` 是 `application/x-www-form-urlencoded`  
+
+2. 设置了这个值，表示将表单提交的数据格式化，形式是 `key=value` 的形式。多个使用 `&` 相连。例如：`name=jack&age=25`，与查询字符串的格式相同。将这些内容放到请求实体里面，随着请求一起发送到服务端。
+
+3. **注意**：如果是中文或特殊字符如`/`、`,`、`:` 等会自动进行 uri 转码。不支持文件，一般用于表单提交。
+
+#### 2. 上传文件的 content-type
+
+1. 上传文件的 `content-type` 是 `multipart/form-data` 
+
+2. 代表我们这个请求有多个部分。因为我们有时候上传的是文件，文件不能使用字符串的形式，而是使用二进制的形式。因此，需要将文件分块。  
+
+3. 在请求头中，`content-type` 的值在 `multipart/form-data` 后面，还会添加 `boundary`，值是一个字符串，这个字符的含义是用来分隔文件的。服务器接收到请求后，根据 `boundary` 的值，找打分块的边界，从而将文件拼接起来，形成一个完整的文件。
+
+4. 上传文件的过程中，首先生成了一个 `boundary` 用于分割不同的字段，在请求实体里每个参数以 `------boundary` 开始，然后是附加信息和参数名，然后是空行，最后是参数内容。多个参数将会有多个 `boundary` 块。如果参数是文件会有特别的文件域。最后以 `------boundary–` 为结束标识。
+
+5. 一个上传文件的请求报文如下图所示：
+
+#### 3. 访问接口常用的 content-type
+
+1. 访问接口常用的 `content-type` 是 `application/json`。
+
+2. JSON 是一种轻量级的数据格式，以键-值对（key-value）的方式组织的数据。这个使用这个类型，需要参数本身就是 json 格式的数据，参数会被直接放到请求实体里，不进行任何处理。服务端/客户端会按 json 格式解析数据（约定好的情况下）。
 
 ## 10. Redirect（重定向）
 
