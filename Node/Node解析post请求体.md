@@ -312,7 +312,7 @@
 3. 根据上面的分析，Buffer 中的 16 进制数和 post 请求报文主体内容是一一对应的，结合前面对报文主体的分析，我们可以根据 Buffer 中的 16 进制数去找到 boundary 和实际数据所在的位置（索引），对 Buffer 数据进行切分，切分出文件信息和文件内容，最后将文件内容依据文件信息写入磁盘中。
     
 
-#### 4. 解析文件的基本过程
+#### 3. 解析文件的基本过程
 
 1. 将 Buffer 的二进制内容转换为 body 字符串。目的是方便根据 boundary 进行切分。
 
@@ -329,7 +329,101 @@
 7. 得到文件内容还是字符串，我们需要将其转换成 Buffer 二进制数据，然后将文件内容写入磁盘。
 
 
+#### 4. 代码实现
 
+1. 通过监听流的 data 事件，我们将一段一段的 buffer 传入了一个数组中，形式如下图所示：
+   ![img_1.png](img/array-buffer.png)
+
+2. 将 Buffer 的二进制内容转换为 body 字符串。目的是方便根据 boundary 进行切分。
+   ```js
+      let requestBody = Buffer.concat(bufferArray).toString('binary');
+   ```
+   转换后的 body 字符串如下所示：
+   ![img.png](img/buffer-str.png)
+
+3. 以 `--boundary` 作为分隔符，对 body 字符串进行切分。因为我们一次可以上传多个文件，多个文件是以 `--boundary` 为分隔符的。所以我们使用 `--boundary` 为分隔符切分 body 字符串，这样能合在一起的文件分开，使得我们能单独解析每个文件。
+
+4. 对单独的一个文件块进行解析。此时以 `\r\n` 为分隔符对文件块进行拆分，这样可以得到 Content-Disposition 和 Content-Type。
+   ```js
+      const fileBodyList = requestBody.split('\r\n');
+       // 文件类型
+       let contentType = '';
+       // 文件名称
+       let filename = '';
+
+      for (let i = 0; i < fileBodyList.length; i++) {
+          let item = fileBodyList[i];
+          if (item.includes('Content-Disposition')) {
+              // let contentDispositionObj = querystring.parse(item, ';', '=');
+              // Content-Disposition 的格式如下：
+              // Content-Disposition: form-data; name="file"; filename="git.jpg"
+              // 从这个字符串中解析出 filename
+              let contentDispositionList = item.split(';');
+              filename = contentDispositionList[contentDispositionList.length - 1].split('=')[1].replace(/"/g, '');
+          }
+
+          if (item.includes('Content-Type')) {
+
+              // Content-Type 的格式如下：
+              // Content-Type: image/jpeg
+              let contentTypeList = item.split(':');
+              contentType = contentTypeList[contentTypeList.length - 1].trim();
+          }
+      }
+   ```
+   Content-Disposition 中找到和文件相关的信息，如文件名：filename。根据 Content-Type 找出文件的类型。
+
+5. 根据规范，Content-Type 所在行、`--boundary--` 的所在行之间的内容是真正的文件内容，因此，我们需要对 body 字符串再次进行拆分，找出文件内容的起始位置和结束位置，得到真正的文件内容。这个位置可以通过定位 Content-Type 和 `--boundary--` 来确定。
+   ```js
+      const start = requestBody.indexOf(contentType) + contentType.length + 4;
+
+      const startFileContent = requestBody.slice(start);
+    
+      const end = startFileContent.indexOf(`--${boundary}--`) - 2;
+
+      // 切分出文件主体内容
+      const fileContentStr = startFileContent.slice(0, end);
+   ```
+6. 得到文件内容还是字符串，我们需要将其转换成 Buffer 二进制数据：
+   ```js
+      const binaryContent = Buffer.from(fileContentStr, 'binary');
+   ```
+   **注意**：将文件内容字符串转换成二进制的 buffer 数据时，编码必须与之前 buffer 二进制数据转换成字符串时指定的编码保持一致。
+
+7. 使用流将二进制的 buffer 数据保存到文件中：
+   ```js
+      const filePath = path.resolve(__dirname, '../../', 'temp');
+      try {
+
+          fs.accessSync(filePath);
+          console.log('temp 目录存在');
+      } catch (e) {
+           // 路径不存在，创建一个目录
+           fs.mkdirSync(filePath);
+      }
+
+      // 将 buffer 转换为可读流
+      const readStreamFromBuffer = (new Stream.PassThrough()).end(fileBinaryContent);
+
+      // createReadStream 不能直接接收 buffer，其接收的是路径或者是 类似路径的内容
+      // 因此需要对 buffer 进行转换，转换可以通过 Stream 中的 Transform 或者 Duplex 实现
+      // const readStream = fs.createWriteStream(readBuffer);
+      const writeStream = fs.createWriteStream(path.join(filePath, filename));
+
+      // 写入文件
+      readStreamFromBuffer.pipe(writeStream);
+   ```
+
+
+
+
+
+
+
+
+
+
+ 
 - 第一个参数总是固定不变的 form-data；附加的参数不区分大小写，并且拥有参数值，参数名与参数值用等号('=')连接，参数值用双引号括起来。参数之间用分号(';')分隔。
 
 Content-Disposition: form-data
