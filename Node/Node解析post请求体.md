@@ -16,23 +16,7 @@
 
 7. [JS : Blob() 转换二进制下载文件流实例](https://juejin.cn/post/6844903700222181384)
 
-8. [1127-buffer定义及常用方法 & 进制转换 & base64转码规则](https://juejin.cn/post/6844903726654865416)
-
-9. [Nodejs 进阶：核心模块 Buffer 常用 API 使用总结](https://juejin.cn/post/6960843000939282469)
-
-10. [JS 的二进制家族：base64、File、Blob、ArrayBuffer 的关系](https://juejin.cn/post/6844904149809627149)
-
-11. [前端下载普通文件与二进制流文件](https://juejin.cn/post/6878912072780873742)
-
-12. [我妈都看得懂的 Buffer 基础](https://juejin.cn/post/6911487429471895560)
-
-13. [[译]一篇帮你彻底弄懂NodeJs中的Buffer](https://juejin.cn/post/6844903688188723208)
-
-14. [javascript处理二进制之ArrayBuffer](https://juejin.cn/post/6844903759064088590)
-
-15. [JS中的二进制数据处理](https://juejin.cn/post/6954281377080541221)
-
-16. [[1.3万字] 玩转前端二进制](https://juejin.cn/post/6846687590783909902)
+8. [[1.3万字] 玩转前端二进制](https://juejin.cn/post/6846687590783909902)
 
 ## 2. 基本说明
 
@@ -301,7 +285,76 @@
       --boundary--
    ```
 
-#### 2. Node 端收到的 Buffer 数据的基本分析
+#### 2. 在一个 post 请求中同时上传多个文件
+
+1. input 在设置了 type 属性为 file 后，如果指定 multiple 为 true，那么可以选择多个文件进行上传。
+
+2. 我们选择了 `git.jpg`、`test-1.txt` 和 `test-2.js` 这三个文件，浏览器解析后，放到 post 请求报文主体的内容如下：
+   ```
+      ------WebKitFormBoundarydCrw3Bj0n9xQRd7y
+      Content-Disposition: form-data; name="file"; filename="git.jpg"
+      Content-Type: image/jpeg
+
+      // 二进制图片数据
+      ------WebKitFormBoundarydCrw3Bj0n9xQRd7y
+      Content-Disposition: form-data; name="file"; filename="test-1.txt"
+      Content-Type: text/plain
+
+      this is test file !
+      this is test file !
+      this is test file !
+      this is test file !
+      this is test file !
+      this is test file !
+      this is test file !
+      this is test file !
+      this is test file !
+      this is test file !
+      this is test file !
+      this is test file !
+      this is test file !
+      this is test file !
+      this is test file !
+      this is test file !
+      this is test file !
+      this is test file !
+      this is test file !
+      this is test file !
+      this is test file !
+      this is test file !
+      this is test file !
+      this is test file !
+      this is test file !
+      this is test file !
+      this is test file !
+      this is test file !
+      this is test file !
+      this is test file !
+      this is test file !
+      this is test file !
+      this is test file !
+      this is test file !
+      this is test file !
+      this is test file !
+      this is test file !
+      ------WebKitFormBoundarydCrw3Bj0n9xQRd7y
+      Content-Disposition: form-data; name="file"; filename="test-2.js"
+      Content-Type: text/javascript
+
+      function test() {}
+
+      console.log('hello world');
+      console.log('hello world');
+      ------WebKitFormBoundarydCrw3Bj0n9xQRd7y--
+   ```
+
+3. 上述请求的 content-type 是：`multipart/form-data; boundary=----WebKitFormBoundarydCrw3Bj0n9xQRd7y`。
+
+4. 请求报文主体中，分成三个部分，每个部分由 `--boundary` 分隔符分隔开，报文主体最后的 `--boundary--` 作为报文的结束分隔符，表示报文到此结束。
+
+5. 因此，对于这种上传多文件的报文，我们首先对其进行分块，也就是以 `--boundary` 作为分隔符，对报文主体进行分割，这样分割出的每个部分都是单独的一个文件，包括文件信息和文件主体。然后针对每个部分进行解析。
+
+#### 3. Node 端收到的 Buffer 数据的基本分析
 
 1. 还是上传同一张图片，我们在看一下 node 端接收的内容是什么样的：
     ```
@@ -316,17 +369,19 @@
 
 1. 将 Buffer 的二进制内容转换为 body 字符串。目的是方便根据 boundary 进行切分。
 
-2. 以 `--boundary` 作为分隔符，对 body 字符串进行切分。因为我们一次可以上传多个文件，多个文件是以 `--boundary` 为分隔符的。所以我们使用 `--boundary` 为分隔符切分 body 字符串，这样能合在一起的文件分开，使得我们能单独解析每个文件。
+2. **注意**：body 字符串实际上是一行字符串，在这一行字符串中存在着换行符：`\r\n`，因此，在编辑器显示这个字符串的时候，不是显示一行，而是显示多行，就是这个 `\r\n` 起到了作用。所以，我们在对这个字符串进行解析的过程中，要把换行符 `\r\n` 也考虑进去。
 
-3. 对单独的一个文件块进行解析。此时以 `\r\n` 为分隔符对文件块进行拆分，这样可以得到 Content-Disposition 和 Content-Type。
+3. 以 `--boundary` 作为分隔符，对 body 字符串进行切分。因为我们一次可以上传多个文件，多个文件是以 `--boundary` 为分隔符的。所以我们使用 `--boundary` 为分隔符切分 body 字符串，这样能合在一起的文件分开，使得我们能单独解析每个文件。
 
-4. 从 Content-Disposition 中找到和文件相关的信息，如文件名：filename。
+4. 对单独的一个文件块进行解析。此时以 `\r\n\r\n` 为分隔符对文件块进行拆分，这样可以得到 Content-Disposition 和 Content-Type。
 
-5. 根据 Content-Type 找出文件的类型。
+5. 从 Content-Disposition 中找到和文件相关的信息，如文件名：filename。
 
-6. 根据规范，Content-Type 所在行、`--boundary--` 的所在行之间的内容是真正的文件内容，因此，我们需要对 body 字符串再次进行拆分，找出文件内容的起始位置和结束位置，得到真正的文件内容。这个位置可以通过定位 Content-Type 和 `--boundary--` 来确定。
+6. 根据 Content-Type 找出文件的类型。
 
-7. 得到文件内容还是字符串，我们需要将其转换成 Buffer 二进制数据，然后将文件内容写入磁盘。
+7. 根据规范，Content-Type 所在行下一行、`--boundary--` 的所在行之间的内容是真正的文件内容，因此，我们需要对 body 字符串再次进行拆分，找出文件内容的起始位置和结束位置，得到真正的文件内容。这个位置可以通过定位 Content-Type 和 `--boundary--` 来确定。
+
+8. 得到文件内容还是字符串，我们需要将其转换成 Buffer 二进制数据，然后将文件内容写入磁盘。
 
 
 #### 4. 代码实现
@@ -340,28 +395,50 @@
    ```
    转换后的 body 字符串如下所示：
    ![img.png](img/buffer-str.png)
+   body 字符串实际上是一行，形式是：`--boundary\r\nContent-Disposition: bbb\r\nContent-Type: ccc\r\n\r\n...\r\n--boundary\r\nContent-Disposition: bbb\r\nContent-Type: ccc\r\n\r\n...\r\n--boundary--`。后面就是对这个字符串进行解析。
 
 3. 以 `--boundary` 作为分隔符，对 body 字符串进行切分。因为我们一次可以上传多个文件，多个文件是以 `--boundary` 为分隔符的。所以我们使用 `--boundary` 为分隔符切分 body 字符串，这样能合在一起的文件分开，使得我们能单独解析每个文件。
-
-4. 对单独的一个文件块进行解析。此时以 `\r\n` 为分隔符对文件块进行拆分，这样可以得到 Content-Disposition 和 Content-Type。
    ```js
-      const fileBodyList = requestBody.split('\r\n');
-       // 文件类型
-       let contentType = '';
-       // 文件名称
-       let filename = '';
+       const list = requestBody.split(`--${boundary}`).filter(item => {
+        return item.includes('Content-Disposition')
+       });
+   ```   
+   1. 以 `--boundary` 为分隔符，对新的报文主体进行切分。报文主体中，相邻的文件块都是被 `--boundary` 分隔开，因此我们可以以 `--boundary` 为分隔符进行分隔。
+   2. 对分隔出来的字符串数组进行过滤，保留同文件相关的字符串。
+   3. list 数组的每一项都是文件块，下面我们使用 parseFile 函数对这个文件块进行解析。
+   ```js
+      let res = [];
 
-      for (let i = 0; i < fileBodyList.length; i++) {
-          let item = fileBodyList[i];
+      for (let i = 0; i < list.length; i++) {
+          const fileContentStr = list[i];
+          const parseResult = parseFile(fileContentStr, boundary);
+          res.push(parseResult);
+      }
+   ```   
+4. 对单独的一个文件块进行解析，也就是前面说到 parseFile 函数的工作。此时以 `\r\n\r\n` 为分隔符对文件块进行拆分，这样可以得到 Content-Disposition 和 Content-Type。
+   ```js
+      // parseFile
+      const contentList = fileBody.split('\r\n\r\n')[0].split('\r\n');
+      // 文件类型
+      let contentType = '';
+      let name = '';
+      // 文件名称
+      let filename = '';
+
+      for (let i = 0; i < contentList.length; i++) {
+          let item = contentList[i];
           if (item.includes('Content-Disposition')) {
-              // let contentDispositionObj = querystring.parse(item, ';', '=');
+            // 注意，分隔键值对的符号是：`; `，键值对的连接符号是 =
+              let contentDispositionObj = querystring.parse(item, '; ', '=');
               // Content-Disposition 的格式如下：
               // Content-Disposition: form-data; name="file"; filename="git.jpg"
+              // 使用 querystring.parse(item, '; ', '=') 解析后，得到的结果如下：
               // 从这个字符串中解析出 filename
-              let contentDispositionList = item.split(';');
-              filename = contentDispositionList[contentDispositionList.length - 1].split('=')[1].replace(/"/g, '');
-          }
+              // 去除值中的双引号 `"`
+              name = contentDispositionObj.name?.replace(/"/g, '');
+              filename = contentDispositionObj.filename?.replace(/"/g, '');
 
+          }
           if (item.includes('Content-Type')) {
 
               // Content-Type 的格式如下：
@@ -371,61 +448,283 @@
           }
       }
    ```
-   Content-Disposition 中找到和文件相关的信息，如文件名：filename。根据 Content-Type 找出文件的类型。
-
-5. 根据规范，Content-Type 所在行、`--boundary--` 的所在行之间的内容是真正的文件内容，因此，我们需要对 body 字符串再次进行拆分，找出文件内容的起始位置和结束位置，得到真正的文件内容。这个位置可以通过定位 Content-Type 和 `--boundary--` 来确定。
+   1. Content-Disposition 中找到和文件相关的信息，如文件名：filename。根据 Content-Type 找出文件的类型。
+   2. 文件名的编码格式是 binary，如果文件名是中文名，或者其他非 ascii 字符，就会出现乱码，因此这个需要对文件名进行重编码：
    ```js
-      const start = requestBody.indexOf(contentType) + contentType.length + 4;
-
-      const startFileContent = requestBody.slice(start);
-    
-      const end = startFileContent.indexOf(`--${boundary}--`) - 2;
-
-      // 切分出文件主体内容
-      const fileContentStr = startFileContent.slice(0, end);
+      // parseFile
+      filename = Buffer.from(filename, 'binary').toString('utf-8');
    ```
-6. 得到文件内容还是字符串，我们需要将其转换成 Buffer 二进制数据：
+      
+5. 开始解析文件的内容。一个只有一个文件的请求报文主体的内容如下：
+   ```
+      ------WebKitFormBoundaryQRppr4oLReN6qlP0
+      Content-Disposition: form-data; name="file"; filename="git.jpg"
+      Content-Type: image/jpeg
+    
+       // 二进制数据
+      ------WebKitFormBoundaryQRppr4oLReN6qlP0--
+   ```
+   1. Content-Type 为 image/jpeg，后面空了一行，才是真正的文件内容。
+   2. 经过转换后报文主体形式是一个单行的字符串，形式是：`--boundary\r\nContent-Disposition: bbb\r\nContent-Type: ccc\r\n\r\n...\r\n--boundary--`
+   3. 换行符用字符表示是：`\r\n`，所以我们找到 contentType 的起始位置后，加上 contentType 的长度，实际上是 Content-Type 那一行的末尾，然后加上两个换行符的长度，才是真正的文件内容的起始位置。
    ```js
+      // parseFile
+      const start = fileBody.indexOf(contentType) + contentType.length + 4;
+   ```
+6. 因为这里处理的单个文件块，每个文件块只有 `--boundary` 作为起始行，没有 `--boundary--` 这个标识报文主体结束的分隔符。所以，我们只需找到文件主体的起始位置，并进行切分即可。
+   ```js
+      // parseFile
+      const fileContent = fileBody.slice(start);
+   ```
+   
+7. 得到文件内容还是字符串，我们需要将其转换成 Buffer 二进制数据：
+   ```js
+      // parseFile
       const binaryContent = Buffer.from(fileContentStr, 'binary');
    ```
    **注意**：将文件内容字符串转换成二进制的 buffer 数据时，编码必须与之前 buffer 二进制数据转换成字符串时指定的编码保持一致。
 
-7. 使用流将二进制的 buffer 数据保存到文件中：
+8. parseFile 函数返回值：
    ```js
-      const filePath = path.resolve(__dirname, '../../', 'temp');
-      try {
-
-          fs.accessSync(filePath);
-          console.log('temp 目录存在');
-      } catch (e) {
-           // 路径不存在，创建一个目录
-           fs.mkdirSync(filePath);
-      }
-
-      // 将 buffer 转换为可读流
-      const readStreamFromBuffer = (new Stream.PassThrough()).end(fileBinaryContent);
-
-      // createReadStream 不能直接接收 buffer，其接收的是路径或者是 类似路径的内容
-      // 因此需要对 buffer 进行转换，转换可以通过 Stream 中的 Transform 或者 Duplex 实现
-      // const readStream = fs.createWriteStream(readBuffer);
-      const writeStream = fs.createWriteStream(path.join(filePath, filename));
-
-      // 写入文件
-      readStreamFromBuffer.pipe(writeStream);
+      // parseFile 
+      return {
+        filename,
+        contentType,
+        name,
+        fileBinaryContent: binaryContent
+    }
    ```
+9. 完整的解析过程如下：
+   1. parseFormData 函数如下：
+      ```js
+         /**
+          * 从一个 buffer 数组中解析出文件名、文件类型和文件的二进制内容
+          * @param bufferArray 由 buffer 组成的数组
+          * @param boundary 分隔边界 —— 请求头中的 Content-Type 指定
+          */
+          function parseFormData(bufferArray: Array<Buffer>, boundary: string) {
+
+             let requestBody = Buffer.concat(bufferArray).toString('binary');
+
+
+             // 因为我们可以一次上传多个文件，多个文件同样是放在 post 请求报文主体中的
+             // 形式如下：
+             // ------WebKitFormBoundarydCrw3Bj0n9xQRd7y
+             // Content-Disposition: form-data; name="file"; filename="git.jpg"
+             // Content-Type: image/jpeg
+             //
+             // // 二进制图片数据
+             // ------WebKitFormBoundarydCrw3Bj0n9xQRd7y
+             // Content-Disposition: form-data; name="file"; filename="test-1.txt"
+             // Content-Type: text/plain
+             //
+             // this is test file !
+             // this is test file !
+             // this is test file !
+             // this is test file !
+             // this is test file !
+             // this is test file !
+             // this is test file !
+             // this is test file !
+             // this is test file !
+             // this is test file !
+             // this is test file !
+             // this is test file !
+             // this is test file !
+             // this is test file !
+             // this is test file !
+             // this is test file !
+             // this is test file !
+             // this is test file !
+             // this is test file !
+             // this is test file !
+             // this is test file !
+             // this is test file !
+             // this is test file !
+             // this is test file !
+             // this is test file !
+             // this is test file !
+             // this is test file !
+             // this is test file !
+             // this is test file !
+             // this is test file !
+             // this is test file !
+             // this is test file !
+             // this is test file !
+             // this is test file !
+             // this is test file !
+             // this is test file !
+             // this is test file !
+             // ------WebKitFormBoundarydCrw3Bj0n9xQRd7y
+             // Content-Disposition: form-data; name="file"; filename="test-2.js"
+             // Content-Type: text/javascript
+             //
+             // function test() {}
+             //
+             // console.log('hello world');
+             // console.log('hello world');
+             // ------WebKitFormBoundarydCrw3Bj0n9xQRd7y--
+
+             // 分隔不同文件的分隔符是 --boundary
+             // 所以我们首先对其进行分块，也就是以 --boundary 作为分隔符，对报文主体进行分割
+             // 然后针对分割出来的每个内容进行解析
+
+             // 1. 以 --boundary 为分隔符，对新的报文主体进行切分
+             //    报文主体中，相邻的文件块都是被 --boundary 分隔开，因此我们可以以 --boundary 为分隔符进行分隔
+             //    对分隔出来的字符串数组进行过滤，保留同文件相关的字符串
+             const list = requestBody.split(`--${boundary}`).filter(item => {
+                 return item.includes('Content-Disposition')
+             });
+
+             let res = [];
+
+             for (let i = 0; i < list.length; i++) {
+                 const fileContentStr = list[i];
+                 const parseResult = parseFile(fileContentStr, boundary);
+                 res.push(parseResult);
+             }
+
+             return res;
+         }
+      ```
+   2. parseFile 函数如下：
+      ```js
+         function parseFile(fileBody: string, boundary: string) {
+
+             // 去除content 首尾的换行符
+             fileBody = fileBody.trim();
+             // 使用两个换行符 \r\n\r\n 对文件进行切分，使用这个分隔符的原因是：从请求报文主体的格式中，我们可以发现：
+             // Content-Disposition 在第一行，而 Content-Type 在第二行，然后空一行，从第四行开始才是真正的文件主体
+             // 将报文主体转换成字符串后，由于字符串只有一行，所以换行符使用 \r\n 表示，即：Content-Disposition: bbb\r\nContent-Type: ccc\r\n\r\n...
+             // \r\n\r\n 准确地将文件内容与 Content-Disposition 及 Content-Type 分隔开
+             // 因此，使用 \r\n\r\n 作为分隔符将报文主体进行切分，并取出第一项，可以准确得到 Content-Disposition 和 Content-Type
+             // 如果文件主体中包含大量的换行符 \r\n，使用  \r\n\r\n 能避免对文件主体进行分割
+             // 同时即使文件主体中存在 \r\n\r\n 这种连续的换行符，或者存在着 Content-Disposition、Content-Type
+             // 由于第一个 \r\n\r\n 前面的内容一定不是报文主体，而是和文件相关其他内容
+             // 所以，我们取出 \r\n\r\n 分隔后的字符串数组的第一项，一定是 Content-Disposition 和 Content-Type，而不会取到文件主体中的同名内容
+             const contentList = fileBody.split('\r\n\r\n')[0].split('\r\n');
+             // 文件类型
+             let contentType = '';
+             let name = '';
+             // 文件名称
+             let filename = '';
+
+             for (let i = 0; i < contentList.length; i++) {
+             let item = contentList[i];
+             if (item.includes('Content-Disposition')) {
+                // 注意，分隔键值对的符号是：`; `，键值对的连接符号是 =
+                 let contentDispositionObj = querystring.parse(item, '; ', '=') as any;
+                // Content-Disposition 的格式如下：
+                // Content-Disposition: form-data; name="file"; filename="git.jpg"
+                // 使用 querystring.parse(item, ';', '=') 解析后，得到的结果如下：
+                // 从这个字符串中解析出 filename
+                // 去除值中的双引号 `"`
+                name = contentDispositionObj.name?.replace(/"/g, '');
+                filename = contentDispositionObj.filename?.replace(/"/g, '');
+
+              }
+              if (item.includes('Content-Type')) {
+
+                  // Content-Type 的格式如下：
+                  // Content-Type: image/jpeg
+                  let contentTypeList = item.split(':');
+                  contentType = contentTypeList[contentTypeList.length - 1].trim();
+              }
+         }
+
+         // 文件名的编码格式是 binary，如果文件名是中文名，或者其他非 ascii 字符，就会出现乱码，因此这个需要对文件名进行重编码
+         filename = Buffer.from(filename, 'binary').toString('utf-8');
+         // 开始解析文件的内容
+
+         // 获得起始位置
+
+         // ------WebKitFormBoundaryQRppr4oLReN6qlP0
+         // Content-Disposition: form-data; name="file"; filename="git.jpg"
+         // Content-Type: image/jpeg
+         //
+         // // 二进制数据
+         // ------WebKitFormBoundaryQRppr4oLReN6qlP0--
+
+         // 上面是一个请求报文主体的内容
+         // Content-Type 为 image/jpeg，后面空了一行，才是真正的文件内容
+         // 现在 fileBody 是一个单行的字符串，形式是：--boundary\r\nContent-Disposition: bbb\r\nContent-Type: ccc\r\n\r\n...
+         // 换行符用字符表示是：\r\n，所以我们找到 contentType 的起始位置后，加上 contentType 的长度
+         // 实际上是 Content-Type 那一行的末尾，然后加上两个换行符的长度，就是文件内容的起始位置
+         const start = fileBody.indexOf(contentType) + contentType.length + 4;
+
+         // 因为这里处理的单个文件块，每个文件块只有 --boundary 作为起始行，没有 --boundary-- 这个标识报文主体结束的分隔符
+         // 所以，我们只需找到文件主体的起始位置，并进行切分即可
+         const fileContent = fileBody.slice(start);
+
+
+         // 转换成二进制内容
+         const binaryContent = Buffer.from(fileContent, 'binary');
+
+            return {
+                filename,
+                contentType,
+                name,
+                fileBinaryContent: binaryContent
+            }
+         }
+      ```
+10. 将刚刚解析出来的二进制文件内容，使用流的方式保存到文件中：
+    ```js
+       const fileInfoList = parseFormData(result, boundary);
+
+       for (let i = 0; i < fileInfoList.length; i++) {
+            const {filename, contentType, name, fileBinaryContent} = fileInfoList[i];// 默认路径
+                  const time = Date.now();
+
+                  const filePath = path.resolve(__dirname, '../../', 'temp');
+                  try {
+
+                      fs.accessSync(filePath);
+                      console.log('temp 目录存在');
+                  } catch (e) {
+                      // 路径不存在，创建一个目录
+                      fs.mkdirSync(filePath);
+                  }
+
+                  // 将 buffer 转换为可读流
+                  // PassThrough 是转换流（transform stream）的一种简易实现，可以将二进制 buffer 转换成可读流
+                  const readStreamFromBuffer = (new Stream.PassThrough()).end(fileBinaryContent);
+
+                  // createReadStream 不能直接接收 buffer，其接收的是路径或者是 类似路径的内容
+                  // 因此需要对 buffer 进行转换，转换可以通过 Stream 中的 Transform 或者 Duplex 实现
+                  // const readStream = fs.createWriteStream(readBuffer);
+                  const writeStream = fs.createWriteStream(path.join(filePath, filename));
+
+                  // 写入文件
+                    readStreamFromBuffer.pipe(writeStream);
+       }
+    ```
+
+11. 核心是下面的内容：
+    ```js
+       const filePath = path.resolve(__dirname, '../../', 'temp');
+       try {
+
+           fs.accessSync(filePath);
+           console.log('temp 目录存在');
+       } catch (e) {
+            // 路径不存在，创建一个目录
+            fs.mkdirSync(filePath);
+       }
+
+       // 将 buffer 转换为可读流
+       // createReadStream 不能直接接收 buffer，其接收的是路径或者是类似路径的内容
+       // 因此需要对 buffer 进行转换，转换可以通过 Stream 中的 Transform 或者 Duplex 实现
+       const readStreamFromBuffer = (new Stream.PassThrough()).end(fileBinaryContent);
+
+       
+    
+       const writeStream = fs.createWriteStream(path.join(filePath, filename));
+
+       // 写入文件
+       readStreamFromBuffer.pipe(writeStream);
+    ```
 
 
 
 
-
-
-
-
-
-
- 
-- 第一个参数总是固定不变的 form-data；附加的参数不区分大小写，并且拥有参数值，参数名与参数值用等号('=')连接，参数值用双引号括起来。参数之间用分号(';')分隔。
-
-Content-Disposition: form-data
-Content-Disposition: form-data; name="fieldName"
-Content-Disposition: form-data; name="fieldName"; filename="filename.jpg"
