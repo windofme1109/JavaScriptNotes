@@ -681,6 +681,15 @@ Etag由服务器发送给浏览器。发起请求时，浏览器将Etag的值赋
 
 2. JSON 是一种轻量级的数据格式，以键-值对（key-value）的方式组织的数据。这个使用这个类型，需要参数本身就是 json 格式的数据，参数会被直接放到请求实体里，不进行任何处理。服务端/客户端会按 json 格式解析数据（约定好的情况下）。
 
+## 10. content-disposition 详解
+
+1. 第一个参数总是固定不变的 form-data；附加的参数不区分大小写，并且拥有参数值，参数名与参数值用等号('=')连接，参数值用双引号括起来。参数之间用分号(';')分隔。
+
+Content-Disposition: form-data
+Content-Disposition: form-data; name="fieldName"
+Content-Disposition: form-data; name="fieldName"; filename="filename.jpg"
+
+
 ## 10. Redirect（重定向）
 
 1. 浏览器访问一个 url 时，真正的资源并不在这个位置，而是在另外一个位置，所以服务器会返回一个状态码（301 或 302），和一个重定向的链接，浏览器收到这个响应后，跟着状态码和重定向链接，会向新的 url 发起请求。这个过程就是重定向。
