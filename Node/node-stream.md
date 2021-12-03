@@ -32,15 +32,27 @@
 ## Node中的流（Streams）
 
 ### 1. 参考资料
-- [Node.js Stream(流)](https://juejin.im/post/6844903583477923848)
-- [Node.js 可读流和可写流](https://juejin.im/post/6844903588649500679)
-- [Node.js 中的一股清流：理解 Stream（流）的基本概念](https://juejin.im/post/6844904014975500301)
-- [你应该知道的Node.js流](https://juejin.im/post/6844903590859898887)
-- [一文搞定 Node.js 流 （Stream）](https://juejin.im/post/6854573219060400141)
-- [Stream | Node.js v12.18.4 Documentation](https://nodejs.org/dist/latest-v12.x/docs/api/stream.html)
-- [浅析nodejs中的stream(流)](https://www.jianshu.com/p/43ea707826b8)
-- [深入理解nodejs Stream模块](https://www.jianshu.com/p/81b032672223)
-- [nodeJS之流stream](https://www.cnblogs.com/xiaohuochai/p/6969307.html?utm_source=tuicool&utm_medium=referral)
+
+1. [Node.js Stream(流)](https://juejin.im/post/6844903583477923848)
+
+2. [Node.js 可读流和可写流](https://juejin.im/post/6844903588649500679)
+
+3. [Node.js 中的一股清流：理解 Stream（流）的基本概念](https://juejin.im/post/6844904014975500301)
+
+4. [你应该知道的Node.js流](https://juejin.im/post/6844903590859898887)
+
+5. [一文搞定 Node.js 流 （Stream）](https://juejin.im/post/6854573219060400141)
+
+6. [Stream | Node.js v12.18.4 Documentation](https://nodejs.org/dist/latest-v12.x/docs/api/stream.html)
+
+7. [浅析nodejs中的stream(流)](https://www.jianshu.com/p/43ea707826b8)
+
+8. [深入理解nodejs Stream模块](https://www.jianshu.com/p/81b032672223)
+
+9. [nodeJS之流stream](https://www.cnblogs.com/xiaohuochai/p/6969307.html?utm_source=tuicool&utm_medium=referral)
+
+10. [理解Node中的Buffer与stream](https://zhuanlan.zhihu.com/p/368045575)
+
 ### 2. 流（Streams）的说明
 
 1. 流（Streams），流指的是一组有方向的、有起点和终点的一种传输数据的方式。字符串、数组、二进制数据等，都可以以流的方式进行传输。
@@ -57,21 +69,22 @@
 
 #### 1. 可读流分为两种模式：
 
-   - `flowing` 模式：可读流自动(不断的) 从底层读取数据（直到读取完毕），并通过 `EventEmitter` 接口的事件尽快将数据提供给应用
+1. `flowing` 模式：可读流自动(不断的) 从底层读取数据（直到读取完毕），并通过 `EventEmitter` 接口的事件尽快将数据提供给应用
    
-   - `paused` 模式：必须显式调用 `stream.read()` 方法来从流中读取数据片段
+2. `paused` 模式：必须显式调用 `stream.read()` 方法来从流中读取数据片段
 
 #### 2. `flowing` 模式
-   - flowing 模式图示：
+
+1. flowing 模式图示：
    
      ![readableStream-flowing](./img/readableStream-flowing.png)
      
-   - 所有初始工作模式为 `paused` 的可读流，可以通过下面三种途径切换到 `flowing` 模式
-     - 监听 `data` 事件
-     - 调用 `stream.resume()` 
-     - 调用 `strean.pipe()` 将数据发送到 Writable
+2. 所有初始工作模式为 `paused` 的可读流，可以通过下面三种途径切换到 `flowing` 模式
+   - 监听 `data` 事件
+   - 调用 `stream.resume()` 
+   - 调用 `strean.pipe()` 将数据发送到 Writable
 
-   - 从流中读取数据：
+3. 从流中读取数据：
    
      ```javascript
         const fs = require('fs');
@@ -120,7 +133,7 @@
             console.log('close');
         })
      ```
-   - 输出：
+4. 输出：
      ```javascript
         open
         123
