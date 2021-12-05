@@ -1030,6 +1030,102 @@
 
 ### 4. Readable
 
+1. 子类继承 Readable 类，并在子类内部实现 _read() 方法，则我们就完成了一个自定义的可读流，可以使用可读流的方法实现对流的操作。
 
+2. 示例代码：
+   ```js
+      /**
+       * 继承 Readable 类实现可读流
+       * 使用可读流的 push 方法将 Buffer 实例推入可读流中
+       */
+
+      class MyReadableStream extends stream.Readable {
+          constructor() {
+              super();
+          }
+
+          /**
+           * 子类覆写 _read() 方法
+           * @private
+           */
+          _read() {
+
+          }
+      }
+   
+      const readableStream = new MyReadableStream();
+      //
+      readableStream.push(Buffer.from('hello '));
+      readableStream.push(Buffer.from('world '));
+      readableStream.push(Buffer.from('!'));
+      readableStream.pipe(writeStream);
+   ```
 
 ### 5. Writable
+
+1. 子类继承 Writable 类，并在子类内部实现 _write() 方法和 _final()。则我们就完成了一个自定义的可写流，可以使用可写流的方法实现对流的操作。
+
+2. 所有可写流实现都必须提供一个 writable._write() 或writable._writev() 方法。当我们调用可读流的 write 方法的时候，就会调用内部的 _write() 或者 _writev() 方法。在子类覆写这个方法的主要目的是将数据收集起来，放到缓冲池中备用。
+
+3. 子类中覆写 _final 方法。此可选 _final() 方法将在可写流关闭之前调用，在 _final 方法内部调用 callback 后会触发 finish 事件。这对于在流结束之前关闭资源或写入缓冲数据非常有用。
+
+4. 一般来说，在 _final 方法内部，我们是将缓冲池内部的数据写入文件（destination）中。我们只有显式调用可写流的 end 方法，这样才会调用内部的 _final 方法。
+
+5. 示例代码：
+   ```js
+      class MyWritableStream extends stream.Writable {
+           constructor(path, encoding, options = {}) {
+               super(options);
+               this.path = path;
+               this.chunk = [];
+               this.encoding = encoding ? encoding : 'utf8';
+           }
+
+    
+
+           /**
+            * 覆写 _write() 方法
+            * @param chunk
+            * @param encoding
+            * @param callback
+            * @private
+            */
+           _write(chunk, encoding, callback) {
+              this.chunk.push(chunk);
+              if (encoding) {
+                  this.encoding = encoding
+              }
+
+               callback();
+           }
+
+          /**
+           * 子类中覆写 _final 方法
+           * 此可选函数将在可写流关闭之前调用，在 _final 方法内部调用 callback 后，
+           * 触发finish 事件
+           * 这对于在流结束之前关闭资源或写入缓冲数据非常有用
+           * @param callback
+           * @private
+           */
+          _final(callback) {
+              const chunk = Buffer.concat(this.chunk);
+
+              // 将可读流数据写入文件中
+              fs.writeFile(this.path, chunk, {encoding: this.encoding}, function (err) {
+                  if (err) {
+                    throw Error(err.message);
+                  }
+              });
+              callback();
+          }
+      }
+
+      const ws = new MyWritableStream('./files/myBuffer.txt', 'utf8');
+
+      ws.write(Buffer.from('hello '));
+      ws.write(Buffer.from('world '));
+      ws.write(Buffer.from('你好 '));
+      ws.write(Buffer.from('世界 '));
+
+      ws.end('!');
+   ```
