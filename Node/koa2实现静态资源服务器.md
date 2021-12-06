@@ -6,6 +6,9 @@
 
 2. [原生koa2实现静态资源服务器](https://chenshenhai.github.io/koa2-note/note/static/server.html)
 
+3. [对静态文件中间件koa-static的一些理解](https://blog.csdn.net/qq_43624878/article/details/107739956)
+3. [使用Node.js原生API写一个web服务器](https://segmentfault.com/a/1190000037604771)
+3. [手写koa-static源码，深入理解静态服务器原理](https://segmentfault.com/a/1190000038397728)
 ## 2. 基本思路
 
 1. 发起一个 http 请求访问 web 服务器上的静态资源，一般响应结果有三种情况：
