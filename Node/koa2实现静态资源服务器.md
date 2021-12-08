@@ -85,7 +85,7 @@
    ```
 4. 判断这个请求是请求静态资源还是访问接口，这里采用判断扩展名的方式：
    ```js
-      const resourcePath = ctx.path;
+        const resourcePath = ctx.path;
         
         const pathObj = path.parse(resourcePath);
         let { base, ext, name, dir } = pathObj;
@@ -127,8 +127,9 @@
          //     name: 'file'
          // }
       ```
-   - 通过判断 ext 是否为空，确定请求的是不是静态资源，如果不是，就进入下一个中间件。 
+   - 通过判断 ext 是否为空，确定请求的是不是静态资源，如果不是，就进入下一个中间件。
    - 使用 `path.resolve` 方法生成根路径。默认根路径就是当前的工作路径，即执行 node 命令所在的目录。 什么是工作路径，比如说，`index.js` 的路径是：`d:/my-project/src/my-components/upload/upload-list/index.js`。在 `my-project` 下执行：`node ./src/my-components/upload/upload-list/index.js`。那么此时的 node 的工作路径就是：`d:/my-project`，而不是 `index.js` 所在的路径。
+   - 使用 `regex` 表达式去除相对路径前面的 `\` 和 `.`，方便后面拼接绝对路径。
    - 使用正则去掉路径前的其他字符，如 `/` 和 `.` 等。保证路径是以英文字母开头。
    - 请求静态资源的路径都是以 `public/` 开头，如果如果不是以 `public/` 开头，我们就直接返回 `404`，防止外部使用者探知服务器目录结构。
    - 将根路径和资源的相对路径进行拼接，得到一个绝对路径。
@@ -190,13 +191,74 @@
 
 3. 收到静态资源请求后，我们将配置的目录与请求的静态资源路径进行拼接，得到完整的资源路径。后面就可根据这个路径进行创建可读流等一系列操作，最终返回前端请求的静态资源。
 
-4. 示例代码 -- 拼接路径：
+4. 示例代码  拼接路径：
    ```js
       export default function fileServer(root = '.', options) {
-    return async function (ctx, next){}
+           return async function (ctx, next){
+         
+           }
+      }
    ```
-   
 5. 示例代码：
    ```js
+        const resourcePath = ctx.path;
+        const pathObj = path.parse(resourcePath);
+        let {base, ext, name, dir} = pathObj;
 
+        if (ext === '') {
+            // ext 是文件的扩展名，如果 ext 不存在，表示这次请求并不是请求资源，因此直接进入下一个中间件进行处理
+            await next();
+        } else {
+
+            const regex = /(\.*)\/?([a-zA-Z0-9\-_]+)\/(.+)/;
+            if (root === '.') {
+                const rootPath = path.resolve('.');
+                // 去掉 public 前面的多余路径分隔符
+                const newPath = resourcePath.replace(regex, `$2/$3`);
+
+                if (newPath.startsWith('public/')) {
+                    const staticResourcePath = path.resolve(rootPath, newPath);
+                     response(ctx, staticResourcePath);
+                } else {
+                    await next();
+                }
+
+            } else {
+                const newRoot = root.replace(regex, '$2/$3');
+                const newRootPath = path.resolve(newRoot);
+                const newResourcePath = resourcePath.replace(regex, '$2/$3');
+                // 拼接路径
+                const staticResourcePath = path.resolve(newRootPath, newResourcePath);
+                response(ctx, staticResourcePath);
+            }
+        }
+   ```
+   1. 如果没有配置静态资源目录，那么默认的根路径是 `.`，使用 path.resolve 将根路径转换成绝对路径。path.resolve('.') 会返回当前的工作路径，即执行 node 命令所在的目录。
+   2. 如果配置了静态资源目录 `root`，那么先对 root 进行处理，去掉root 前面的 `/` 和 `.`，然后使用 path.resolve() 将这个目录转换成一个绝对路径，即与当前的工作路径进行拼接。
+   3. 对请求资源的相对路径进行处理，然后与 root 进行拼接，得到最终的静态资源路径。
+
+6. response 方法的实现如下：
+   ```js
+      function response(ctx: Koa.Context, resourcePath: string) {
+          if (exist(resourcePath)) {
+              const resource = fs.createReadStream(resourcePath);
+              // 得到文件的扩展名（不带点的）
+              const fileExt = getExt(ctx.path).toLowerCase();
+              ctx.type = fileExt;
+              ctx.body = resource;
+          } else {
+        ctx.status = 404;
+          }
+      }
+
+
+      function getExt(filename:string) {
+          const arr = filename.split('.');
+          return arr[arr.length - 1];
+      }
+
+
+      function exist(path:string) {
+           return fs.existsSync(path);
+      }
    ```
