@@ -246,6 +246,8 @@
     4. 第三方中间件
 
 ### 2. 应用级中间件
+
+
 1. 应用级中间件通过 `app.use()` 绑定到 app 对象的实例上。来扩展 app 的功能。
 
 2. 示例：
@@ -497,7 +499,7 @@
 
 ## 7. Koa2 处理 Cookies
 
-1、在 Koa 中，我们可以给某个响应设置  Cookie 的信息，用来在客户端保持同用户相关的信息，实现免登录等功能。
+1. 在 Koa 中，我们可以给某个响应设置  Cookie 的信息，用来在客户端保持同用户相关的信息，实现免登录等功能。
 
 2. Koa 中，可以直接设置 Cookie，如下所示：`ctx.cookies.set(name, value, [options])`
 
@@ -746,6 +748,50 @@
         console.log('<< three');
       });
    ```
+
+### 6. 中间件最佳实践 - 异步行为同步化
+
+1. Koa2 的中间的调用方式是洋葱模型。在一个中间件执行结束后，会进入执行下一个中间件。
+
+2. 如果在中间件中有异步操作，如 I/O 操作、监听事件等，而我们必须在异步操作的回调中获得数据，并且在回调中对 ctx 进行一些操作。由于事件循环机制，只有主线程上的同步任务执行完毕，js 引擎才会去事件队列中取出已经触发的事件的回调函数放到主线程执行。这样就带来一个问题，就是如果在异步任务的回调中对上下文对象 ctx 有操作，那么等到回调函数执行的时候，对某个响应进行处理的所有的中间件的执行以全部结束，且已经将响应返回给前端。那么此时对 ctx 的操作毫无意义，因为本次响应已经结束了。
+
+3. 为了解决这个问题，不能在异步操作的回调函数中修改 ctx，而在这个中间件中修改 ctx，这样，等到这个中间件执行完后，ctx 已经是最新的了，最新的 ctx 进行后面的中间件进行其他处理。
+
+4. 使用 Promise 将异步操作封装为支持 async / await 的函数，这样，在中间件内部，我们可以以同步的方式执行异步操作，从而拿到异步操作的结果，根据操作结果对 ctx 执行不同的操作。
+
+5. 假设我们在某个中间件中，要读取某个文件，然后将这个文件内容挂载到 ctx 中，那么首先使用 Promise 封装一个读文件操作：
+   ```js
+      const fs = require('fs');
+      const readFile = (path, options = {encoding: 'utf8'}) => {
+           return new Promise((resolve, reject) => {
+                fs.readFile(path, options, function(err, chunk) {
+                     if (err) {
+                         reject(err);
+                         return;
+                     }
+                     resolve(chunk);
+                })
+           })
+      }
+   ```
+6. 定义一个中间件，并引入 readFile 函数：
+   ```js
+       function getConfig(options) {
+           return async function(ctx, next) {
+               try {
+                  const res = await readFile(options.path);
+                  ctx.config = JSON.parse(res.toString());
+                 
+               } catch (e) {
+               
+               }
+               
+               // 执行下一个中间件
+               next();
+           }     
+       }
+   ```
+7. 执行 getConfig 这个中间件的时候，调用 readFile 读取文件时，由于使用了 await 关键字，那么 getConfig 暂停执行，直到 readFile 有了结果，才继续向下执行其他操作。这就保证了中间件执行完毕，对 ctx 的操作也完成了。从而避免了在回调中操作 ctx 带来的问题。
 
 ## 9. Koa2 处理 Session
 

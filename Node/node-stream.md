@@ -645,9 +645,11 @@
 
 7. **一般来说，我们不使用 readable 事件和read() 方法，使用 pipe() 或 data 事件代替**。
 ##### 4.  resume()
+
 1. 将可读流由 pause 模式转换为 flowing 模式，使得能够继续触发 data 事件。
 
 2. resume() 方法在 readable 事件的处理函数中不起作用。
+
 ##### 5. setEncoding(encoding)
 
 1. 设置可读流中的字符编码。
