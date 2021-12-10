@@ -45,6 +45,7 @@
 1. **注意**：如果我们指定了请求方法是 post，那么 Axios 会根据配置项中，data 的类型自动指定请求头中的 Content-Type 的值。例如：data 如果为字符串或者是 URLSearchParams，那么 Content-Type 会被指定为 `application/x-www-form-urlencoede`。如果 data 为纯对象，那么 `Content-Type` 会被指定为 `application/json`，如果 data 是 FormData 的实例，那么 `Content-Type` 会被指定为 `multipart/formdata`。
 
 2. 当前的 axios 版本是：`0.24.0`。
+
 ### 1. 指定 transformRequest
  
 1. 指定 Axios 中的配置项中的 transformRequest 属性值为处理函数，作用是在发送请求之前转换配置项中的 data 属性中指定的数据。

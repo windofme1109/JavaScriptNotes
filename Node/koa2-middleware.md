@@ -12,6 +12,19 @@
 
 ## KOA2 中间件的原理及其实现
 
+## 1. 参考资料
+
+1. [带你走进 koa2 的世界（koa2 源码浅谈）](https://juejin.cn/post/6844903477798240264)
+
+2. [Koa源码剖析笔记(一) - 主体流程、koa-compose洋葱模型](https://juejin.cn/post/6998677014722904101)
+
+3. [koa实践总结，总有你用的到抄的走的](https://juejin.cn/post/6952665400890884127)
+
+4. [《Koa2进阶学习笔记》已完结](https://chenshenhai.github.io/koa2-note/)
+
+5. [手写Koa.js源码](https://segmentfault.com/a/1190000037769323)
+
+
 ### 1. 中间件的使用
 
 1. 通过 `app.use(function)` 调用。将给定的中间件方法添加到此应用程序中。在 Koa2 中，use() 不接收 path 参数，所以只要发起请求，就会调用这个中间件。
