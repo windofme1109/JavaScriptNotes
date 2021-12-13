@@ -1,4 +1,4 @@
-# Axios 模拟发送表单请求
+# Axios 模拟发送表单请求/模拟上传文件
 
 ## 1. 参考资料
 
@@ -12,7 +12,7 @@
 
 1. 在前端页面，我们使用表单提交一个 post 请求，页面的代码如下所示：
 ```html
-   <form action="/submit" method="post">
+   <form action="/submit" method="post" enctype="application/x-www-form-urlencoded">
        <label for="username">用户名:</label>
        <input type="text" id="username">
        <br>
@@ -112,3 +112,47 @@
         
 
 
+
+
+## 4. Axios 实现文件上传
+
+### 1. 原生表单的方式实现上传
+
+1. 可以通过表单的方式实现文件上传：
+   ```html
+      <form action="/submit" method="post" enctype="multipart/form-data">
+          <input type="file" >
+          <button type="submit">上传</button>
+      </form>
+   ```
+2. 使用表单上传文件，有下面几个要求：
+   - 指定 form 元素的 action 为上传的地址
+   - 请求方法为 post
+   - 还要指定 enctype 为 multipart/form-data
+   - input 的类型为 file。
+
+3.选定文件，点击上传后，浏览器会自动解析上传的文件，将其放在 post 请求的报文主体上，并指定 post 请求的 Content-Type 为 `multipart/form-data`。请求头中的 `Content-Type` 字段值为 `multipart/form-data`，在 `Content-Type` 中可能还附带如下所示的内容分隔符：
+   ```
+      Content-Type: multipart/form-data; boundary=----WebKitFormBoundary4Hsing01Izo2AHqv
+   ```
+   boundary 表示报文主体内容的分隔符，因为我们可能上传多个文件，因此使用 boundary 进行分隔。
+
+4. 假设我们在浏览器端上传一个文件，浏览器解析后的请求报文主体的内容如下：
+   ```
+      ------WebKitFormBoundaryQRppr4oLReN6qlP0
+      Content-Disposition: form-data; name="file"; filename="git.jpg"
+       Content-Type: image/jpeg
+
+       
+      // 二进制数据
+      ------WebKitFormBoundaryQRppr4oLReN6qlP0--
+   ```
+5. 而这次请求的 `Content-Type` 是：
+   ```
+      multipart/form-data; boundary=----WebKitFormBoundaryQRppr4oLReN6qlP0
+   ```
+6. 通过这样的方式，就能实现最基本的文件上传。
+
+7. 使用表单上传文件有一个缺点，就是上传后，页面会刷新，浏览器地址栏中的地址会变成上传文件的地址，这个用户体验就非常不好。
+
+### 1. 使用 Axios 实现上传
