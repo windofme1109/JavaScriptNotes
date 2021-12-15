@@ -1,3 +1,19 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [Axios 模拟发送表单请求/模拟上传文件](#axios-%E6%A8%A1%E6%8B%9F%E5%8F%91%E9%80%81%E8%A1%A8%E5%8D%95%E8%AF%B7%E6%B1%82%E6%A8%A1%E6%8B%9F%E4%B8%8A%E4%BC%A0%E6%96%87%E4%BB%B6)
+  - [1. 参考资料](#1-%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99)
+  - [2. 表单请求的基本说明](#2-%E8%A1%A8%E5%8D%95%E8%AF%B7%E6%B1%82%E7%9A%84%E5%9F%BA%E6%9C%AC%E8%AF%B4%E6%98%8E)
+  - [3. Axios 模拟发送表单请求](#3-axios-%E6%A8%A1%E6%8B%9F%E5%8F%91%E9%80%81%E8%A1%A8%E5%8D%95%E8%AF%B7%E6%B1%82)
+    - [1. 指定 transformRequest](#1-%E6%8C%87%E5%AE%9A-transformrequest)
+    - [2. 使用 URLSearchParams](#2-%E4%BD%BF%E7%94%A8-urlsearchparams)
+  - [4. Axios 实现文件上传](#4-axios-%E5%AE%9E%E7%8E%B0%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0)
+    - [1. 原生表单的方式实现上传](#1-%E5%8E%9F%E7%94%9F%E8%A1%A8%E5%8D%95%E7%9A%84%E6%96%B9%E5%BC%8F%E5%AE%9E%E7%8E%B0%E4%B8%8A%E4%BC%A0)
+    - [2. 使用 Axios 实现上传](#2-%E4%BD%BF%E7%94%A8-axios-%E5%AE%9E%E7%8E%B0%E4%B8%8A%E4%BC%A0)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # Axios 模拟发送表单请求/模拟上传文件
 
 ## 1. 参考资料
@@ -109,10 +125,6 @@
             data: urlSearchParams
         });
    ```
-        
-
-
-
 
 ## 4. Axios 实现文件上传
 
@@ -128,7 +140,7 @@
 2. 使用表单上传文件，有下面几个要求：
    - 指定 form 元素的 action 为上传的地址
    - 请求方法为 post
-   - 还要指定 enctype 为 multipart/form-data
+   - 还要指定 enctype 为 `multipart/form-data`
    - input 的类型为 file。
 
 3.选定文件，点击上传后，浏览器会自动解析上传的文件，将其放在 post 请求的报文主体上，并指定 post 请求的 Content-Type 为 `multipart/form-data`。请求头中的 `Content-Type` 字段值为 `multipart/form-data`，在 `Content-Type` 中可能还附带如下所示的内容分隔符：
@@ -155,4 +167,51 @@
 
 7. 使用表单上传文件有一个缺点，就是上传后，页面会刷新，浏览器地址栏中的地址会变成上传文件的地址，这个用户体验就非常不好。
 
-### 1. 使用 Axios 实现上传
+### 2. 使用 Axios 实现上传
+
+1. 使用 Axios 也能实现文件上传。
+
+2. 当我们使用 input 上传文件的时候，会触发 input 元素的 change 事件。在 change 事件的处理函数中，我们能拿到事件对象 event，通过 event.target 获得当前事件的目标元素，这个目标元素有一个 files 属性，就是存放读取到的文件信息。因为可以同时选择多个文件，files 是一个类数组对象，里面存放了多个和上传文件相关的 file 对象。
+
+3. 拿到上传文件信息后，我们需要手动构造 post 请求体的报文主体内容。使用 FormData 构造函数，生成一个 FormData 实例，然后调用这个实例的 append 方法，将 file 对象添加到 FormData 实例中。
+
+4. 接下来是 Axios 的配置，将 Axios 的请求方法 method 设置为 post，然将 data 属性设置为 FormData 实例，这样 Axios 会自动设置请求的 Content-Type 为 multipart/form-data，不需要我们手动设置 Content-Type。
+
+5. 示例代码（jsx 格式） - html 结构：
+   ```html
+      <div className="moon-upload-file-form">
+                    <input onChange={handleInputFile} type="file" multiple={true}/>
+      </div>
+   ```
+6. handleInputFile 实现：
+   ```js
+      import axios from 'axios';
+   
+      const handleInputFile = async (e) => {
+        const files = e.target.files;
+        if (!files) {
+            return;
+        }
+
+        const fileList = Array.from(files);
+        const formData = new FormData();
+        fileList.forEach((file, index) => {
+            formData.append(`file`, file);
+        });
+        try {
+            const res = await axios({
+                url: '/upload/images',
+                method: 'post',
+                data: formData
+            }).then(data => data).catch(err => err);
+
+             console.log(res);
+        } catch (e) {
+        
+        }
+        
+       
+
+      }
+   ```
+7. 这样就通过 Axios 实现了文件上传。
