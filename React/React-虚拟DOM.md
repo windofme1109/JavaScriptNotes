@@ -20,13 +20,20 @@
 
 ## 1. 参考资料
 
-1. [知乎 - 如何理解虚拟DOM？](https://www.zhihu.com/question/29504639) 
+1. [知乎 - 如何理解虚拟DOM？](https://www.zhihu.com/question/29504639)
+
 2. [深度剖析：如何实现一个 Virtual DOM 算法](https://github.com/livoras/blog/issues/13) 
+
 3. [理解 Virtual DOM](https://github.com/y8n/blog/issues/5) 
+
 4. [深入浅出React（四）：虚拟DOM Diff算法解析](http://www.infoq.com/cn/articles/react-dom-diff) 
+
 5. [全面理解虚拟DOM，实现虚拟DOM](https://foio.github.io/virtual-dom/) 
+
 6. [50行代码实现Virtual DOM](http://www.jianshu.com/p/cbb7d7094fb9) 
+
 7. [网上都说操作真实 DOM 慢，但测试结果却比 React 更快，为什么？](https://www.zhihu.com/question/31809713) 
+
 8. [react官网对虚拟DOM的解释](https://reactjs.org/docs/faq-internals.html)
 
 9. [谈谈React虚拟DOM和diff算法](https://juejin.cn/post/6844903856690724872)
@@ -46,15 +53,16 @@
 1. 虚拟 DOM 树
    - > 虚拟 DOM 是一个概念，表示保存在内存中的 UI，而且通过像 ReactDOM 这样的库来保持与真实的 DOM 同步，这个过程叫做 reconciliation。
    - 上面是官网对虚拟DOM的解释。
-   - 我个人的理解：
-     首先，真实的 DOM 的属性非常多，非常复杂。如果我们直接操作真实的 DOM，在现有的 API 的情况下，速度比较慢。尤其是一个比较大型的应用需要频繁操作 DOM 的场景下，频繁操作 DOM 会严重影响性能。而且我们只需要真实的 DOM 中的一部分属性。
-     其次，虚拟 DOM 并不是真实的 DOM。而是 React 使用 JavaScript 对象表示 DOM 节点。这个 js 对象只实现一部分真实的 DOM 的属性和
-     节点之间的层次关系，它相当于建立在JavaScript 和 DOM 之间的一层“缓存”。
-     基于 JavaScript 语言特性，这样生成的代表 DOM 节点的 js 对象的速度非常快。因此，我们就可以很简单的使用 JavaScript 来表示 DOM 结构。这就是所谓的虚拟 DOM。
-     最后，我们可以根据虚拟 DOM 树构造出真实的 DOM 树。最后调用虚拟 DOM 对象原型的 render() 方法，就可以得到一个真实的 DOM 树。
+
+2. 我个人的理解：
+   - 首先，真实的 DOM 的属性非常多，非常复杂。如果我们直接操作真实的 DOM，在现有的 API 的情况下，速度比较慢。尤其是一个比较大型的应用需要频繁操作 DOM 的场景下，频繁操作 DOM 会严重影响性能。而且我们只需要真实的 DOM 中的一部分属性。
+   - 其次，虚拟 DOM 并不是真实的 DOM。而是 React 使用 JavaScript 对象表示 DOM 节点。这个 js 对象只实现一部分真实的 DOM 的属性和
+   - 节点之间的层次关系，它相当于建立在JavaScript 和 DOM 之间的一层“缓存”。
+   - 基于 JavaScript 语言特性，这样生成的代表 DOM 节点的 js 对象的速度非常快。因此，我们就可以很简单的使用 JavaScript 来表示 DOM 结构。这就是所谓的虚拟 DOM。
+   - 最后，我们可以根据虚拟 DOM 树构造出真实的 DOM 树。最后调用虚拟 DOM 对象原型的 render() 方法，就可以得到一个真实的 DOM 树。
    - 现在我们使用了 js 对象表示 DOM，当数据发生变化的需要改变 DOM 结构的时候，我们可以通过 js 对象表示的虚拟 DOM 计算出实际的 DOM 需要作出的最小的改动。然后将这个改动映射到真实的 DOM 树上。从而避免了粗放式操作 DOM 带来的性能问题。
 
-2. 虚拟 DOM 举例：
+3. 虚拟 DOM 举例：
    - html 结构：
      ```html
         <ul id='list'>
@@ -82,13 +90,13 @@
 
      ``` 
 
-3. 总结：
+4. 总结：
    - 虚拟DOM就是一个 JavaScript 对象，包含了真实 DOM 的一部分属性和节点之间的层次关系。可以依据其构造出真实的 DOM 树，最后调用 render() 方法渲染出真实的 DOM 树。
-4. 虚拟 DOM 更新流程：
+   
+5. 虚拟 DOM 更新流程：
    ![](./img/virtualDOM.png)
 
 ## 3. 比较两棵虚拟DOM树的差异 - diff 算法
-
 
 ### 1. 基本前提 
 

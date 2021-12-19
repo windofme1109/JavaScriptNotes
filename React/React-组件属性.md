@@ -16,7 +16,7 @@
 
 ## 1. 基本说明
 
-1. React 无论是 函数组件还是类组件，都拥有一些组件属性，可以给组件添加一些额外的功能，方便我们开发和调试。
+1. React 无论是函数组件还是类组件，都拥有一些组件属性，可以给组件添加一些额外的功能，方便我们开发和调试。
 
 2. 参考资料
    - [Class 属性 - defaultProps](https://zh-hans.reactjs.org/docs/react-component.html#defaultprops)

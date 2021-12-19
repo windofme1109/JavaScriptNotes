@@ -61,7 +61,7 @@
 
 5. 更新阶段
    1. `componentWillReceiveProps(nextProps)`
-      组件初始化时不调用，组件接收新的props时调用。
+      组件初始化时不调用，组件接收新的 props 时调用。
    2. `shouldComponentUpdate(nextProps, nextState)`
       react性能优化非常重要的一环。组件接受新的 state 或者 props 时调用，我们可以设置在此对比前后两个 props 和 state 是否相同，如果相同则返回 false 阻止更新，因为相同的属性状态一定会生成相同的 dom 树，这样就不需要创造新的 dom 树和旧的 dom 树进行diff算法对比，节省大量性能，尤其是在 dom 结构复杂的时候。
    3. `componentWillUpdate(nextProps, nextState)`
@@ -83,30 +83,30 @@
       构造函数，在创建组件的时候调用一次。
 
    2. `void componentWillMount()`
-       在组件挂载之前调用一次。如果在这个函数里面调用setState，本次的render函数可以看到更新后的state，并且只渲染一次。
+       在组件挂载之前调用一次。如果在这个函数里面调用 setState，本次的 render 函数可以看到更新后的 state，并且只渲染一次。
    3. `void componentDidMount()`
-       在组件挂载之后调用一次。这个时候，子组件也都挂载好了，可以在这里使用refs。
+       在组件挂载之后调用一次。这个时候，子组件也都挂载好了，可以在这里使用 refs。
        
    4. `void componentWillReceiveProps(nextProps)`
-       props是父组件传递给子组件的。父组件发生render的时候子组件就会调用componentWillReceiveProps()（不管props有没有更新，也不管父子组件之间有没有数据交换）。
+       props 是父组件传递给子组件的。父组件发生 render 的时候子组件就会调用 componentWillReceiveProps()（不管 props 有没有更新，也不管父子组件之间有没有数据交换）。
 
    5. `bool shouldComponentUpdate(nextProps, nextState)`
-       组件挂载之后，每次调用setState后都会调用shouldComponentUpdate判断是否需要重新渲染组件。默认返回true，需要重新render。在比较复杂的应用里，有一些数据的改变并不影响界面展示，可以在这里做判断，优化渲染效率。
+       组件挂载之后，每次调用 setState 后都会调用 shouldComponentUpdate 判断是否需要重新渲染组件。默认返回 true，需要重新 render。在比较复杂的应用里，有一些数据的改变并不影响界面展示，可以在这里做判断，优化渲染效率。
 
    6. `void componentWillUpdate(nextProps, nextState)`
-       shouldComponentUpdate返回true或者调用forceUpdate之后，componentWillUpdate会被调用。
+       shouldComponentUpdate 返回 true 或者调用 forceUpdate 之后，componentWillUpdate 会被调用。
+   
    7. `void componentDidUpdate(prevProps, prevState, snapshot)`
-
        除了首次render之后调用componentDidMount，其它render结束之后都是调用componentDidUpdate。
-        componentWillMount、componentDidMount和componentWillUpdate、componentDidUpdate 可以对应起来。区别在于，前者在只有组件装载的时候才会被调用，而后者是每次更新的时候就会被调用。 
+      `componentWillMount`、`componentDidMount` 和 `componentWillUpdate`、`componentDidUpdate` 可以对应起来。区别在于，前者在只有组件装载的时候才会被调用，而后者是每次更新的时候就会被调用。 
 
    8. `ReactElement render()`
-       render是一个React组件所必不可少的核心函数（上面的其它函数都不是必须的）。记住，不要在 render 里面修改 state。
+       render 是一个 React 组件所必不可少的核心函数（上面的其它函数都不是必须的）。记住，不要在 render 里面修改 state。
 
    9. `void componentWillUnmount()`
-       组件被卸载的时候调用。一般在componentDidMount里面注册的事件需要在这里删除。
+       组件被卸载的时候调用。一般在 componentDidMount 里面注册的事件需要在这里删除。
 
-9. 触发更新的几种方式（**注：假设shouldComponentUpdate都是按照默认返回true的方式**）：
+9. 触发更新的几种方式（**注：假设 shouldComponentUpdate 都是按照默认返回true的方式**）：
    1. 初始化阶段
    2. 调用 this.setState() （并不是调用一次 setState 会触发一次 render，React 可能会合并操作，再批量进行 render）
    3. 父组件发生更新 （一般就是 props 发生改变，但是就算 props 没有改变或者父子组件之间没有数据交换也会触发 render）
@@ -248,6 +248,7 @@
       render-num 1
    ```
    从上面的例子中，可以看出，当我们在生命周期函数中多次调用 setState，React 使用的是批量更新方式。即将要更新的 state 放入一个队列中，在合适的时机，执行一次 setState，所以这些新的 state 会被合并然后统一更新。其效果类似于：`Object.assign({}, {num: xx}, {num: yy}, {num: zz})`，所以相同的属性会被合并，后面的属性值会覆盖前面的属性值。所以上例中，`num` 最终结果是 `1` 而不是 `3`。 
+
 3. 合成事件：React 为了解决跨平台、兼容性问题，自己封装实现了一套事件机制，用来取代原生事件。像 onClick、onChange 等都是合成事件。
 
 4. setState 是异步调用的情况：
@@ -267,21 +268,22 @@
 1. `setState(updater, [callback])`
  
 2. 参数说明
-   - `updater` 可以是一个对象，也可以是一个函数。如果是对象的话，里面存放的是需要更新的属性。使用对象形式更新 state 需要注意：**多次调用setState，会进行批量更新，同时拿不到最新的 state。**
-     如果是函数的话，形式如下：
-      ```js
-        (state, props) => stateChange
-      ```
+   - `updater` 
+     - 可以是一个对象，也可以是一个函数。如果是对象的话，里面存放的是需要更新的属性。使用对象形式更新 state 需要注意：**多次调用 setState，会进行批量更新，同时拿不到最新的 state。**
+     - 如果是函数的话，形式如下：
+       ```js
+           (state, props) => stateChange
+       ```
       `state` 是对应用变化时组件状态的引用。`props` 就是对组件的 `props` 的引用。你应该使用基于 `state` 和 `props` 构建的新对象来表示变化。函数最后必须返回一个对象，这个对象的属性就是我们要更新的属性，例如：
-      ```js
-         this.setState((state, props) => {
-            return {
-               counter: state.counter + props.counter
-            }
-         })
-      ```
-      使用回调函数的方式更新 state 更符合函数式编程的思想。同时回调函数能为我们提供可靠的 state 和 props，即自动地将我们的状态更新操作添加到队列中并等待前面的更新完毕后传入最新的状态值。
-   - `callback` 可选的回调函数，这个回调函数在 setState 执行完，更新完 state 以后，重新渲染组件后执行。我们可以在这个回调函数中拿到最新的 state。React 官方 建议使用 componentDidUpdate() 来获取最新的 state。
+       ```js
+          this.setState((state, props) => {
+             return {
+                counter: state.counter + props.counter
+             }
+          })
+       ```
+       使用回调函数的方式更新 state 更符合函数式编程的思想。同时回调函数能为我们提供可靠的 state 和 props，即自动地将我们的状态更新操作添加到队列中并等待前面的更新完毕后传入最新的状态值。
+   - `callback` 可选的回调函数，这个回调函数在 setState 执行完，更新完 state 以后，重新渲染组件后执行。我们可以在这个回调函数中拿到最新的 state。React 官方建议使用 componentDidUpdate() 来获取最新的 state。
       ```js
          this.setState((state, props) => {
             return {
@@ -291,8 +293,7 @@
             console.log('counter', this.state.counter);
          })
       ```
-
-
+   
 ### 4. setState 的推荐使用方式
 
 1. 第一个参数设置为函数，使用函数的方式更新 state。这样做的好处有：
@@ -394,7 +395,7 @@
      ```tsx
          const {Provider, Consumer} = React.createContext(initialValue);
      ```
-   - `Provider` 组件时数据的提供者，通过`value`属性接收存储的公共状态，来传递给子组件或后代组件。示例：
+   - `Provider` 组件时数据的提供者，通过 `value` 属性接收存储的公共状态，来传递给子组件或后代组件。示例：
      ```tsx
          <Provider value={val}>
             <childComponent />
@@ -402,7 +403,7 @@
      ```
      `Provider` 组件一般用在需要向子组件或者后代组件传递数据的地方。可以放在根组件中。要传递的数值放在 `value` 属性中。
 
-   - `Consumer` 组件是数据的消费者，通过订阅`Provider` 传入的 `context` 的值，来实时更新当前组件的状态。示例：
+   - `Consumer` 组件是数据的消费者，通过订阅 `Provider` 传入的 `context` 的值，来实时更新当前组件的状态。示例：
      ```tsx
         <Consumer>
            {
