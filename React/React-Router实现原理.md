@@ -170,13 +170,13 @@
 
 1. `hashchange` 事件：当 url 的片段标识符更改时，将触发 hashchange 事件 (跟在 `#` 符号后面的 url 部分，包括 `#` 符号)。url 中的 hash 部分发生变化触发。
 
-2. window.location.hash 获得 url 中的 hash 部分
+2. `window.location.hash` 获得 `url` 中的 `hash` 部分。
 
 3. `popstate` 事件：当活动历史记录条目更改时，将触发 popstate 事件。如果被激活的历史记录条目是通过对 history.pushState() 的调用创建的，或者受到对 history.replaceState() 的调用的影响，popstate 事件的 state 属性包含历史条目的状态对象的副本。
 
 4. 需要注意的是调用 history.pushState() 或 history.replaceState() 不会触发 popstate 事件。只有在做出浏览器动作时，才会触发该事件，如用户点击浏览器的回退按钮（或者在Javascript 代码中调用 history.back() 或者 history.forward() 方法）。a 标签的锚点也会触发这个事件。
 
-5. window.location.pathname 获得浏览器地址栏的 path 部分
+5. `window.location.pathname` 获得浏览器地址栏的 `path` 部分
 
 6. pushState
    - `history.pushState(state, title[, url])`
