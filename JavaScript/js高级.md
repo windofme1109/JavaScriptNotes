@@ -54,10 +54,14 @@ JavaScript 是单线程的，也就是说，在同一时间只能执行一个任
 ### 2. 事件轮询（Event Loop）
 
 1. JavaScript中，任务分为两种，同步任务和异步任务，在执行过程中进入不同的场所，同步任务进入主线程执行，而异步任务则进入Event Table并注册回调函数。  
-当指定的事件触发时，Event Table将这个函数推入Event Queue。  
-主线程的任务执行完毕，会进入Event Queue取出对应的函数，放到主线程去执行。  
-上述过程不断执行，就是常说的事件轮询（Event Loop）。  
-维基百科的定义是：“事件循环是一个程序结构，用于等待和发送消息和事件（
+
+2. 当指定的事件触发时，Event Table 将这个函数推入 Event Queue。  
+
+3. 主线程的任务执行完毕，会进入 Event Queue 取出对应的函数，放到主线程去执行。  
+
+4. 上述过程不断执行，就是常说的事件轮询（Event Loop）。  
+
+5. 维基百科的定义是：“事件循环是一个程序结构，用于等待和发送消息和事件（
    > a programming construct that waits for and dispatches events or messages in a program.
 
 ### 3. 异步操作的模式
@@ -68,7 +72,7 @@ JavaScript 是单线程的，也就是说，在同一时间只能执行一个任
 2. 事件监听
    - 异步任务的执行不取决于代码的执行，而取决于某个事件是否发生。
 
-3. 发布/订阅 （不了解，暂时不说）
+3. 发布/订阅
   
 4. Promise
 

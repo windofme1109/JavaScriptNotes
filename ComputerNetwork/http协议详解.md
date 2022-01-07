@@ -5,8 +5,8 @@
 - [一、概述](#%E4%B8%80%E6%A6%82%E8%BF%B0)
     - [1. 从输入url，按下回车，到浏览器最终显示界面，都经历了什么？](#1-%E4%BB%8E%E8%BE%93%E5%85%A5url%E6%8C%89%E4%B8%8B%E5%9B%9E%E8%BD%A6%E5%88%B0%E6%B5%8F%E8%A7%88%E5%99%A8%E6%9C%80%E7%BB%88%E6%98%BE%E7%A4%BA%E7%95%8C%E9%9D%A2%E9%83%BD%E7%BB%8F%E5%8E%86%E4%BA%86%E4%BB%80%E4%B9%88)
 - [二、HTTP协议基础及发展历史](#%E4%BA%8Chttp%E5%8D%8F%E8%AE%AE%E5%9F%BA%E7%A1%80%E5%8F%8A%E5%8F%91%E5%B1%95%E5%8E%86%E5%8F%B2)
-  - [1. 5层网络模型简介](#1-5%E5%B1%82%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E7%AE%80%E4%BB%8B)
-    - [1. http协议是基于TCP协议构建的应用层协议。](#1-http%E5%8D%8F%E8%AE%AE%E6%98%AF%E5%9F%BA%E4%BA%8Etcp%E5%8D%8F%E8%AE%AE%E6%9E%84%E5%BB%BA%E7%9A%84%E5%BA%94%E7%94%A8%E5%B1%82%E5%8D%8F%E8%AE%AE)
+  - [1. 5 层网络模型简介](#1-5-%E5%B1%82%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E7%AE%80%E4%BB%8B)
+    - [1. http 协议是基于 TCP 协议构建的应用层协议。](#1-http-%E5%8D%8F%E8%AE%AE%E6%98%AF%E5%9F%BA%E4%BA%8E-tcp-%E5%8D%8F%E8%AE%AE%E6%9E%84%E5%BB%BA%E7%9A%84%E5%BA%94%E7%94%A8%E5%B1%82%E5%8D%8F%E8%AE%AE)
     - [2. 5层的计算机网络模型](#2-5%E5%B1%82%E7%9A%84%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B)
     - [3. 物理层、数据链路层、网络层的作用](#3-%E7%89%A9%E7%90%86%E5%B1%82%E6%95%B0%E6%8D%AE%E9%93%BE%E8%B7%AF%E5%B1%82%E7%BD%91%E7%BB%9C%E5%B1%82%E7%9A%84%E4%BD%9C%E7%94%A8)
     - [4. 传输层](#4-%E4%BC%A0%E8%BE%93%E5%B1%82)
@@ -16,6 +16,10 @@
     - [2. http/1.0](#2-http10)
     - [3. http/1.1](#3-http11)
     - [4. http/2](#4-http2)
+      - [1. 二进制分帧](#1-%E4%BA%8C%E8%BF%9B%E5%88%B6%E5%88%86%E5%B8%A7)
+      - [2. 多路复用（Multiplexing）](#2-%E5%A4%9A%E8%B7%AF%E5%A4%8D%E7%94%A8multiplexing)
+      - [3. 头部压缩（Header Compression）](#3-%E5%A4%B4%E9%83%A8%E5%8E%8B%E7%BC%A9header-compression)
+      - [4. 服务端推送（Server Push）](#4-%E6%9C%8D%E5%8A%A1%E7%AB%AF%E6%8E%A8%E9%80%81server-push)
   - [3. TCP三次握手](#3-tcp%E4%B8%89%E6%AC%A1%E6%8F%A1%E6%89%8B)
   - [4. URI、URL和URN](#4-uriurl%E5%92%8Curn)
     - [1. URI](#1-uri)
@@ -31,17 +35,22 @@
     - [1. JSONP](#1-jsonp)
     - [2. CORS](#2-cors)
     - [3. CORS预请求](#3-cors%E9%A2%84%E8%AF%B7%E6%B1%82)
+      - [1. 简单请求](#1-%E7%AE%80%E5%8D%95%E8%AF%B7%E6%B1%82)
+      - [2. 非简单请求](#2-%E9%9D%9E%E7%AE%80%E5%8D%95%E8%AF%B7%E6%B1%82)
   - [4. 缓存头Cache-Control的含义和使用](#4-%E7%BC%93%E5%AD%98%E5%A4%B4cache-control%E7%9A%84%E5%90%AB%E4%B9%89%E5%92%8C%E4%BD%BF%E7%94%A8)
     - [1. 可缓存性](#1-%E5%8F%AF%E7%BC%93%E5%AD%98%E6%80%A7)
     - [2. 到期](#2-%E5%88%B0%E6%9C%9F)
     - [3. 重新验证](#3-%E9%87%8D%E6%96%B0%E9%AA%8C%E8%AF%81)
     - [4. 其他](#4-%E5%85%B6%E4%BB%96)
     - [5. 如何解决在缓存未失效的情况下，浏览器能够请求到最新的资源？](#5-%E5%A6%82%E4%BD%95%E8%A7%A3%E5%86%B3%E5%9C%A8%E7%BC%93%E5%AD%98%E6%9C%AA%E5%A4%B1%E6%95%88%E7%9A%84%E6%83%85%E5%86%B5%E4%B8%8B%E6%B5%8F%E8%A7%88%E5%99%A8%E8%83%BD%E5%A4%9F%E8%AF%B7%E6%B1%82%E5%88%B0%E6%9C%80%E6%96%B0%E7%9A%84%E8%B5%84%E6%BA%90)
-  - [5. 缓存验证Last-Modified和Etag的使用](#5-%E7%BC%93%E5%AD%98%E9%AA%8C%E8%AF%81last-modified%E5%92%8Cetag%E7%9A%84%E4%BD%BF%E7%94%A8)
+  - [5. 缓存验证 Last-Modified 和 Etag 的使用](#5-%E7%BC%93%E5%AD%98%E9%AA%8C%E8%AF%81-last-modified-%E5%92%8C-etag-%E7%9A%84%E4%BD%BF%E7%94%A8)
     - [1. 资源验证](#1-%E8%B5%84%E6%BA%90%E9%AA%8C%E8%AF%81)
     - [2. 验证头](#2-%E9%AA%8C%E8%AF%81%E5%A4%B4)
+      - [1. Last-Modified](#1-last-modified)
+      - [2. Etag](#2-etag)
     - [3. 强缓存](#3-%E5%BC%BA%E7%BC%93%E5%AD%98)
     - [4. 协商缓存](#4-%E5%8D%8F%E5%95%86%E7%BC%93%E5%AD%98)
+      - [1. 协商缓存具体过程](#1-%E5%8D%8F%E5%95%86%E7%BC%93%E5%AD%98%E5%85%B7%E4%BD%93%E8%BF%87%E7%A8%8B)
     - [5. 一些问题总结](#5-%E4%B8%80%E4%BA%9B%E9%97%AE%E9%A2%98%E6%80%BB%E7%BB%93)
   - [6. Cookie](#6-cookie)
     - [1. Cookie的基本说明](#1-cookie%E7%9A%84%E5%9F%BA%E6%9C%AC%E8%AF%B4%E6%98%8E)
@@ -50,7 +59,11 @@
       - [1. Domain](#1-domain)
       - [2. Path](#2-path)
   - [7. http长连接](#7-http%E9%95%BF%E8%BF%9E%E6%8E%A5)
+    - [1. 短连接](#1-%E7%9F%AD%E8%BF%9E%E6%8E%A5)
+    - [3. 流水线](#3-%E6%B5%81%E6%B0%B4%E7%BA%BF)
   - [8. 数据协商](#8-%E6%95%B0%E6%8D%AE%E5%8D%8F%E5%95%86)
+    - [2. 请求](#2-%E8%AF%B7%E6%B1%82)
+    - [3. 响应](#3-%E5%93%8D%E5%BA%94)
   - [9. content-type 详解](#9-content-type-%E8%AF%A6%E8%A7%A3)
     - [1. 基本说明](#1-%E5%9F%BA%E6%9C%AC%E8%AF%B4%E6%98%8E)
     - [2. 常见的 content-type](#2-%E5%B8%B8%E8%A7%81%E7%9A%84-content-type)
@@ -58,6 +71,7 @@
       - [1.  表单提交的 content-type](#1--%E8%A1%A8%E5%8D%95%E6%8F%90%E4%BA%A4%E7%9A%84-content-type)
       - [2. 上传文件的 content-type](#2-%E4%B8%8A%E4%BC%A0%E6%96%87%E4%BB%B6%E7%9A%84-content-type)
       - [3. 访问接口常用的 content-type](#3-%E8%AE%BF%E9%97%AE%E6%8E%A5%E5%8F%A3%E5%B8%B8%E7%94%A8%E7%9A%84-content-type)
+  - [10. content-disposition 详解](#10-content-disposition-%E8%AF%A6%E8%A7%A3)
   - [10. Redirect（重定向）](#10-redirect%E9%87%8D%E5%AE%9A%E5%90%91)
     - [1. 301](#1-301)
     - [2. 302](#2-302)
@@ -75,33 +89,51 @@
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 # 一、概述
+
 ### 1. 从输入url，按下回车，到浏览器最终显示界面，都经历了什么？
+
 ![](img/1-2.png)
+
 # 二、HTTP协议基础及发展历史
-## 1. 5层网络模型简介
-### 1. http协议是基于TCP协议构建的应用层协议。
+
+## 1. 5 层网络模型简介
+
+### 1. http 协议是基于 TCP 协议构建的应用层协议。
+
 ### 2. 5层的计算机网络模型
-从上到下分别是：
-  - 应用层
-  - 运输层
-  - 网络层
-  - 数据链路层
-  - 物理层  
+
+1. 从上到下分别是：
+   - 应用层
+   - 运输层
+   - 网络层
+   - 数据链路层
+   - 物理层  
+
 ### 3. 物理层、数据链路层、网络层的作用
-  1. 物理层  
+
+1. 物理层  
   定义物理设备如何传输数据。
-  2. 数据链路层  
-  在通信的实体间建立数据链路的连接
-  3. 网络层  
-  在节点之间传输创建逻辑链路
+
+2. 数据链路层  
+  在通信的实体间建立数据链路的连接。
+
+3. 网络层  
+  在节点之间传输创建逻辑链路。
+
 ### 4. 传输层
-向用户提供可靠的端到端（End-to-End）的服务。  
+
+1. 向用户提供可靠的端到端（End-to-End）的服务。  
 传输层向高层屏蔽了下层数据通信的细节。  
-最重要的两个协议：TCP协议和UDP协议。
+
+2. 最重要的两个协议：TCP协议和UDP协议。
+
 ### 5. 应用层
-为软件提供很多服务。  
-构建于TCP协议之上。  
-屏蔽网络传输相关细节。
+
+1. 为软件提供很多服务。  
+
+2. 构建于TCP协议之上。  
+
+3. 屏蔽网络传输相关细节。
 
 ## 2. http协议发展历史
 
@@ -142,18 +174,23 @@
 
 3. http/2 的关键点在于：在应用层(HTTP/2)和传输层(TCP or UDP)之间增加一个二进制分帧层。在二进制分帧层中，http/2 会将所有传输的信息分割为更小的消息和帧（frame），并对它们采用二进制格式的编码，其中 http/1.x 的首部信息会被封装到 HEADER frame，而相应的 Request Body 则封装到 DATA frame 里面。
 
-4. 二进制分帧
-   - 所有数据以二进制的形式传输。以前的是以文本形式进行传输。  
+#### 1. 二进制分帧
 
-5. 多路复用（Multiplexing） 
-   - 同一个TCP连接里面发送多个请求不再需要按照顺序来。并行提高效率。
-   - 允许通过单一的 http/2 连接发起多重的请求-响应。
+1. 所有数据以二进制的形式传输。以前的是以文本形式进行传输。  
 
-6. 头部压缩（Header Compression）
-   - 因为 http/1.x 的头部有大量的信息，而且每次都要重复发送，占用带宽。因此 http/2 对头部信息进行压缩，通信的双方各自缓存一份 header fields 表，避免了头部的重复传输，还减少了传输的数据大小。头部信息压缩目的是减少带宽的占用。
+#### 2. 多路复用（Multiplexing）
 
-7. 服务端推送（Server Push）
-   - 服务端推送能把客户端所需要的资源伴随着 index.html 一起发送到客户端，省去了客户端重复请求的步骤。比如我请求了一个 `style.css` 的样式文件，那么服务器会认为我也需要 `main.js` 这个 js 文件，那么服务器就会主动推送 `main.js` 文件到客户端，而且这个 js 文件可以被浏览器缓存。正因为没有发起请求，建立连接等操作，所以静态资源通过服务端推送的方式可以极大地提升速度。
+1. 同一个TCP连接里面发送多个请求不再需要按照顺序来。并行提高效率。
+
+2. 允许通过单一的 http/2 连接发起多重的请求-响应。
+
+#### 3. 头部压缩（Header Compression）
+
+1. 因为 http/1.x 的头部有大量的信息，而且每次都要重复发送，占用带宽。因此 http/2 对头部信息进行压缩，通信的双方各自缓存一份 header fields 表，避免了头部的重复传输，还减少了传输的数据大小。头部信息压缩目的是减少带宽的占用。
+
+#### 4. 服务端推送（Server Push）
+
+1. 服务端推送能把客户端所需要的资源伴随着 index.html 一起发送到客户端，省去了客户端重复请求的步骤。比如我请求了一个 `style.css` 的样式文件，那么服务器会认为我也需要 `main.js` 这个 js 文件，那么服务器就会主动推送 `main.js` 文件到客户端，而且这个 js 文件可以被浏览器缓存。正因为没有发起请求，建立连接等操作，所以静态资源通过服务端推送的方式可以极大地提升速度。
 
 ## 3. TCP三次握手
 
@@ -161,10 +198,12 @@
 
 ### 1. URI
 
-1. 统一资源标识符（Uniform Resource Identifier）  
+1. 统一资源标识符（Uniform Resource Identifier）。
+
 2. 用来唯一标识互联网上的信息资源，包括URL和URN。
 
 ### 2. URL
+
 1. 统一资源定位符（Uniform Resource Location）  
 
 2. 对互联网上的资源进行定位。我的理解：就是告诉你这个资源位于那一台主机的哪个文件夹里面。  
@@ -222,17 +261,23 @@
    ![](./img/response-header-2.png)
 
 ### 3. http方法
-用来定义对于资源的操作，主要有：
-GET  获取
-POST 修改
-PUT 上传较大的文件
-DELETE 删除文件
-OPTION 查询url支持哪些方法
-HEAD 获取首部信息
+
+1.用来定义对于资源的操作，主要有：
+  - GET  获取
+  - POST 修改
+  - PUT 上传较大的文件
+  - DELETE 删除文件
+  - OPTION 查询url支持哪些方法
+  - HEAD 获取首部信息
+
 ### 4. http状态码
-定义服务器对请求的处理结果  
-各个区间的CODE的有各自的语义  
-好的HTTP服务可以通过状态码判断结果
+
+1. 定义服务器对请求的处理结果。
+
+2. 各个区间的CODE的有各自的语义。
+
+3. 好的HTTP服务可以通过状态码判断结果。
+
 # 三、HTTP各种特性总览
 
 ## 1. 跨域
@@ -253,22 +298,26 @@ HEAD 获取首部信息
 
 ### 3. CORS预请求
 
-1. 简单请求   
-   1. 如果请求信息满足以下两个条件，就是简单请求，简单请求不需要预先发送请求，而是直接发送CORS请求。具体来说，就是在头信息之中，增加一个Origin字段。 
-      1. 默认允许的方法  
-         - GET
-         - POST
-         - HEAD
-      2. HTTP的头信息不超出以下几种字段：
-         - Accept
-         - Accept-Language
-         - Content-Language
-         - Last-Event-ID
-         - Content-Type：只限于三个值：
-           - application/x-www-form-urlencoded
-           - multipart/form-data
-           - text/plain  
-   2. 如果Origin指定的域名在许可范围内，服务器返回的响应，会多出几个头信息字段：  
+#### 1. 简单请求 
+
+1. 如果请求信息满足以下两个条件，就是简单请求，简单请求不需要预先发送请求，而是直接发送 CORS 请求。具体来说，就是在头信息之中，增加一个 Origin 字段。 
+
+2. 默认允许的方法  
+   - GET
+   - POST
+   - HEAD
+
+3. HTTP的头信息不超出以下几种字段：
+   - Accept
+   - Accept-Language
+   - Content-Language
+   - Last-Event-ID
+   - Content-Type：只限于三个值：
+      - application/x-www-form-urlencoded
+      - multipart/form-data
+      - text/plain  
+
+4. 如果Origin指定的域名在许可范围内，服务器返回的响应，会多出几个头信息字段：  
       ```javascript
          Access-Control-Allow-Origin: http://localhost:8888
          Access-Control-Allow-Credentials: true
@@ -277,32 +326,38 @@ HEAD 获取首部信息
          Date: Wed, 16 Oct 2019 05:27:49 GMT
          Transfer-Encoding: chunked
       ```
-   3. 字段说明：
-      - Access-Control-Allow-Origin  
+5. 字段说明：
+   - Access-Control-Allow-Origin  
       该字段是必须的。它的值要么是请求时Origin字段的值，要么是一个*，表示接受任意域名的请求。
-      - Access-Control-Allow-Credentials  
+   - Access-Control-Allow-Credentials  
       该字段可选。它的值是一个布尔值，表示是否允许发送Cookie。默认情况下，Cookie不包括在CORS请求之中。设为true，即表示服务器明确许可，Cookie可以包含在请求中，一起发给服务器。这个值也只能设为true，如果服务器不要浏览器发送Cookie，删除该字段即可。
-      - Access-Control-Expose-Headers  
+   - Access-Control-Expose-Headers  
       该字段可选。CORS请求时，XMLHttpRequest对象的getResponseHeader()方法只能拿到6个基本字段：Cache-Control、Content-Language、Content-Type、Expires、Last-Modified、Pragma。如果想拿到其他字段，就必须在Access-Control-Expose-Headers里面指定。上面的例子指定，getResponseHeader('FooBar')可以返回FooBar字段的值。
-   4. CORS请求默认不发送Cookie和HTTP认证信息。如果要把Cookie发到服务器，一方面要服务器同意，指定Access-Control-Allow-Credentials字段。 
+
+6. CORS 请求默认不发送 Cookie 和 HTTP 认证信息。如果要把 Cookie 发到服务器，一方面要服务器同意，指定Access-Control-Allow-Credentials 字段。 
 `Access-Control-Allow-Credentials: true`。
-   5. 另一方面，开发者必须在AJAX请求中打开withCredentials属性。
+
+7. 另一方面，开发者必须在AJAX请求中打开withCredentials属性。
       ```javascript
          // ajax配置方法
          var xhr = new XMLHttpRequest();
          xhr.withCredentials = true;
       ```
     
-   6. 否则，即使服务器同意发送Cookie，浏览器也不会发送。或者，服务器要求设置Cookie，浏览器也不会处理。
-    但是，如果省略withCredentials设置，有的浏览器还是会一起发送Cookie。这时，可以显式关闭withCredentials。`xhr.withCredentials = false;`。
-   7. 需要注意的是，如果要发送Cookie，Access-Control-Allow-Origin就不能设为星号，必须指定明确的、与请求网页一致的域名。同时，Cookie依然遵循同源政策，只有用服务器域名设置的Cookie才会上传，其他域名的Cookie并不会上传，且（跨源）原网页代码中的document.cookie也无法读取服务器域名下的Cookie。  
+8. 否则，即使服务器同意发送 Cookie，浏览器也不会发送。或者，服务器要求设置 Cookie，浏览器也不会处理。
+    但是，如果省略 withCredentials 设置，有的浏览器还是会一起发送 Cookie。这时，可以显式关闭 withCredentials。`xhr.withCredentials = false;`。
+
+9. 需要注意的是，如果要发送Cookie，Access-Control-Allow-Origin就不能设为星号，必须指定明确的、与请求网页一致的域名。同时，Cookie依然遵循同源政策，只有用服务器域名设置的Cookie才会上传，其他域名的Cookie并不会上传，且（跨源）原网页代码中的document.cookie也无法读取服务器域名下的Cookie。  
  
-2. 非简单请求   
-   1. 请求信息不满足以上的两个条件，就是非简单请求。非简单请求是那种对服务器有特殊要求的请求，比如请求方法是PUT或DELETE，或者Content-Type字段的类型是application/json。  
-   2. 非简单请求的CORS请求，会在正式通信之前，增加一次HTTP查询请求，称为"预检"请求（preflight）。  
-  浏览器先询问服务器，当前网页所在的域名是否在服务器的许可名单之中，以及可以使用哪些HTTP请求方法和头信息字段。只有得到肯定答复，浏览器才会发出正式的XMLHttpRequest请求，否则就报错。  
-  例如，使用fetch方法发送一个请求，并自定义头部信息。
-  
+#### 2. 非简单请求 
+
+1. 请求信息不满足以上的两个条件，就是非简单请求。非简单请求是那种对服务器有特殊要求的请求，比如请求方法是PUT或DELETE，或者Content-Type字段的类型是application/json。  
+
+2. 非简单请求的CORS请求，会在正式通信之前，增加一次HTTP查询请求，称为"预检"请求（preflight）。  
+
+3. 浏览器先询问服务器，当前网页所在的域名是否在服务器的许可名单之中，以及可以使用哪些HTTP请求方法和头信息字段。只有得到肯定答复，浏览器才会发出正式的XMLHttpRequest请求，否则就报错。  
+
+4. 例如，使用 fetch 方法发送一个请求，并自定义头部信息。
        ```javascript
          fetch('http://localhost:3000', {
              // 设置请求方法
@@ -314,7 +369,7 @@ HEAD 获取首部信息
          }).then() ;
       ```
 
-   3. 浏览器发现这是一个非简单请求，就会发送一个预请求，要求服务器可以确认这样的请求。我们可以看一下预请求的头部信息：
+5. 浏览器发现这是一个非简单请求，就会发送一个预请求，要求服务器可以确认这样的请求。我们可以看一下预请求的头部信息：
    
        ```javascript
        OPTIONS /cors HTTP/1.1
@@ -326,12 +381,13 @@ HEAD 获取首部信息
        User-Agent: Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.87 Safari/537.36
       ```
 
-   4. 这个预请求的方法是Options，表示这个请求是用来询问的。头信息里面，关键字段是Origin，表示请求来自哪个源。 除了Origin字段，"预检"请求的头信息包括两个特殊字段。
-      - Access-Control-Request-Method  
-      该字段是必须的，用来列出浏览器的CORS请求会用到哪些HTTP方法，上例是POST。
-      - Access-Control-Request-Headers  
-      该字段是一个逗号分隔的字符串，指定浏览器CORS请求会额外发送的头信息字段，上例是X-Test-Cors。
-   5. 服务器收到"预检"请求以后，检查了Origin、Access-Control-Request-Method和Access-Control-Request-Headers字段以后，确认允许跨源请求，就可以做出回应。我们的响应头如下：
+6. 这个预请求的方法是Options，表示这个请求是用来询问的。头信息里面，关键字段是Origin，表示请求来自哪个源。 除了Origin字段，"预检"请求的头信息包括两个特殊字段。
+   - Access-Control-Request-Method  
+     该字段是必须的，用来列出浏览器的CORS请求会用到哪些HTTP方法，上例是POST。
+   - Access-Control-Request-Headers  
+     该字段是一个逗号分隔的字符串，指定浏览器CORS请求会额外发送的头信息字段，上例是X-Test-Cors。
+
+7. 服务器收到"预检"请求以后，检查了Origin、Access-Control-Request-Method和Access-Control-Request-Headers字段以后，确认允许跨源请求，就可以做出回应。我们的响应头如下：
    
       ```javascript
          Access-Control-Allow-Headers: X-Test-Cors
@@ -341,8 +397,10 @@ HEAD 获取首部信息
          Date: Wed, 16 Oct 2019 03:44:05 GMT
          Transfer-Encoding: chunked
         ```
-   6. 在上面的响应头中，关键的是Access-Control-Allow-Origin字段，表示http://localhost:8888可以请求数据。该字段也可以设为星号，表示同意任意跨源请求。即`Access-Control-Allow-Origin: *`。  
-   服务器回应的其他CORS相关字段如下：
+
+8. 在上面的响应头中，关键的是Access-Control-Allow-Origin字段，表示http://localhost:8888可以请求数据。该字段也可以设为星号，表示同意任意跨源请求。即`Access-Control-Allow-Origin: *`。  
+
+9. 服务器回应的其他CORS相关字段如下：
   
       ```javascript
           Access-Control-Allow-Headers: X-Test-Cors
@@ -350,17 +408,19 @@ HEAD 获取首部信息
           Access-Control-Allow-Credentials: true
           Access-Control-Allow-Max-Age: 1728000
       ```     
-   7. 每个字段的含义如下：
-      - Access-Control-Allow-Methods   
+10. 每个字段的含义如下：
+    - Access-Control-Allow-Methods   
       该字段必需，它的值是逗号分隔的一个字符串，表明服务器支持的所有跨域请求的方法。注意，返回的是所有支持的方法，而不单是浏览器请求的那个方法。这是为了避免多次"预检"请求。
-      - Access-Control-Allow-Headers  
+    - Access-Control-Allow-Headers  
       如果浏览器请求包括Access-Control-Request-Headers字段，则Access-Control-Allow-Headers字段是必需的。它也是一个逗号分隔的字符串，表明服务器支持的所有头信息字段，不限于浏览器在"预检"中请求的字段。
-      - Access-Control-Allow-Credentials    
+    - Access-Control-Allow-Credentials    
       该字段与简单请求时的含义相同。
-      - Access-Control-Allow-Max-Age    
+    - Access-Control-Allow-Max-Age    
       该字段可选，用来指定本次预检请求的有效期，单位为秒。上面结果中，有效期是20天（1728000秒），即允许缓存该条回应1728000秒（即20天），在此期间，不用发出另一条预检请求。
-   8. 一旦服务器通过了"预检"请求，以后每次浏览器正常的CORS请求，就都跟简单请求一样，会有一个Origin头信息字段。服务器的回应，也都会有一个Access-Control-Allow-Origin头信息字段。
-   9. 经过“预检”之后，浏览器的正常CORS请求如下：
+
+11. 一旦服务器通过了"预检"请求，以后每次浏览器正常的CORS请求，就都跟简单请求一样，会有一个Origin头信息字段。服务器的回应，也都会有一个Access-Control-Allow-Origin头信息字段。
+
+12. 经过“预检”之后，浏览器的正常 CORS 请求如下：
       ```javascript
        Origin: http://localhost:8888
        Referer: http://localhost:8888/
@@ -370,7 +430,8 @@ HEAD 获取首部信息
       ```
       上面头信息的Origin字段是浏览器自动添加的。  
       同预检的请求头相比，没有了Access-Control-Request-Headers、Access-Control-Request-Methods和Access-Control-Allow-Origin。
-   10. 而服务器的回应是这样的：
+
+13. 而服务器的回应是这样的：
        ```javascript
           Access-Control-Allow-Headers: X-Test-Cors
           Access-Control-Allow-Methods: PUT, DELETE
@@ -384,7 +445,7 @@ HEAD 获取首部信息
 
 ### 1. 可缓存性
 
-- 可缓存性指的是哪些地方可以进行缓存，主要的值有：
+1. 可缓存性指的是哪些地方可以进行缓存，主要的值有：
     - public  
     客户端和代理服务器(CDN)都可缓存，任何请求经过的地方都可缓存。
     - private  
@@ -394,7 +455,7 @@ HEAD 获取首部信息
 
 ### 2. 到期
 
-- 指的是经过多长时间，缓存过期。主要的值有：
+1. 指的是经过多长时间，缓存过期。主要的值有：
   - max-age = `seconds`  
   请求缓存后的X秒不再发起请求，属于http1.1属性，与Expires(http1.0属性)类似，但优先级要比Expires高
   - s-maxage = `seconds`  
@@ -404,59 +465,72 @@ HEAD 获取首部信息
 
 ### 3. 重新验证
 
-- 我的理解是，缓存设置时间max-age到期后，就要重新想源服务器请求新的数据。
-  - must-revalidate  
-  缓存到期后，客户端必须重新向源服务器请求数据。
-  - proxy-revalidate  
+1. 我的理解是，缓存设置时间max-age到期后，就要重新想源服务器请求新的数据。
+
+2. must-revalidate  
+   缓存到期后，客户端必须重新向源服务器请求数据。
+
+3. proxy-revalidate  
   缓存到期后，缓存服务器（代理服务器）必须重新向源服务器请求数据。  
-- 这两个字段不常用。
+
+4. 这两个字段不常用。
 
 ### 4. 其他
 
-- 还有no-store、no-transform字段。
-  - no-store  
-  所有内容都不缓存
-  - no-transform  
-  用在代理服务器上，代理服务器可能资源进行压缩等操作，设置了这个字段，表示不允许服务器进行这个操作。
+1.  还有 no-store、no-transform 字段。
+
+2. no-store  
+   所有内容都不缓存
+
+2. no-transform  
+   用在代理服务器上，代理服务器可能资源进行压缩等操作，设置了这个字段，表示不允许服务器进行这个操作。
 
 ### 5. 如何解决在缓存未失效的情况下，浏览器能够请求到最新的资源？
 
-- 如果我们的max-age设置的时间很长，那么在这个期间内，浏览器都不会主动发起请求获得最新的资源，但是我们的资源又常常更新，如何让浏览器感受到变化然后能够请求最新的资源呢？
+1.  如果我们的max-age设置的时间很长，那么在这个期间内，浏览器都不会主动发起请求获得最新的资源，但是我们的资源又常常更新，如何让浏览器感受到变化然后能够请求最新的资源呢？
 
-- 常见的做法是，在前端工程化的构建过程中，我们给资源名称附加上MD5，这样资源发生变化，MD5也跟着发生变化。这样嵌入在html页面中资源的名称也会跟着变化。对于浏览器而言，url变了，则需要重新请求资源。这样就实现了浏览器在缓存未过期的情况下请求最新的资源。
+2. 常见的做法是，在前端工程化的构建过程中，我们给资源名称附加上MD5，这样资源发生变化，MD5也跟着发生变化。这样嵌入在html页面中资源的名称也会跟着变化。对于浏览器而言，url变了，则需要重新请求资源。这样就实现了浏览器在缓存未过期的情况下请求最新的资源。
 
-## 5. 缓存验证Last-Modified和Etag的使用
+## 5. 缓存验证 Last-Modified 和 Etag 的使用
 
 ### 1. 资源验证
 
-浏览器对于资源的请求以及缓存的使用如下图所示：
-![](./img/3-5.png)
+1. 浏览器对于资源的请求以及缓存的使用如下图所示：
+   ![](./img/3-5.png)
 
 ### 2. 验证头
 
-- Last-Modified  
-资源上次修改的时间。  
-配合If-Modified-Since或者If-Unmodified-Since使用。
-last-Modified是服务器传给浏览器的一个字段，表示资源的修改时间。当浏览器发起请求的时候，将If-Modified-Since这个字段的属性值设置为资源上次修改的时间（也就是Last-Modified的值），服务器接收到这个字段后，会将If-Modified-Since字段代表的时间同资源最新的修改时间进行比对，如果相同，表示资源没有变化，服务器就告诉浏览器，使用缓存即可，此时返回的状态码是304，表示Not Modified。如果不同，表示资源有变化，服务器会返回给浏览器最新的资源。
+#### 1. Last-Modified  
 
-- Etag  
-一种更加严格的验证机制。通过数据签名实现验证。通过哈希计算，得到同资源内容相关的唯一标识，只要资源内容发生变化，那么这个唯一标识也会发生变化。  
-配合If-Match或者If-Non-Match使用。  
-Etag由服务器发送给浏览器。发起请求时，浏览器将Etag的值赋给If-Non-Match，发送给服务器，服务会对If-Non-Match代表的标识同Etag进行比对，如果相同，表示资源没有变化，服务器就告诉浏览器，使用缓存即可，此时返回的状态码是304，表示Not Modified。如果不同，表示资源有变化，服务器会返回给浏览器最新的资源。
+1. 资源上次修改的时间。 
+
+2. 配合If-Modified-Since或者If-Unmodified-Since使用。
+
+3. last-Modified是服务器传给浏览器的一个字段，表示资源的修改时间。当浏览器发起请求的时候，将- - If-Modified-Since这个字段的属性值设置为资源上次修改的时间（也就是Last-Modified的值），服务器接收到这个字段后，会将If-Modified-Since字段代表的时间同资源最新的修改时间进行比对，如果相同，表示资源没有变化，服务器就告诉浏览器，使用缓存即可，此时返回的状态码是304，表示Not Modified。如果不同，表示资源有变化，服务器会返回给浏览器最新的资源。
+
+#### 2. Etag  
+
+1.  一种更加严格的验证机制。通过数据签名实现验证。通过哈希计算，得到同资源内容相关的唯一标识，只要资源内容发生变化，那么这个唯一标识也会发生变化。  
+
+2. 配合If-Match或者If-Non-Match使用。  
+
+3. Etag由服务器发送给浏览器。发起请求时，浏览器将Etag的值赋给If-Non-Match，发送给服务器，服务会对If-Non-Match代表的标识同Etag进行比对，如果相同，表示资源没有变化，服务器就告诉浏览器，使用缓存即可，此时返回的状态码是304，表示Not Modified。如果不同，表示资源有变化，服务器会返回给浏览器最新的资源。
 
 ### 3. 强缓存
 
-- 浏览器第一次请求数据，服务器除了将资源返回给浏览器之外，还会将缓存规则包含在响应 header 中。  
+1.  浏览器第一次请求数据，服务器除了将资源返回给浏览器之外，还会将缓存规则包含在响应 header 中。  
 
-- 对于强缓存而言，响应 header 中有两个字段：Expires（过期时间）和Cache-Control，用来标明失效规则。
-  - Expires  
-  表示过期时间，是 GMT 格式的日期时间字符串。由服务器设置，并发送给浏览器。这个字段是 http 1.0 时期的产物。使用上存在问题，就是浏览器获取的是本地时间，但是本地时间容易被修改，这样就会导致这个过期的时间不准确。
-  - Cache-Control
+2. 对于强缓存而言，响应 header 中有两个字段：Expires（过期时间）和 Cache-Control，用来标明失效规则。
+
+3. Expires  
+   - 表示过期时间，是 GMT 格式的日期时间字符串。由服务器设置，并发送给浏览器。这个字段是 http 1.0 时期的产物。使用上存在问题，就是浏览器获取的是本地时间，但是本地时间容易被修改，这样就会导致这个过期的时间不准确。
+
+4. Cache-Control
   前面说到了，这里不详细说了。
 
-- 同时设置了 Expires 和 Cache-Control，Cache-Control 的优先级要高于 Expires。
+5. 同时设置了 Expires 和 Cache-Control，Cache-Control 的优先级要高于 Expires。
 
-- 那么什么是强缓存呢？实际上就是缓存没有过期，我们不需要发送请求，浏览器直接使用本地缓存即可。
+6. 那么什么是强缓存呢？实际上就是缓存没有过期，我们不需要发送请求，浏览器直接使用本地缓存即可。
 
 ### 4. 协商缓存
 
@@ -464,20 +538,25 @@ Etag由服务器发送给浏览器。发起请求时，浏览器将Etag的值赋
 
 2. 缓存资源的头部的 Cache-Control 字段设置了 no-cache，那么浏览器每次使用缓存前，都要发请求服务器，询问一下能否使用本地缓存，如果能使用，服务器返回 304。如果不能使用，服务器返回最新的资源和和缓存标识给浏览器。
 
-3. 具体过程
-  1. 浏览器第一次请求该资源，服务器将资源和缓存标识传递给浏览器，此时的缓存标识包含 Last-Modified 和 Etag。
-  2. 如果未命中强缓存，则浏览器会发送请求到服务器。请求头主要包含两个字段：If-Modified-Since 和 If-None-Match。If-Modified-Since 就是上一次服务器返回的 Last-Modified 的值，而 If-None-Match 则是上一次服务器返回的 Etag 的值。
-  3. 服务器接收到这个请求后，会将请求头中的 If-Modified-Since 同请求资源的最后修改时间（Last-Modified）进行比对：
-     - 如果最后修改时间同 If-Modified-Since 表示的时间相同，则说明资源文件没有发生变化，此时服务器返回 304，不返回任何资源。通知浏览器可以继续使用本地缓存。
-     - 如果最后修改时间大于 If-Modified-Since 表示的时间，则说明资源文件发生变化，此时服务器返回 200，并携带最新的资源返回。
-  4. 服务器将请求头中的 If-None-Match 与资源的唯一标识（Etag）进行比对：
-     - 相同，则说明资源文件没有发生变化，此时服务器返回304，不返回任何资源。通知浏览器可以继续使用本地缓存。
-     - 不同，则说明资源文件发生变化，此时服务器返回200，并携带最新的资源返回。
-   5. 注意，第3步和第4步是同时进行的。Etag 的优先级高于 Last-Modified。也就是说，优先验证 Etag，没有变化的情况下，才会去验证 Last-Modified。
+#### 1. 协商缓存具体过程
+
+1. 浏览器第一次请求该资源，服务器将资源和缓存标识传递给浏览器，此时的缓存标识包含 Last-Modified 和 Etag。
+
+2. 如果未命中强缓存，则浏览器会发送请求到服务器。请求头主要包含两个字段：If-Modified-Since 和 If-None-Match。If-Modified-Since 就是上一次服务器返回的 Last-Modified 的值，而 If-None-Match 则是上一次服务器返回的 Etag 的值。
+
+3. 服务器接收到这个请求后，会将请求头中的 If-Modified-Since 同请求资源的最后修改时间（Last-Modified）进行比对：
+   - 如果最后修改时间同 If-Modified-Since 表示的时间相同，则说明资源文件没有发生变化，此时服务器返回 304，不返回任何资源。通知浏览器可以继续使用本地缓存。
+   - 如果最后修改时间大于 If-Modified-Since 表示的时间，则说明资源文件发生变化，此时服务器返回 200，并携带最新的资源返回。
+
+4. 服务器将请求头中的 If-None-Match 与资源的唯一标识（Etag）进行比对：
+   - 相同，则说明资源文件没有发生变化，此时服务器返回304，不返回任何资源。通知浏览器可以继续使用本地缓存。
+   - 不同，则说明资源文件发生变化，此时服务器返回200，并携带最新的资源返回。
+
+5. 注意，第3步和第4步是同时进行的。Etag 的优先级高于 Last-Modified。也就是说，优先验证 Etag，没有变化的情况下，才会去验证 Last-Modified。
 
 ### 5. 一些问题总结
 
-1. Etag 与 If-None-Match 是一对，值相同，只不过Etag是服务器生成并传给浏览器的，而If-None-Match则是浏览器传递给服务器的。
+1. Etag 与 If-None-Match 是一对，值相同，只不过 Etag 是服务器生成并传给浏览器的，而 If-None-Match 则是浏览器传递给服务器的。
 
 2. Last-Modified 和 If-Modified-Since 是一对。Last-Modified 是服务器生成传给浏览器的，而 If-Modified-Since 则是浏览器传递给服务器的。
 
@@ -493,7 +572,7 @@ Etag由服务器发送给浏览器。发起请求时，浏览器将Etag的值赋
   - Etag 是服务器自动生成或者由开发者生成的对应资源在服务器端的唯一标识符，能够更加准确的控制缓存。Last-Modified 与ETag 是可以一起使用的，服务器会优先验证 ETag，一致的情况下，才会继续比对 Last-Modified，最后才决定是否返回 304。
 
 5. 生成 Etag 的方式  
-根据文件的内容、修改时间、大小等生成。
+   - 根据文件的内容、修改时间、大小等生成。
 
 6. 用户行为与缓存
   
@@ -550,57 +629,88 @@ Etag由服务器发送给浏览器。发起请求时，浏览器将Etag的值赋
 这时，我们要把 Cookie 的 Path 属性设置成 `/`。在指定路径的时候，凡是来自同一服务器，URL 里有相同路径的所有 WEB 页面都可以共享 Cookie。简单来讲，下面的路径可以访问上面的路径的内容，当  Path 设置为 `/`,则意味着根路径下面都可以访问。
 
 
-
-
 ## 7. http长连接  
 
-- http1.x有几种连接模式:
-  - short-lived connections(短连接) 
-  - persistent connections(长连接)
-  - HTTP pipelining(HTTP 流水线)
- - 三种连接如下图所示：
+1. http1.x 有几种连接模式:
+   - short-lived connections(短连接) 
+   - persistent connections(长连接)
+   - HTTP pipelining(HTTP 流水线)
+
+2. 三种连接如下图所示：
  ![](https://upload-images.jianshu.io/upload_images/3209607-456fb95b0a3451ae.png)   
- - 短连接  
- 短连接是http 1.0的特性。每一个 HTTP 请求都由它自己独立的连接完成；这意味着发起每一个 HTTP 请求之前都会有一次 TCP 握手，而且是连续不断的。  
- 意思是每次发起一个http请求，都要建立一个TCP连接，http请求结束后，TCP连接也会关闭。  
- 缺点：由于建立一次TCP连接耗费时间，所以TCP可以保持更多的热连接来适应负载。短连接破坏了TCP具备的能力，新的冷连接降低了其性能。  
- 在 HTTP/1.1 中，只有当请求头字段 Connection 被设置为 close 时才会用到这个模型。  
- - 长连接  
- 在 HTTP/1.1 里，默认就是长连接的。  
- 请求头有一个connection字段，默认是keep-alive。意思就是http连接是长连接。   
- 一个长连接会保持一段时间，重复用于发送一系列请求，节省了新建 TCP 连接握手的时间，还可以利用 TCP 的性能增强能力。当然这个连接也不会一直保留着：连接在空闲一段时间后会被关闭(服务器可以使用 Keep-Alive 协议头来指定一个最小的连接保持时间)。  
- 缺点：就算是在空闲状态，它还是会消耗服务器资源，而且在重负载时，还有可能遭受 DoS attacks 攻击。这种场景下，可以使用非长连接，即尽快关闭那些空闲的连接，也能对性能有所提升。  
- - 流水线  
- 默认情况下，HTTP请求是按顺序发出的。下一个请求只有在当前请求收到应答过后才会被发出。由于会受到网络延迟和带宽的限制，在下一个请求被发送到服务器之前，可能需要等待很长时间。  
- 流水线是在同一条长连接上发出连续的请求，而不用等待应答返回。这样可以避免连接延迟。理论上讲，性能还会因为两个 HTTP 请求有可能被打包到一个 TCP 消息包中而得到提升。  
- 流水线就是浏览器并行发送http请求，服务器串行发送http响应。
- - chrome浏览器在一个TCP连接上，允许同时发送（并行）6个http连接。
- - http 2.0默认在一个TCP连接上发送所有的http连接（同一域名下）。也就是所谓的信道复用。
- - 在服务器端，如果我们设置响应头中connection字段为close，则关闭长连接，启动短连接。
+ -
+ ### 1. 短连接  
+ 
+1. 短连接是http 1.0的特性。每一个 HTTP 请求都由它自己独立的连接完成；这意味着发起每一个 HTTP 请求之前都会有一次 TCP 握手，而且是连续不断的。
+
+2.意思是每次发起一个http请求，都要建立一个TCP连接，http请求结束后，TCP连接也会关闭。  
+ 
+3. 缺点：由于建立一次TCP连接耗费时间，所以TCP可以保持更多的热连接来适应负载。短连接破坏了TCP具备的能力，新的冷连接降低了其性能。  
+
+4. 在 HTTP/1.1 中，只有当请求头字段 Connection 被设置为 close 时才会用到这个模型。  
+ 
+ ### 2. 长连接  
+ 
+1. 在 HTTP/1.1 里，默认就是长连接的。  
+ 
+2. 请求头有一个connection字段，默认是keep-alive。意思就是http连接是长连接。   
+ 
+3. 一个长连接会保持一段时间，重复用于发送一系列请求，节省了新建 TCP 连接握手的时间，还可以利用 TCP 的性能增强能力。当然这个连接也不会一直保留着：连接在空闲一段时间后会被关闭(服务器可以使用 Keep-Alive 协议头来指定一个最小的连接保持时间)。  
+ 
+4. 缺点：就算是在空闲状态，它还是会消耗服务器资源，而且在重负载时，还有可能遭受 DoS attacks 攻击。这种场景下，可以使用非长连接，即尽快关闭那些空闲的连接，也能对性能有所提升。  
+
+### 3. 流水线  
+
+1. 默认情况下，HTTP请求是按顺序发出的。下一个请求只有在当前请求收到应答过后才会被发出。由于会受到网络延迟和带宽的限制，在下一个请求被发送到服务器之前，可能需要等待很长时间。  
+ 流水线是在同一条长连接上发出连续的请求，而不用等待应答返回。这样可以避免连接延迟。理论上讲，性能还会因为两个 HTTP 请求有可能被打包到一个 TCP 消息包中而得到提升。 
+
+ 
+2. 流水线就是浏览器并行发送http请求，服务器串行发送http响应。
+
+3. chrome浏览器在一个TCP连接上，允许同时发送（并行）6个http连接。
+
+4. http 2.0默认在一个TCP连接上发送所有的http连接（同一域名下）。也就是所谓的信道复用。
+
+5. 在服务器端，如果我们设置响应头中connection字段为close，则关闭长连接，启动短连接。
+
 ## 8. 数据协商
-- 浏览器发起请求时，会声明这这一次的请求希望得到的数据格式。服务器收到这一次请求后，会根据请求头信息，决定返回什么格式的数据。
-- 请求  
-请求头中，有几个字段，用来表示我们希望得到的数据格式。主要有：
-  - Accept  
-  指定希望得到的数据类型。
-  - Accept-Encoding  
-  数据编码方法，指定服务端如何进行数据的压缩。
-  - Accept-Language
-  浏览器愿意接受的语言类型。
-  - User-Agent  
-  客户端信息。
-  - Content-Type
-    指 http/https 发送信息至服务器时的内容编码类型，Content-Type用于表明发送数据流的类型，服务器根据编码类型使用特定的解析方式，获取数据流中的数据。
-- 响应  
-响应头中的一些字段，表明服务端返回的数据格式，主要有：  
-  - Content-Type  
+
+1. 浏览器发起请求时，会声明这这一次的请求希望得到的数据格式。服务器收到这一次请求后，会根据请求头信息，决定返回什么格式的数据。
+
+### 2. 请求  
+
+1. 请求头中，有几个字段，用来表示我们希望得到的数据格式。
+
+2. Accept  
+   指定希望得到的数据类型。
+
+3. Accept-Encoding  
+   数据编码方法，指定服务端如何进行数据的压缩。
+
+4. Accept-Language
+   浏览器愿意接受的语言类型。
+
+5. User-Agent  
+   客户端信息。
+
+6. Content-Type
+   指 http/https 发送信息至服务器时的内容编码类型，Content-Type 用于表明发送数据流的类型，服务器根据编码类型使用特定的解析方式，获取数据流中的数据。
+
+### 3. 响应  
+
+1. 响应头中的一些字段，表明服务端返回的数据格式，  
+
+2. Content-Type  
   与Accept对应，表示本次返回的资源的确切格式。例如：`text/plain`、`image/jpg`。前一个表示主类型，后一个表示分类型。
-  - Content-Encoding  
-  与Accept-Encoding对应，资源的压缩方式。
-  - Content-Language
-  与Accept-Language对应，具体支持的语言。
-  - X-Content-Type-Options  
-  一般是nosniff，设置这个头部，表示不允许浏览器猜测返回的数据格式。主要是提升安全性。
+
+3. Content-Encoding  
+   与Accept-Encoding对应，资源的压缩方式。
+
+4. Content-Language
+   与Accept-Language对应，具体支持的语言。
+
+5. X-Content-Type-Options  
+   一般是nosniff，设置这个头部，表示不允许浏览器猜测返回的数据格式。主要是提升安全性。
 
 ## 9. content-type 详解
 
@@ -673,8 +783,6 @@ Etag由服务器发送给浏览器。发起请求时，浏览器将Etag的值赋
 
 4. 上传文件的过程中，首先生成了一个 `boundary` 用于分割不同的字段，在请求实体里每个参数以 `------boundary` 开始，然后是附加信息和参数名，然后是空行，最后是参数内容。多个参数将会有多个 `boundary` 块。如果参数是文件会有特别的文件域。最后以 `------boundary–` 为结束标识。
 
-5. 一个上传文件的请求报文如下图所示：
-
 #### 3. 访问接口常用的 content-type
 
 1. 访问接口常用的 `content-type` 是 `application/json`。
@@ -696,17 +804,17 @@ Content-Disposition: form-data; name="fieldName"; filename="filename.jpg"
 
 ### 1. 301
 
-- 状态码301表示永久重定向。某个url指定的资源已经永久转移到另外一个url上面了。此时需要服务器返回的状态码是301，同时响应头中的location字段的值是目标url。
+1. 状态码301表示永久重定向。某个url指定的资源已经永久转移到另外一个url上面了。此时需要服务器返回的状态码是301，同时响应头中的location字段的值是目标url。
 
-- 对于浏览器而言，只有第一次请求，才会发生重定向。因为第一次返回的是状态码是301，所以浏览器会记住location中的url（目标url），后序直接向目标url发起请求。
+2. 对于浏览器而言，只有第一次请求，才会发生重定向。因为第一次返回的是状态码是301，所以浏览器会记住location中的url（目标url），后序直接向目标url发起请求。
 
-- 浏览器会对状态码为301的资源内容进行缓存，缓存的时间是尽可能长，因此，要慎用301。因此一旦使用301，浏览器会进行缓存，如果我后期又更改了重定向的目标url，则客户端在不清理缓存的情况下，是无法获取最新的资源的。
+3. 浏览器会对状态码为301的资源内容进行缓存，缓存的时间是尽可能长，因此，要慎用301。因此一旦使用301，浏览器会进行缓存，如果我后期又更改了重定向的目标url，则客户端在不清理缓存的情况下，是无法获取最新的资源的。
 
 ### 2. 302
 
-- 状态码302表示临时重定向。某个url指定的资源已经临时转移到另外一个url上面了。此时需要服务器返回的状态码是302，同时响应头中的location字段的值是目标url。
+1. 状态码302表示临时重定向。某个url指定的资源已经临时转移到另外一个url上面了。此时需要服务器返回的状态码是302，同时响应头中的location字段的值是目标url。
 
-- 对于浏览器而言，每一次请求，都会进行重定向。
+2. 对于浏览器而言，每一次请求，都会进行重定向。
 
 # 四、https
 
@@ -727,11 +835,11 @@ Content-Disposition: form-data; name="fieldName"; filename="filename.jpg"
 
 ## 2. http 存在的问题
 
-1. 请求信息明文传输，容易被窃听截取
+1. 请求信息明文传输，容易被窃听截取。
 
-2. 数据完整性未被校验，容易被篡改
+2. 数据完整性未被校验，容易被篡改。
 
-3. 没有验证对方身份，存在着冒充身份的危险
+3. 没有验证对方身份，存在着冒充身份的危险。
 
 ## 3. https 详解
 
@@ -777,6 +885,7 @@ Content-Disposition: form-data; name="fieldName"; filename="filename.jpg"
 # 五、Nginx代理以及面向未来的HTTP
 
 ## 1. 学习资料
+
 1. [Beginner’s Guide](http://nginx.org/en/docs/beginners_guide.html)
 
 2. [前端Nginx那些事](https://juejin.cn/post/6844904102447546382)
@@ -786,6 +895,7 @@ Content-Disposition: form-data; name="fieldName"; filename="filename.jpg"
 4. [前端必备 Nginx 配置](https://juejin.cn/post/6844903942262882318)
 
 ## 2. Nginx 基本命令
+
 命令|说明
 :--:|:--:
 nginx -t|检查配置文件是否有语法错误
@@ -945,6 +1055,7 @@ nginx -s quit|等待工作进程处理完成后关闭
       - `location` 表示请求的路径，如果是 `/`，表示任意请求，也就是说，任意请求都会走 `location` 内部的配置。
       - `proxy_pass` 表示代理地址。域名为 `test.com` 的任意请求都会被代理到这个地址。
       - `proxy_set_header` 这一行的作用是把原 http 请求的 Header 中的 Host 字段也放到转发的请求里。如果不加这一行的话，nginx转发的请求 header 里的 host 字段就是 `proxy_pass` 代理的地址，而不是我们在浏览器里的的那个地址。而服务器是靠这个Host值来区分你请求的是哪个域名的资源的。
+
 6. 代理缓存
    - 缓存主要配置 `http` 下的 `proxy_cache_path` 字段。例如：
    `proxy_cache_path cache levels=1:2 key_zone=my_cache:10m`
@@ -960,6 +1071,7 @@ nginx -s quit|等待工作进程处理完成后关闭
         }
      ```
    - 我们可以将一些通用的经常访问的请求，在 Nginx 中设置代理缓存，这样所有走 Nginx 代理，访问那个请求的都可以拿到这个缓存，极大的提高了响应的速度。
+
 7. http 响应头
    - `Cache-Control` 
      - `s-maxage` 表示浏览器使用的缓存是代理服务器的缓存。
@@ -1014,9 +1126,10 @@ nginx -s quit|等待工作进程处理完成后关闭
 1. 优势
    1. 信道复用
    2. 分帧传输
-   3. 服务端推送（server push）
+   3. 头部压缩
+   4. 服务端推送（server push）
 
-2. Chrome 浏览器允许的最大的并发连接数量是6个
+2. Chrome 浏览器允许的最大的并发连接数量是6个。
 
 3. 启用 http 2.0 协议进行传输，我们可以在请求头中配置 `Link` 字段，表明服务器需要主动推送到浏览器的资源。例如：`"Link": "</test.jpg>; as=image; rel=preload"`。
   - `</test.jpg>` 表示图片的路径，这个路径要和前端的图片的请求路径一样。
