@@ -50,31 +50,31 @@
 2. 合成类型（引用类型）1种：
     1. Object
     
-3. 特殊类型2种：
+3. 特殊类型 2 种：
     1. undefined
     2. null
     
-3. ES6新增的1种：
+3. ES6新增的 1 种：
     1. Symbol
     
 ## 2. 检测数据类型
 
-1. typeof，可以直接得到基本数据类型、undefined和Symbol所属的类型。null返回的是object。对于引用类型，一律返回object。但是函数返回的是function。例如：  
+1. typeof，可以直接得到基本数据类型、undefined 和Symbol 所属的类型。null返回的是 object。对于引用类型，一律返回 object。但是函数返回的是 function。例如：  
      ```javascript
-   typeof 123 ;  // Number
-   typeof 'a' ;  // String
-   typeof true ;  // Boolean
-   typeof undefined ;   //Undefined
-   typeof null ;      //Object 
-   typeof Symbol ;  // Symbol
+        typeof 123 ;  // Number
+        typeof 'a' ;  // String
+        typeof true ;  // Boolean
+        typeof undefined ;   //Undefined
+        typeof null ;      //Object 
+        typeof Symbol ;  // Symbol
    
-   function fn() {}
-   typeof fn ;   // function;
-   typeof [] ;   // object
+        function fn() {}
+        typeof fn ;   // function;
+        typeof [] ;   // object
    
    ```
    
-2. instanceof，判断某个实例是否是一个对象的实例。主要是用于Object类型。例如：
+2. instanceof，判断某个实例是否是一个对象的实例。主要是用于 Object 类型。例如：
      ```javascript
        [] instanceof Array ; // true
        function fn() {}
@@ -82,7 +82,7 @@
        null instanceof Object ;   // false
    ```
    
-3. Object.prototype.toString.call() 这种方式可以将全部的数据类型检测出来也是推荐的方式。因为toString是Object的原型方法, 而 Array Function 等都是Object的实例。都重写了toString 方法。返回的是类型的字符串。例如：
+3. Object.prototype.toString.call() 这种方式可以将全部的数据类型检测出来也是推荐的方式。因为toString是Object的原型方法, 而 Array Function 等都是 Object 的实例。都重写了toString 方法。返回的是类型的字符串。例如：
      ```javascript
         Object.prototype.toString.call(null) ;    // [object Null]
    
@@ -115,7 +115,7 @@
       Array.isArray(undefined);  // false
    ```  
    
-5. 对于数组的判断，我们更倾向于使用isArray()。
+5. 对于数组的判断，我们更倾向于使用 isArray()。
 
 ## 3. 检测数据类型的引申问题：如何判断空字符串，空数组，空对象
 
@@ -148,41 +148,49 @@
 
 ## 4. 加操作符与减操作符
 
-1. 加（+）操作符  
-   - a + b，结果取决于a和b的类型：
-     1. a 和 b 都是数值，则按照常规的加法进行操作。
-     2. a 和 b 都是字符串，则将两个字符串相连。
-     3. a 和 b 其中有一个是字符串，另一个不是，则将另一个变量转换为字符串，然后执行相连操作。  
-     4. 如果有一个操作数是对象、数值或布尔值，则调用它们的 toString() 方法取得相应的字符串值，然后再应用前面关于字符串的规则。对于 undefined 和 null ，则分别调用 String() 函数并取得字符串 "undefined" 和 "null"。
-   - 特殊情况
-     1. `[] + []`
-        - `[] + [] === ''`
-        - `+` 操作符两边都是对象，因此首先调用对象的 toString() 方法，将空数组 `[]` 转换为 `''`，实际上就变成了：`'' + ''`，所以结果还是空字符串：`''`。
-     2. `{} + []`
-        - `{} + [] === 0`
-        -  `+` 操作符两边都是对象，但是 `+` 左侧是一个对象：`{}`，JavaScript 引擎将第一个 `{}` 解释成了一个空的代码块并忽略了它，因此实际上执行的是：`+[]`，这里的加号并不是代表加法的二元运算符，而是一个一元运算符，作用是将它后面的操作数转换成数字，和Number()函数完全一样。即先将空数组转换为字符串：`[] --> ''`，然后将空字符串 `''` 转换为数字 `0`。
-        - 为什么第一个 `{}` 会被解析成代码块呢？原因是，整个输入被解析成了一个语句，如果一个语句是以左大括号开始的，则这对大括号会被解析成一个代码块。所以，你也可以通过强制把输入解析成一个表达式来修复这样的计算结果：`({} + [])`，结果是：`"[object Object]"`。
-     3. `1 + []`
-        - `1 + [] === '1'`
-        - 1 是基本类型，而空数组 `[]` 是对象，需要转换，空数组 `[]` 被转换为 `''`，所以最后的结果就是：`1 + '' --> '1'`
-     4. `{} + {}`
-        - FireFox：`{} + {} === NaN`
-        - Chrome：`{} + {} === '[object Object][object Object]'`
-        - 在 FireFox 中，第一个对象 `{}` 被解析为代码块，因此被忽略，剩下的就是 `+{}`，即将空对象转换为数字，`{}` 转换的结果是 ·，因此结果就是`NaN`。
-        - 在 Chrome 中，没有将第一个对象 `{}` 被解析为代码块，而是将其转换为基本类型——字符串。所以结果就是 `'[object Object][object Object]'`。
-     5. `{} + '1'`
-        - `{} + '1' === 1`
-        - 第一个对象 · 被解析为代码块，因此被忽略，剩下的就是 `+'1'`，显然就是数字形式的 ·。
-   - 参考资料：
-     - [[译]JavaScript中,{}+{}等于多少?](https://www.cnblogs.com/ziyunfei/archive/2012/09/15/2685885.html)
-     - [精彩的javascript对象和数组混合相加](https://www.cnblogs.com/leungUwah/p/5452731.html)
-     - [JavaScript values: not everything is an object](https://2ality.com/2011/03/javascript-values-not-everything-is.html)
+### 1. 加（+）操作符  
 
-2. 减（-）操作符  
-   - a - b，结果取决于a和b的类型：
-     1. a 和 b 都是数值，则按照常规的减法进行操作。
-     2. a 和 b 其中有一个是数字，另一个不是，是字符串、布尔值、null 或 undefined，则先在后台调用 Number() 函数将其转换为数值，然后再根据前面的规则执行减法计算。如果转换的结果是 NaN，则减法的结果就是 NaN。  
-   - 如果有一个操作数是对象，则调用对象的 valueOf() 方法以取得表示该对象的数值。如果得到的值是NaN，则减法的结果就是 NaN。如果对象没有 valueOf() 方法，则调用其 toString() 方法并将得到的字符串转换为数值。
+### 1. 正常情况
+
+1. a + b，结果取决于 a 和 b 的类型：
+   1. a 和 b 都是数值，则按照常规的加法进行操作。
+   2. a 和 b 都是字符串，则将两个字符串相连。
+   3. a 和 b 其中有一个是字符串，另一个不是，则将另一个变量转换为字符串，然后执行相连操作。  
+   4. 如果有一个操作数是对象、数值或布尔值，则调用它们的 toString() 方法取得相应的字符串值，然后再应用前面关于字符串的规则。对于 undefined 和 null ，则分别调用 String() 函数并取得字符串 "undefined" 和 "null"。
+
+#### 2. 加（+）操作的特殊情况
+
+1. 特殊情况：`[] + []`
+   - `[] + [] === ''`
+   - `+` 操作符两边都是对象，因此首先调用对象的 toString() 方法，将空数组 `[]` 转换为 `''`，实际上就变成了：`'' + ''`，所以结果还是空字符串：`''`。
+   
+2. 特殊情况：`{} + []`
+   - `{} + [] === 0`
+   - `+` 操作符两边都是对象，但是 `+` 左侧是一个对象：`{}`，JavaScript 引擎将第一个 `{}` 解释成了一个空的代码块并忽略了它，因此实际上执行的是：`+[]`，这里的加号并不是代表加法的二元运算符，而是一个一元运算符，作用是将它后面的操作数转换成数字，和Number()函数完全一样。即先将空数组转换为字符串：`[] --> ''`，然后将空字符串 `''` 转换为数字 `0`。
+   - 为什么第一个 `{}` 会被解析成代码块呢？原因是，整个输入被解析成了一个语句，如果一个语句是以左大括号开始的，则这对大括号会被解析成一个代码块。所以，你也可以通过强制把输入解析成一个表达式来修复这样的计算结果：`({} + [])`，结果是：`"[object Object]"`。
+
+3. 特殊情况：`1 + []`
+   - `1 + [] === '1'`
+   - 1 是基本类型，而空数组 `[]` 是对象，需要转换，空数组 `[]` 被转换为 `''`，所以最后的结果就是：`1 + '' --> '1'`
+
+4. 特殊情况：`{} + {}`
+   - FireFox：`{} + {} === NaN`
+   - Chrome：`{} + {} === '[object Object][object Object]'`
+   - 在 FireFox 中，第一个对象 `{}` 被解析为代码块，因此被忽略，剩下的就是 `+{}`，即将空对象转换为数字，`{}` 转换的结果是 NaN，因此结果就是`NaN`。
+   - 在 Chrome 中，没有将第一个对象 `{}` 被解析为代码块，而是将其转换为基本类型——字符串。所以结果就是 `'[object Object][object Object]'`。
+
+5. 特殊情况：`{} + '1'`
+   - `{} + '1' === 1`
+   - 第一个对象 `{}` 被解析为代码块，因此被忽略，剩下的就是 `+'1'`，显然就是数字形式的 1。
+   
+
+### 2. 减（-）操作符  
+
+1. a - b，结果取决于a和b的类型：
+   1. a 和 b 都是数值，则按照常规的减法进行操作。
+   2. a 和 b 其中有一个是数字，另一个不是，是字符串、布尔值、null 或 undefined，则先在后台调用 Number() 函数将其转换为数值，然后再根据前面的规则执行减法计算。如果转换的结果是 NaN，则减法的结果就是 NaN。  
+
+2. 如果有一个操作数是对象，则调用对象的 valueOf() 方法以取得表示该对象的数值。如果得到的值是 NaN，则减法的结果就是 NaN。如果对象没有 valueOf() 方法，则调用其 toString() 方法并将得到的字符串转换为数值。
     ```javascript
        var result1 = 5 - true; // 4，因为 true 被转换成了 1
        var result2 = NaN - 1; // NaN
@@ -193,10 +201,13 @@
        var result7 = 5 - undefined ;   //NaN, undefined被转换为NaN
    ```
    
-3. `--i`（`++i`）与`i--`（`i++`）的区别
-    1. `--i` 属于前自减运算符，也就是先对 i 执行减 1 操作，然后将i的值赋给其他变量。
-    2. `i--` 属于后自减运算符，也就是先将 i 的值赋给其他变量，然后对 i 执行减 1 操作。
-    3. 具体代码说明如下：
+### 3. `--i`（`++i`）与`i--`（`i++`）的区别
+
+1. `--i` 属于前自减运算符，也就是先对 i 执行减 1 操作，然后将i的值赋给其他变量。
+
+2. `i--` 属于后自减运算符，也就是先将 i 的值赋给其他变量，然后对 i 执行减 1 操作。
+
+3. 具体代码说明如下：
        ```javascript
           // 前自减运算符
           var num1 = 2 ;
@@ -219,7 +230,8 @@
           // 2
           console.log(age1) ;
        ```
-    4. `i++`和`++i`区别和`i--`和`--i`相同。代码示例如下：
+
+4. `i++`和`++i`区别和`i--`和`--i`相同。代码示例如下：
           ```javascript
              // 前自增运算符
              var num1 = 3 ;
@@ -241,10 +253,11 @@
              // 4
              console.log(age1) ;
           ```
-    5. 总结：
-       - 前置（`++i`和`--i`）就是先对自己加或减，把自己搞好了再去做其他的。
-       - 后置（`i++`和`i--`）就是先去做其他的，等其他的搞好了，再对自己加或减。
-    6. 前置和后置的主要区别还是在赋值上面。
+5. 总结：
+   - 前置（`++i`和`--i`）就是先对自己加或减，把自己搞好了再去做其他的。
+   - 后置（`i++`和`i--`）就是先去做其他的，等其他的搞好了，再对自己加或减。
+
+6. 前置和后置的主要区别还是在赋值上面。
 
 # 二、变量、作用域和内存
 
@@ -252,7 +265,7 @@
 
 1. 理解：作用域定义了变量或函数有权访问的其他数据，决定了它们各自的行为。也就是说，变量和函数的起作用范围，在哪个范围内能访问到哪些变量和函数。 
  
-2. 分类： 在ES6出现之前，只有函数作用域和全局作用域，没有块级作用域。   
+2. 分类： 在 ES6 出现之前，只有函数作用域和全局作用域，没有块级作用域。   
 
 3. 没有块级作用域的缺点：
    1. 变量容易混淆  
@@ -309,7 +322,7 @@
       }
    ```
    
-## 2. 创建对象的引申问题：new的过程
+## 2. 创建对象的引申问题：new 的过程
 
 1. js 高级程序设计中的说法：
    1. 创建一个新对象
@@ -319,16 +332,16 @@
      
 2. 详细版（new ClassA(…)）：
    1. 创建一个新对象  
-      `var obj = {} ;`
-   2. 设置新对象的__proto__属性指向构造函数的prototype对象：   
-      `obj.__proto__ = ClassA.prototype ;`
+      `var obj = {};`
+   2. 设置新对象的__proto__属性指向构造函数的 prototype对象：   
+      `obj.__proto__ = ClassA.prototype;`
    3. 使用新对象调用函数，函数中的this被指向新实例对象：  
       `ClassA.call(obj) ;`  
    4. 将初始化完毕的新对象地址，保存到等号左边的变量中：  
-      `var a = new ClassA() ;`  
-   5. 将`new ClassA()`获得的对象地址赋值给变量`a`。
+      `var a = new ClassA();`  
+   5. 将 `new ClassA()` 获得的对象地址赋值给变量`a`。
      
-3. 代码版（手动实现一个new的过程）
+3. 代码版（手动实现一个 new 的过程）
      ```javascript
         function Parent(name, age) {
              this.name = name ;
@@ -342,32 +355,37 @@
             // 1. 将构造器（Parent）的prototype属性作为原型，创建一个新的对象
             let child = Object.create(Parent.prototype) ;  
             // 2. 将this和调用参数传递给构造函数执行
-            let ret = Parent.apply(child, rest) ;
+            let ret = Parent.apply(child, rest);
             // 3. 返回第一次创建的对象
             // return child ;
   
             // 如果构造函数没有返回对象，我们返回手动创建的 obj 对象
-            return typeof ret === 'object' ? ret : obj; 
+            return typeof ret === 'object' ? ret : child; 
         }
      ``` 
 4. 对上面代码的描述：  
    - 以构造器的 prototype 属性为原型，创建新对象；  
-     - 将 this (也就是上一句中的新对象) 和调用参数传给构造器，执行；  
-     - 如果构造器没有手动返回对象，则返回第一步创建的对象
+   - 将 this (也就是上一句中的新对象) 和调用参数传给构造器，执行；  
+   - 如果构造器没有手动返回对象，则返回第一步创建的对象
 
 
 ## 3. 原型链
 
-1. 原型  
-   - 原型是函数属性，每个函数创建后，都有一个prototype属性，prototype指向原型对象。所有原型对象都会自动获得一个 constructor（构造函数）属性，这个属性包含一个指向 prototype 属性所在函数的指针。   
-   - 我们通过而通过这个构造函数，我们还可继续为原型对象添加其他属性和方法。
+### 1. 原型对象
+
+1. 原型是函数属性，每个函数创建后，都有一个prototype属性，prototype指向原型对象。所有原型对象都会自动获得一个 constructor（构造函数）属性，这个属性包含一个指向 prototype 属性所在函数的指针。   
+
+2. 我们通过而通过这个构造函数，我们还可继续为原型对象添加其他属性和方法。
      
-2. 隐式原型（[[proto]]）  
-   - 这个是实例对象属性。脚本不可访问。指向的是创建这个对象的构造函数的原型对象。  
-   - 我们访问对象中的属性的时候，首先看实例中是否存在这个属性，如果没有，就找到这个实例对象的原型，看是否存在这个属性，如果有，就返回，没有，就继续向上父级的原型对象去查找（继承）。
+### 2. 隐式原型（[[proto]]）  
+
+1. 这个是实例对象属性。脚本不可访问。指向的是创建这个对象的构造函数的原型对象。  
+
+2. 我们访问对象中的属性的时候，首先看实例中是否存在这个属性，如果没有，就找到这个实例对象的原型，看是否存在这个属性，如果有，就返回，没有，就继续向上父级的原型对象去查找（继承）。
       
-3. 原型链  
-   - 由前面可知，实例对象的隐式原型（[[proto]]）指向构造函数的显示原型对象。那么原型链，指的就是其他构造函数的显示原型属性（prototype），指向另一个构造函数的实例对象，而这个实例对象的隐式原型又指向创建这个实例对象的构造函数的显示原型对象。如果这个构造函数的原型属性又指向另外一个实例对象，那么上述关系也存在。原型指向的层层递进，就构成了实例与原型的链条。
+### 3. 原型链  
+
+1. 由前面可知，实例对象的隐式原型（[[proto]]）指向构造函数的显示原型对象。那么原型链，指的就是其他构造函数的显示原型属性（prototype），指向另一个构造函数的实例对象，而这个实例对象的隐式原型又指向创建这个实例对象的构造函数的显示原型对象。如果这个构造函数的原型属性又指向另外一个实例对象，那么上述关系也存在。原型指向的层层递进，就构成了实例与原型的链条。
      ```javascript
         function SuperType() {
            this.property = true;
@@ -381,10 +399,10 @@
           this.subproperty = false;
         }
      
-        SubType.prototype = new SuperType() ;
+        SubType.prototype = new SuperType();
      
         SubType.prototype.getSubValue = function() {
-        return this.subproperty ;
+        return this.subproperty;
         }
         var instance = new SubType() ;
         alert(instance.getSuperValue()) ; //true
@@ -394,9 +412,11 @@
   
 ## 4. 原型链的引申问题：原型链的最顶端是什么，为什么顶端是这个？
 
-1. 原型链的最顶端是Object.prototype。  
-   - 原因：所有引用类型默认都继承了Object，而这个继承也是通过原型链实现的。大家要记住，所有函数的默认原型都是Object的实例，因此默认原型都会包含一个内部指针，指向Object.prototype。  
-**注意**：Object.prototype也是一个对象，也具有隐式原型（[[proto]]），但是，这个隐式原型指向的是null。
+1. 原型链的最顶端是 Object.prototype。  
+
+2. 原因：所有引用类型默认都继承了 Object，而这个继承也是通过原型链实现的。所有函数的默认原型都是 Object 的实例，因此默认原型都会包含一个内部指针，指向Object.prototype。  
+
+3. **注意**：Object.prototype 也是一个对象，也具有隐式原型（`[[proto]]`），但是，这个隐式原型指向的是 null。
 
 ## 5. 继承
 
@@ -413,19 +433,20 @@
       }
     
       function Apple(color, name, shape) {
-          Fruits.call(this, color, name) ;
+          Fruits.call(this, color, name);
           this.shape = shape ;
       }
 
       // 原型链继承
-      Apple.prototype = new Fruits() ;
+      Apple.prototype = new Fruits();
       // 将构子类的原型对象的造函数属性指定为子类构造函数
-      Apple.prototype.constructor = Apple ;
+      Apple.prototype.constructor = Apple;
       Apple.prototype.getShape = function() {
-          return this.shape ;
+          return this.shape;
       }
    ```
-3. **缺点**：调用两次父类的构造函数， 一次在子类的构造函数中，一次在原型继承实例化父类过程中。   
+3. **缺点**：调用两次父类的构造函数， 一次在子类的构造函数中，一次在原型继承实例化父类过程中。  
+
 4. **注意**：组合式继承，在子类原型对象指向父类实例时，原型对象的 constructor 属性会丢失，所以，我们要将 constructor 属性重新指向子类的构造函数。
 
 ## 6. Object.create()
@@ -440,7 +461,7 @@
          return new F() ;
       }
    ```
-3. 不使用构造函数，借用已经存在的对象实现的一种继承方式。传入的对象o会作为返回的实例对象的原型对象。  
+3. 不使用构造函数，借用已经存在的对象实现的一种继承方式。传入的对象 o 会作为返回的实例对象的原型对象。  
 
 4. **缺点**：如果对象o中存在引用类型的属性，则这个属性会被所有返回的实例共享，一旦修改，所有实例的这个属性均会发生变化。  
 
@@ -454,13 +475,15 @@
 
 1. 所以在全局作用域声明和定义的变量与函数，都会被添加到window对象中。
   
-2. 常用方法和属性： 
-   1. alert()  
-      - 这个方法接受一个字符串并将其显示给用户。具体来说，调用alert() 方法的结果就是向用户显示一个系统对话框，其中包含指定的文本和一个 OK（“确定”）按钮。
-      - 通常使用 alert() 生成的“警告”对话框向用户显示一些他们无法控制的消息，例如错误消息。而用户只能在看完消息后关闭对话框。
-   2. confirm()  
-      - 第二种对话框是调用 confirm() 方法生成的。从向用户显示消息的方面来看，这种“确认”对话框很像是一个“警告”对话框。但二者的主要区别在于“确认”对话框除了显示 OK 按钮外，还会显示一个 Cancel（“取消”）按钮，两个按钮可以让用户决定是否执行给定的操作。  
-       - 用户点击了ok，返回的是true，如果点击了cancle或关闭对话框，返回的是false。用法如下：
+### 1. 常用方法和属性
+
+1. alert()  
+   - 这个方法接受一个字符串并将其显示给用户。具体来说，调用alert() 方法的结果就是向用户显示一个系统对话框，其中包含指定的文本和一个 OK（“确定”）按钮。
+   - 通常使用 alert() 生成的“警告”对话框向用户显示一些他们无法控制的消息，例如错误消息。而用户只能在看完消息后关闭对话框。
+
+2. confirm()  
+   - 第二种对话框是调用 confirm() 方法生成的。从向用户显示消息的方面来看，这种“确认”对话框很像是一个“警告”对话框。但二者的主要区别在于“确认”对话框除了显示 OK 按钮外，还会显示一个 Cancel（“取消”）按钮，两个按钮可以让用户决定是否执行给定的操作。  
+   - 用户点击了ok，返回的是true，如果点击了cancle或关闭对话框，返回的是false。用法如下：
        ```javascript
           if (confirm("Are you sure?")) {
              alert("I'm so glad you're sure! ");
@@ -468,23 +491,28 @@
              alert("I'm sorry to hear you're not sure. ");
           }
        ```
-   3. open()  
-      - 接收一个 url，作用是打开一个新的浏览器窗口或查找一个已命名的窗口。
-   4. scrollTo(x,y)  
-      - 滚动到指定的位置。其中x和y以窗口的左上角为原点。
-   5. setInterval() 和 setTimeout()  
-      - 定时器
-   6. innerHeight 和 innerWidth  
-      - 浏览器窗口的内部宽度和高度。  
-      - 内部宽高是指除去菜单栏、工具栏、边框等占位元素后，用于显示网页的净宽高。
-   7. outerHeight 和 outerWidth
-      - 浏览器窗口的整个宽度和高度。
-   8. screenLeft/screenTop、screenX/screenY  
-      - 只读整数。声明了窗口的左上角在屏幕上的的 x 坐标和 y 坐标。IE、Safari、Chrome 和 Opera 支持 screenLeft和 screenTop，而 Chrome、Firefox 和 Safari 支持 screenX 和 screenY。
+3. open()  
+   - 接收一个 url，作用是打开一个新的浏览器窗口或查找一个已命名的窗口。
+
+4. scrollTo(x,y)  
+   - 滚动到指定的位置。其中x和y以窗口的左上角为原点。
+
+5. setInterval() 和 setTimeout()  
+   - 定时器
+
+6. innerHeight 和 innerWidth  
+   - 浏览器窗口的内部宽度和高度。  
+   - 内部宽高是指除去菜单栏、工具栏、边框等占位元素后，用于显示网页的净宽高。
+
+7. outerHeight 和 outerWidth
+   - 浏览器窗口的整个宽度和高度。
+
+8. screenLeft/screenTop、screenX/screenY  
+   - 只读整数。声明了窗口的左上角在屏幕上的的 x 坐标和 y 坐标。IE、Safari、Chrome 和 Opera 支持 screenLeft和 screenTop，而 Chrome、Firefox 和 Safari 支持 screenX 和 screenY。
      
 ## 2. location
 
-1. location 是最有用的 BOM对象之一，它提供了与当前窗口中加载的文档有关的信息，还提供了一些导航功能。事实上， location 对象是很特别的一个对象，因为它既是 window 对象的属性，也是document 对象的属性；换句话说，window.location 和 document.location 引用的是同一个对象。
+1. location 是最有用的 BOM 对象之一，它提供了与当前窗口中加载的文档有关的信息，还提供了一些导航功能。事实上， location 对象是很特别的一个对象，因为它既是 window 对象的属性，也是document 对象的属性；换句话说，window.location 和 document.location 引用的是同一个对象。
 
 2. hash  
    - 返回URL中的hash（#号后跟零或多个字符），如果URL中不包含散列，则返回空字符串。如`#document`。
@@ -669,6 +697,6 @@
      - remove(value)   
        从列表中删除给定的字符串。
      - toggle(value)  
-       如果列表中已经存在给定的值，删除它；如果列表中没有给定的值，添加它
+       如果列表中已经存在给定的值，删除它；如果列表中没有给定的值，添加它。
 
   

@@ -8,7 +8,9 @@
     - [2. 事件轮询（Event Loop）](#2-%E4%BA%8B%E4%BB%B6%E8%BD%AE%E8%AF%A2event-loop)
     - [3. 异步操作的模式](#3-%E5%BC%82%E6%AD%A5%E6%93%8D%E4%BD%9C%E7%9A%84%E6%A8%A1%E5%BC%8F)
     - [4. 宏任务和微任务](#4-%E5%AE%8F%E4%BB%BB%E5%8A%A1%E5%92%8C%E5%BE%AE%E4%BB%BB%E5%8A%A1)
-    - [5. setTimeout()和setInterval()](#5-settimeout%E5%92%8Csetinterval)
+      - [1. 参考资料](#1-%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99)
+      - [2. 常见的宏任务与微任务](#2-%E5%B8%B8%E8%A7%81%E7%9A%84%E5%AE%8F%E4%BB%BB%E5%8A%A1%E4%B8%8E%E5%BE%AE%E4%BB%BB%E5%8A%A1)
+    - [5. setTimeout() 和 setInterval()](#5-settimeout-%E5%92%8C-setinterval)
   - [2. 事件](#2-%E4%BA%8B%E4%BB%B6)
     - [1. 对事件的理解](#1-%E5%AF%B9%E4%BA%8B%E4%BB%B6%E7%9A%84%E7%90%86%E8%A7%A3)
     - [2. 事件流](#2-%E4%BA%8B%E4%BB%B6%E6%B5%81)
@@ -20,7 +22,7 @@
     - [2. 状态](#2-%E7%8A%B6%E6%80%81)
     - [3. 代码](#3-%E4%BB%A3%E7%A0%81)
     - [4. ajax缺点](#4-ajax%E7%BC%BA%E7%82%B9)
-    - [5. onreadystatechange与onload的区别](#5-onreadystatechange%E4%B8%8Eonload%E7%9A%84%E5%8C%BA%E5%88%AB)
+    - [5. onreadystatechange 与 onload 的区别](#5-onreadystatechange-%E4%B8%8E-onload-%E7%9A%84%E5%8C%BA%E5%88%AB)
   - [4. JSON](#4-json)
     - [1. 序列化](#1-%E5%BA%8F%E5%88%97%E5%8C%96)
     - [2. 反序列化](#2-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96)
@@ -76,7 +78,7 @@ JavaScript 是单线程的，也就是说，在同一时间只能执行一个任
   
 4. Promise
 
-5. async/awiat
+5. async/await
 
 ### 4. 宏任务和微任务
 
