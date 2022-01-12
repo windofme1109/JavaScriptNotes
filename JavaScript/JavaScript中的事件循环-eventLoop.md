@@ -8,9 +8,9 @@
 
 3. [又被node的eventloop坑了，这次是node的锅](https://zhuanlan.zhihu.com/p/54951550)
 
-4. [js事件循环机制(浏览器端Event Loop) 以及async/await的理解](https://www.cnblogs.com/smile-fanyin/p/14622432.html)
+4. [js事件循环机制(浏览器端Event Loop) 以及async/await的理解 - 博客园](https://www.cnblogs.com/smile-fanyin/p/14622432.html)
 
-5. [js事件循环机制(浏览器端Event Loop) 以及async/await的理解](https://segmentfault.com/a/1190000017554062)
+5. [js事件循环机制(浏览器端Event Loop) 以及async/await的理解 - 思否](https://segmentfault.com/a/1190000017554062)
 
 6. [Async、Await 从源码层面解析其工作原理](https://zhuanlan.zhihu.com/p/143826516)
 
@@ -18,7 +18,37 @@
 
 8. [微任务、宏任务与Event-Loop](https://juejin.cn/post/6844903657264136200)
 
+9. [JavaScript中的Event Loop（事件循环）机制](https://segmentfault.com/a/1190000022805523)
+
 ## 2. 事件循环的概念
+
+### 1. 基本示例
+
+1. 使用 setTimeout 模拟异步任务：
+   ```js
+      console.log('script start');
+
+      setTimeout(function() {
+          console.log('setTimeout');
+      }, 0);
+      
+      Promise.resolve().then(function() {
+          console.log('promise1');
+      }).then(function() {
+          console.log('promise2');
+      });
+
+      console.log('script end');
+   ```
+2. 上面的代码的输出顺序是：
+   ```text
+      script start
+      script end
+      promise1
+      promise2
+      setTimeout
+   ```
+   为什么是这样的输出顺序而不是按照代码的顺序输出呢，这就和 js 的单线程、异步、事件循环有关了。
 
 ### 1. 异步
 
@@ -41,6 +71,30 @@
 5. 维基百科的定义是：“事件循环是一个程序结构，用于等待和发送消息和事件（
    > a programming construct that waits for and dispatches events or messages in a program.
 
+6. 用一段代码来解释上面的事件循环：
+   ```js
+      console.log('代码执行开始');
+      $.ajax({
+          url:www.javascript.com,
+          data:data,
+          success:() => {
+              console.log('发送成功!');
+          }
+      });
+      console.log('代码执行结束');
+   ```
+7. 上面代码的执行过程是：
+   - 代码开始执行，执行 `console.log('代码执行开始')`
+   - ajax 函数进入 event table，并注册回调函数 success。
+   - 执行  `console.log('代码执行结束')`
+   - 收到响应，success 回调函数进入 event queue。
+   - 主线程从 event queue 中取出 success 函数并执行。
+   
+8. 事件循环示意图 - 1：   
+   ![](https://p1-jj.byteimg.com/tos-cn-i-t2oaga2asx/gold-user-assets/2018/7/14/164974fb89da87c5~tplv-t2oaga2asx-watermark.awebp)
+   
+9. 事件循环示意图 - 2：
+   ![img.png](img/event-loop.png)
 
 ### 3. 异步操作的模式
 
@@ -50,16 +104,212 @@
 2. 事件监听
     - 异步任务的执行不取决于代码的执行，而取决于某个事件是否发生。
 
-3. 发布/订阅
+3. 发布/订阅 - publish / subscribe
 
 4. Promise
 
-5. async/await
+5. async / await
 
-## 3. 宏任务
+## 3. 宏任务和微任务
 
-## 4. 微任务
+1. 异步任务可以分为宏任务和微任务，为什么要这样划分呢，原因是： 页面渲染事件，各种 IO 的完成事件等随时被添加到任务队列中，一直会保持先进先出的原则执行，我们不能准确地控制这些事件被添加到任务队列中的位置。但是这个时候突然有高优先级的任务需要尽快执行，那么一种类型的任务就不合适了，所以引入了微任务队列。
 
-## 5. async / await
+2. 也就是说，异步任务也是有优先级的，js 引擎要优先处理优先级高的异步任务。
+
+3. 下表是常见的宏任务：
+
+   类型|浏览器|Node
+      :---:|:---:|:---:
+   I/O|是|否
+   setTimeout|是|是
+   setInterval|是|是
+   setImmediate|否|是
+   requestAnimationFrame|是|否
+   - **注**：整体代码 script 也被认为是宏任务。
+
+4. 下表是常见的微任务：
+
+   类型|浏览器|Node
+   :---:|:---:|:---:
+   process.nextTick|否|是
+   MutationObserver|是|否
+   Promise.then/catch/finally|是|是
+
+5. 将异步任务区分为宏任务和微任务后，事件循环如下图所示：
+   ![宏任务与微任务](https://p1-jj.byteimg.com/tos-cn-i-t2oaga2asx/gold-user-assets/2018/7/14/164974fa4b42e4af~tplv-t2oaga2asx-watermark.awebp)  
+   图片来自于：[这一次，彻底弄懂 JavaScript 执行机制](https://juejin.im/post/59e85eebf265da430d571f89#heading-2)
+
+6. 从上图中可以看出，整体代码作为宏任务第一次执行，执行完成后，此时会去微任务队列取出微任务放到主线程执行，如果微任务队列为空，那么就去宏任务队列取出宏任务放到主线程执行。宏任务执行完成后，继续执行微任务。上述过程不断循环，就是事件循环机制。***注意**：每一轮事件循环中，一定是将微任务队列中所有的微任务执行完成后，再去执行下一个宏任务。宏任务进入宏任务队列，微任务进入微任务队列。
+
+7. 举个例子：
+   ```js
+      console.log('script start');
+
+      setTimeout(() => {
+          console.log('timeout');
+      }, 0);
+
+      new Promise((resolve, reject) => {
+          console.log('promised');
+      resolve()
+      }).then(() => {
+          console.log('then');
+      });
+   ```
+   输出是：
+   ```text
+      script start
+      promised
+      then
+      timeout
+   ```
+   - 整体代码开始执行，输出 script start
+   - 遇到 setTimeout，这是一个宏任务，放到宏任务队列。
+   - 遇到 Promise，注意，Promise 的构造函数是同步执行的，因此执行传入的 executor 函数，所以输出 promised。
+   - 因为传入 Promise 构造函数的 executor 函数中直接调用了 resolve 函数， Promise 变成 resolved 状态，会调用 then 函数，then 函数是微任务，因此将其推入微任务队列。
+   - 整体代码执行完成。此时会去微任务队列取出微任务放到主线程执行，执行 then 的回调函数，因此输出 then。
+   - 微任务执行完成，此时微任务队列空了，所以本次事件循环结束。开始执行下个宏任务。从宏任务队列中取出宏任务放到主线程执行，即执行 setTimeout 的回调函数，因此输出 timeout。
+
+8. 几个需要注意的点：
+   - 任务队列中的都是异步任务的回调函数，即异步任务完成，将其回调函数推入任务队列中。
+   - 微任务优先级高于宏任务。一定是微任务队列空了以后，才去执行下个宏任务。
+   - 对于 Promise 而言，一定是变成 resolved 状态，才能调用 then 方法，将 then 的第一个回调函数推入微任务队列。
+
+## 4. async / await
+
+1. async / await 是语法糖，本质上是 Promise + Generator。
+
+2. await 后面可以跟一个普通的表达式、Promise 或者另外一个 async 函数。
+
+3. 执行一个 async 函数时，在遇到 await 语句前，其内部的代码以同步的方式执行。遇到 await 语句时，函数在此被阻塞，同时，await 右边的表达式立即执行，然后，跳出当前这个 async 函数，执行函数外面的同步代码。
+
+4. async / await 本质上还是基于 Promise 的一些封装，而Promise 是属于微任务的一种。所以在使用 await 关键字与Promise.then 效果类似。
+
+5. 假设我们 async 函数如下：
+   ```js
+      async function f() {
+         await p;
+         console.log('ok');
+      }
+   ```
+6. 我们可以简化理解为：
+   ```js
+      function f() {
+          Promise.resolve(p).then(res => {
+              console.log('b')
+          })
+      }
+   ```
+   **注意**：这是新版浏览器（根据 2018 年 9 月的最新 V8 引擎）的优化结果，老版本的浏览器优化结果于此不同。
+
+7. 那么由于是调用了 Promise.resolve 函数，如果 p 是一个值，那么此 Promise 会立即变成 resolved 状态。如果 p 是一个 Promise，那么就直接返回这个 p。
 
 ## 6. 事件循环 - 同步任务、宏任务、微任务、async/await 执行顺序
+
+### 1. 嵌套的宏任务和微任务 - setTimeout 和 Promise 和 Process.nextTick
+
+##### 1. 宏任务中嵌套微任务 - node 环境下执行
+
+1. 示例代码：   
+   ```js
+      console.log('1');
+
+      setTimeout(function() {
+          console.log('2');
+          process.nextTick(function() {
+             console.log('3');
+          })
+          new Promise(function(resolve) {
+             console.log('4');
+             resolve();
+          }).then(function() {
+             console.log('5')
+          })
+      }, 0);
+   
+      process.nextTick(function() {
+          console.log('6');
+      })
+      new Promise(function(resolve) {
+          console.log('7');
+          resolve();
+      }).then(function() {
+          console.log('8')
+      })
+
+      setTimeout(function() {
+           console.log('9');
+           process.nextTick(function() {
+               console.log('10');
+           })
+           new Promise(function(resolve) {
+               console.log('11');
+               resolve();
+           }).then(function() {
+               console.log('12')
+           })
+      })
+   ```
+2. 输出结果：
+   ```text
+      1
+      7
+      6
+      8
+      2
+      4
+      3
+      5
+      9
+      11
+      10
+      12
+
+   ```
+
+3. 解释：
+
+##### 2. 宏任务中嵌套微任务 - 浏览器环境下执行
+
+1. 浏览器下没有 process.nextTick，因此需要去掉 process.nextTick，示例代码如下：
+   ```js
+
+   ```
+2. 输出结果：
+   ```text
+
+   ```
+3. 解释：
+
+##### 3. 微任务中嵌套宏任务
+
+#### 4. Promise 与 async / await
+
+1. 虽然 Promise 与 async / await 都是微任务，但是放到一起，执行顺序还是有区别的，下面用代码说明。
+
+2. 示例代码 - 1：
+   ```js
+      async function async1() {
+          console.log('async1 start')
+          await async2()
+          console.log('async1 end')
+      }
+
+      async function async2() {
+          console.log('async2')
+      }
+
+      console.log('script start')
+          setTimeout(function() {
+          console.log('setTimeout')
+      }, 0)
+
+      async1();
+
+      new Promise( function( resolve ) {
+      console.log('promise1')
+          resolve();
+      }).then( function() {
+         console.log('promise2')
+      })
+   ```

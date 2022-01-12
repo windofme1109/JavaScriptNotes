@@ -123,7 +123,7 @@ JavaScript 是单线程的，也就是说，在同一时间只能执行一个任
    
 4. 宏任务、微任务、事件循环的关系如下图所示：
 
-![宏任务与微任务](./img/async-sync.awebp)  
+![宏任务与微任务](https://p1-jj.byteimg.com/tos-cn-i-t2oaga2asx/gold-user-assets/2018/7/14/164974fa4b42e4af~tplv-t2oaga2asx-watermark.awebp)  
 图片来自于：[这一次，彻底弄懂 JavaScript 执行机制](https://juejin.im/post/59e85eebf265da430d571f89#heading-2)
 
 5. 总结：常见的宏任务有整体代码 script（代码第一次执行，会被当做宏任务）、setTimeout、setInterval。常见的微任务有 Promise 和Process.nextTick。在整体代码执行完毕以后，**优先**执行微任务，再去执行宏任务。在执行过程中，宏任务和微任务进入不同的事件队列（Evevt Queue）。
