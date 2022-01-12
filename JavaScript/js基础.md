@@ -208,7 +208,7 @@
 2. `i--` 属于后自减运算符，也就是先将 i 的值赋给其他变量，然后对 i 执行减 1 操作。
 
 3. 具体代码说明如下：
-       ```javascript
+   ```javascript
           // 前自减运算符
           var num1 = 2 ;
           var num2 = 20 ;
@@ -229,10 +229,10 @@
           console.log(age3) ;
           // 2
           console.log(age1) ;
-       ```
+   ```
 
 4. `i++`和`++i`区别和`i--`和`--i`相同。代码示例如下：
-          ```javascript
+    ```javascript
              // 前自增运算符
              var num1 = 3 ;
              var num2 = 30 ;
@@ -252,7 +252,7 @@
              console.log(age3) ;
              // 4
              console.log(age1) ;
-          ```
+   ```
 5. 总结：
    - 前置（`++i`和`--i`）就是先对自己加或减，把自己搞好了再去做其他的。
    - 后置（`i++`和`i--`）就是先去做其他的，等其他的搞好了，再对自己加或减。
@@ -326,43 +326,43 @@
 
 1. js 高级程序设计中的说法：
    1. 创建一个新对象
-   2. 将构造函数的作用域赋值给这个新对象（将this指向这个新对象）
+   2. 将构造函数的作用域赋值给这个新对象（将 this 指向这个新对象）
    3. 执行构造函数中的代码（给新对象添加属性）
    4. 返回这个新对象  
      
 2. 详细版（new ClassA(…)）：
-   1. 创建一个新对象  
+   1. 创建一个空对象，构造函数中的this指向这个空对象  
       `var obj = {};`
-   2. 设置新对象的__proto__属性指向构造函数的 prototype对象：   
+   2. 这个新对象被执行 [[原型]] 连接（设置新对象的 `__proto__` 属性指向构造函数的 `prototype` 对象）：  
       `obj.__proto__ = ClassA.prototype;`
-   3. 使用新对象调用函数，函数中的this被指向新实例对象：  
-      `ClassA.call(obj) ;`  
-   4. 将初始化完毕的新对象地址，保存到等号左边的变量中：  
-      `var a = new ClassA();`  
-   5. 将 `new ClassA()` 获得的对象地址赋值给变量`a`。
-     
+   3. 执行构造函数方法，属性和方法被添加到this引用的对象中：    
+      `ClassA.call(obj);`  
+   4. 如果构造函数中没有返回其它对象，那么返回this，即创建的这个的新对象，否则，返回构造函数中返回的对象。
+
 3. 代码版（手动实现一个 new 的过程）
-     ```javascript
-        function Parent(name, age) {
+   ```js
+      function Parent(name, age) {
              this.name = name ;
              this.age = age ;
-        }
-        Parent.prototype.sayName = function ()       {
+      }
+      Parent.prototype.sayName = function () {
             console.log(this.name);
-        }
-        // 自己定义new方法
-        function newMethod(Parent, ...rest) {
-            // 1. 将构造器（Parent）的prototype属性作为原型，创建一个新的对象
-            let child = Object.create(Parent.prototype) ;  
-            // 2. 将this和调用参数传递给构造函数执行
-            let ret = Parent.apply(child, rest);
-            // 3. 返回第一次创建的对象
-            // return child ;
-  
-            // 如果构造函数没有返回对象，我们返回手动创建的 obj 对象
-            return typeof ret === 'object' ? ret : child; 
-        }
-     ``` 
+      }
+      
+      // 自己定义new方法
+      function newMethod(Parent, ...rest) {
+         // 1. 将构造器（Parent）的prototype属性作为原型，创建一个新的对象
+         let child = Object.create(Parent.prototype) ;  
+         // 2. 将this和调用参数传递给构造函数执行
+         let ret = Parent.apply(child, rest);
+         // 3. 如果构造函数返回了对象，那么就返回这个对象
+         if (result && (typeof (result) == "object" || typeof (result) == "function")) {
+              return  ret;
+          }
+           // 4. 如果构造函数没有返回对象，我们返回手动创建的 obj 对象
+           return child; 
+      }
+   ``` 
 4. 对上面代码的描述：  
    - 以构造器的 prototype 属性为原型，创建新对象；  
    - 将 this (也就是上一句中的新对象) 和调用参数传给构造器，执行；  
@@ -414,7 +414,7 @@
 
 1. 原型链的最顶端是 Object.prototype。  
 
-2. 原因：所有引用类型默认都继承了 Object，而这个继承也是通过原型链实现的。所有函数的默认原型都是 Object 的实例，因此默认原型都会包含一个内部指针，指向Object.prototype。  
+2. 原因：所有引用类型默认都继承了 Object，而这个继承也是通过原型链实现的。所有函数的默认原型都是 Object 的实例，因此默认原型都会包含一个内部指针，指向 Object.prototype。  
 
 3. **注意**：Object.prototype 也是一个对象，也具有隐式原型（`[[proto]]`），但是，这个隐式原型指向的是 null。
 

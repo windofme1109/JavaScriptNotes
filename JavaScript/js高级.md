@@ -91,6 +91,14 @@ JavaScript 是单线程的，也就是说，在同一时间只能执行一个任
 
 3. [又被node的eventloop坑了，这次是node的锅](https://zhuanlan.zhihu.com/p/54951550)
 
+4. [js事件循环机制(浏览器端Event Loop) 以及async/await的理解](https://www.cnblogs.com/smile-fanyin/p/14622432.html)
+
+5. [js事件循环机制(浏览器端Event Loop) 以及async/await的理解](https://segmentfault.com/a/1190000017554062)
+
+6. [Async、Await 从源码层面解析其工作原理](https://zhuanlan.zhihu.com/p/143826516)
+
+7. [async/await 在chrome 环境和 node 环境的 执行结果不一致，求解？](https://www.zhihu.com/question/268007969)
+
 #### 2. 常见的宏任务与微任务
 
 1. 异步任务可以分为两种：宏任务和微任务。
@@ -166,7 +174,8 @@ JavaScript 是单线程的，也就是说，在同一时间只能执行一个任
 
 ### 1. 对事件的理解 
  
-1. 应该问的是什么是事件吧。JavaScript 与 HTML 之间的交互是通过事件实现的。**事件，就是文档或浏览器窗口中发生的一些特定的交互瞬间**。可以使用侦听器（或处理程序）来预订事件，以便事件发生时执行相应的代码。这种在传统软件工程中被称为观察员模式的模型，支持页面的行为（JavaScript 代码）与页面的外观（HTML 和 CSS 代码）之间的松散耦合。  
+1. 应该问的是什么是事件吧。JavaScript 与 HTML 之间的交互是通过事件实现的。**事件，就是文档或浏览器窗口中发生的一些特定的交互瞬间**。可以使用侦听器（或处理程序）来预订事件，以便事件发生时执行相应的代码。这种在传统软件工程中被称为观察员模式的模型，支持页面的行为（JavaScript 代码）与页面的外观（HTML 和 CSS 代码）之间的松散耦合。
+
 2. 要点：
    1. JavaScript 与 HTML 交互
    2. 文档或浏览器窗口中发生特定的交互瞬间
@@ -176,7 +185,7 @@ JavaScript 是单线程的，也就是说，在同一时间只能执行一个任
 
 1. 事件流分为三个阶段：  
    1. 捕获阶段  
-      - 事件有不具体的元素向具体发生的元素逐级传播。用意在于在事件到达预定目标之前捕获它。从document开始，经过html，一直到具体发生事件的元素。
+      - 事件由不具体的元素向具体发生的元素逐级传播。用意在于在事件到达预定目标之前捕获它。从 document 开始，经过 html，一直到具体发生事件的元素。
    2. 处于目标阶段  
       - 实际的目标元素接收到事件。
    3. 冒泡阶段  
@@ -186,26 +195,29 @@ JavaScript 是单线程的，也就是说，在同一时间只能执行一个任
 
 1. 给元素指定事件处理函数。第一个参数是事件名，第二个参数是事件处理函数，第三个是布尔值，参数如果是 true ，表示在捕获阶段调用事件处理程序；如果是 false ，表示在冒泡阶段调用事件处理程序。默认是 false。
 
-### 4. addEventListener()与onclick的区别  
+### 4. addEventListener() 与 onclick 的区别
+
 1. addEventListener() 可以向一个事件绑定多个处理函数，事件发生后，依次调用。onclick 只能绑定一个处理函数，多次绑定，后面的会将前面的覆盖。
 
 ### 5. 移除绑定的事件
 
-2. 使用 removeEventListener()。移除不能使用匿名函数。
+1. 使用 removeEventListener()。移除不能使用匿名函数。
 
 ## 3. ajax
 
 ### 1. XMLHttpRequest
 
 1. ajax 的核心是 XLMHttpRequest 对象。这个对象具有下面几个属性：
-   1. responseText  
-      - 响应主体返回的报文
-   2. status
-      - 响应的 http 状态
-   3. statusText
-      - http 状态说明
-   4. readyState
-      - 请求/响应过程的当前活动阶段，值为：0，1，2，3，4
+
+2. responseText  
+   - 响应主体返回的报文
+3. status
+   - 响应的 http 状态
+4. statusText
+   - http 状态说明
+
+5. readyState
+   - 请求/响应过程的当前活动阶段，值为：0，1，2，3，4
       
 ### 2. 状态
 
@@ -262,7 +274,9 @@ JavaScript 是单线程的，也就是说，在同一时间只能执行一个任
 ### 5. onreadystatechange 与 onload 的区别
 
 1. 在一些较旧的浏览器不支持 onload 事件，只支持 onreadystatechange 事件。onreadystatechange 事件的兼容性更好。
-2. onreadystatechange 事件的定义是只要返回的状态码只要变化时就调用一次函数，可以输出的状态码是2、3、4。而 onload 只有状态码为4时才能调用一次函数。
+
+2. onreadystatechange 事件的定义是只要返回的状态码只要变化时就调用一次函数，可以输出的状态码是2、3、4。而 onload 只有状态码为 4 时才能调用一次函数。
+
 3. 新版浏览器可以直接使用 onload 事件，保证兼容性，使用 onreadystatechange。
 
 ## 4. JSON 
@@ -283,66 +297,101 @@ JavaScript 是单线程的，也就是说，在同一时间只能执行一个任
 
 ### 1. cookie
 
+#### 1. 基本说明
+
 1. 保存在浏览器端，记录了一些用户操作信息（包括用户登录信息）。
 
 2. 大小限制  
    - 单个 cookie 保存的数据不能超过 4kb。每个域可保存的 cookie 数量和浏览器相关。
-   
-3. 应用场景  
-   1. 判断用户是否登陆过网站，以便下次登录时能够实现自动登录（或者记住密码）。如果我们删除 cookie，则每次登录必须从新填写登录的相关信息。
-   2. 保存上次登录的时间等信息。
-   3. 保存上次查看的页面
-   4. 浏览计数
-   
-4. 缺点
-   1. 大小受限。
-   2. 用户可以操作（禁用）cookie，使功能受限。
-   3. 安全性较低。
-   4. 有些状态不可能保存在客户端。
-   5. 每次访问都要传送 cookie 给服务器，浪费带宽。
-   6. cookie 数据有路径（path）的概念，可以限制 cookie 只属于某个路径下。
+
+#### 2. 应用场景
+
+1. 判断用户是否登陆过网站，以便下次登录时能够实现自动登录（或者记住密码）。如果我们删除 cookie，则每次登录必须从新填写登录的相关信息。
+
+2. 保存上次登录的时间等信息。
+
+3. 保存上次查看的页面。
+
+4. 浏览计数。
+
+#### 3. 缺点
+
+1. 大小受限。
+
+2. 用户可以操作（禁用）cookie，使功能受限。
+
+3. 安全性较低。
+
+4. 有些状态不可能保存在客户端。
+
+5. 每次访问都要传送 cookie 给服务器，浪费带宽。
+
+6. cookie 数据有路径（path）的概念，可以限制 cookie 只属于某个路径下。
    
 ### 2.  session
 
+#### 1. session 基本说明
+
 1. 当服务器收到请求需要创建 session 对象时，首先会检查客户端请求中是否包含 sessionid。如果有 sessionid，服务器将根据该 id 返回对应 session 对象。如果客户端请求中没有 sessionid，服务器会创建新的 session 对象，并把 sessionid 在本次响应中返回给客户端。通常使用 cookie 方式存储 sessionid 到客户端，在交互中浏览器按照规则将 sessionid 发送给服务器。如果用户禁用 cookie，则要使用 URL 重写，可以通过 response.encodeURL(url) 进行实现；API 对 encodeURL 的约束为，当浏览器支持 Cookie 时，url 不做任何处理；当浏览器不支持 Cookie 的时候，将会重写 URL 将 SessionID 拼接到访问地址后。
+
 2. session 通过类似与 Hashtable 的数据结构来保存，能支持任何类型的对象。
 
 3. session 没有任何大小限制。
 
-4. 应用场景
-   1. Session 用于保存每个用户的专用信息，变量的值保存在服务器端，通过 SessionID 来区分不同的客户。
-   2. 网上商城中的购物车。
-   3. 保存用户登录信息。
-   4. 将某些数据放入session中，供同一用户的不同页面使用。
-   5. 防止用户非法登录。
-5. 缺点
-   1. Session保存的东西越多，就越占用服务器内存，对于用户在线人数较多的网站，服务器的内存压力会比较大。
-   2. 依赖于cookie（sessionID保存在cookie），如果禁用cookie，则要使用URL重写，不安全。
-   3. 创建Session变量有很大的随意性，可随时调用，不需要开发者做精确地处理，所以，过度使用session变量将会导致代码不可读而且不好维护。
+#### 2. session 的应用场景
+
+1. Session 用于保存每个用户的专用信息，变量的值保存在服务器端，通过 SessionID 来区分不同的客户。
+
+2. 网上商城中的购物车。
+
+3. 保存用户登录信息。
+
+4. 将某些数据放入session中，供同一用户的不同页面使用。
+
+5. 防止用户非法登录。
+
+#### 3. session 的缺点
+
+1. Session保存的东西越多，就越占用服务器内存，对于用户在线人数较多的网站，服务器的内存压力会比较大。
+
+2. 依赖于cookie（sessionID保存在cookie），如果禁用cookie，则要使用URL重写，不安全。
+
+3. 创建Session变量有很大的随意性，可随时调用，不需要开发者做精确地处理，所以，过度使用session变量将会导致代码不可读而且不好维护。
 
 ## 6. localStorage
+
+### 1. 基本说明
+
 1. 是 html5 新增的 API。目的是解决 cookies 存储容量小（只有 4k）的问题。localStorage 主要是用来作为本地存储的；localStorage 中一般浏览器支持的容量大小是 5M，针对不同的浏览器，localStorage 容量大小会有所不同。  
 
 2. 同 cookies 相比，localStorage 并且不会随着HTTP传输，这样可以节约带宽。
+
 3. 提供一种在 cookie 之外存储会话数据的路径。
 
 4. 提供一种存储大量可以跨会话存在的数据的机制。
 
-5. 应用场景：  
-   - 常用于长期登录（+判断用户是否已登录），适合长期保存在本地的数据。    
-   - 注意：localStorage 存储的只能是字符串。
+### 2. localStorage 应用场景  
+
+1. 常用于长期登录（+判断用户是否已登录），适合长期保存在本地的数据。    
+
+2. 注意：localStorage 存储的只能是字符串。
+
+### 3. localStorage 常用 API
+
+1. setItem(name, value)  
+   - 为指定的 name 设置一个对应的值
    
-6. 常用API：
-   1. setItem(name, value)  
-      - 为指定的 name 设置一个对应的值
-   2. getItem(name)  
-      - 根据指定的名字 name 获取对应的值
-   3. key(index)  
-      - 获得 index 位置处的值的名字
-   4. removeItem(name)  
-      - 删除由 name 指定的名值对儿
-   5. clear()  
-      - 清除所有的键值对
+2. getItem(name)  
+   - 根据指定的名字 name 获取对应的值
+   
+3. key(index)  
+   - 获得 index 位置处的值的名字
+   
+4. removeItem(name)  
+   - 删除由 name 指定的名值对
+   
+5. clear()  
+   - 清除所有的键值对
   
 ## 7. sessionStorage
 
@@ -355,32 +404,39 @@ JavaScript 是单线程的，也就是说，在同一时间只能执行一个任
 4. 应用场景  
    - 敏感数据的一次登录。如网上银行的登录。
    
-## 8. localStorage和sessionStorage共同的特点
+## 8. localStorage 和 sessionStorage 共同的特点
 
 1. localStorage 和sessionStorage 都受到浏览器同源策略的限制。不同源的页面无法访问 localStorage 和 sessionStorage。
-2. 优点
-  1. 存储空间更大：cookie 为4KB，而 WebStorage 是5MB。
-  2. 节省网络流量：WebStorage 不会传送到服务器，存储在本地的数据可以直接获取，也不会像 cookie 一样美词请求都会传送到服务器，所以减少了客户端和服务器端的交互，节省了网络流量。
-  3. 对于那种只需要在用户浏览一组页面期间保存而关闭浏览器后就可以丢弃的数据，sessionStorage 会非常方便。
-  4. 快速显示：有的数据存储在 WebStorage 上，再加上浏览器本身的缓存。获取数据时可以从本地获取会比从服务器端获取快得多，所以速度更快。
-  5. 安全性：WebStorage 不会随着 HTTP header 发送到服务器端，所以安全性相对于 cookie 来说比较高一些，不会担心截获，但是仍然存在伪造问题；
-  6. WebStorage 提供了一些方法，数据操作比 cookie 方便。
+
+### 1. 优点
+
+1. 存储空间更大：cookie 为4KB，而 WebStorage 是 5MB。
+
+2. 节省网络流量：WebStorage 不会传送到服务器，存储在本地的数据可以直接获取，也不会像 cookie 一样美词请求都会传送到服务器，所以减少了客户端和服务器端的交互，节省了网络流量。
+
+3. 对于那种只需要在用户浏览一组页面期间保存而关闭浏览器后就可以丢弃的数据，sessionStorage 会非常方便。
+
+4. 快速显示：有的数据存储在 WebStorage 上，再加上浏览器本身的缓存。获取数据时可以从本地获取会比从服务器端获取快得多，所以速度更快。
+
+5. 安全性：WebStorage 不会随着 HTTP header 发送到服务器端，所以安全性相对于 cookie 来说比较高一些，不会担心截获，但是仍然存在伪造问题。
+
+6. WebStorage 提供了一些方法，数据操作比 cookie 方便。
   
-## 9. cookie、localStorage以及sessionStorage跨域问题的解决
+## 9. cookie、localStorage 以及 sessionStorage 跨域问题的解决
 
 ### 1. cookie
 
 1. 在服务器端的响应头中的 Set-Cookie 字段，设置值 domain 为一级域名，则相应的二级域名可以访问次 cookie。例如：`Set-Cookie: 'id=123;domain=baidu.com'`。
 
-2. 两个网页一级域名相同，只是二级域名不同，浏览器允许通过设置d ocument.domain 共享 Cookie。
+2. 两个网页一级域名相同，只是二级域名不同，浏览器允许通过设置 document.domain 共享 Cookie。
 
-### 2. localStorage和sessionStorage
+### 2. localStorage 和 sessionStorage
 
-1. 通过html5新增api——postMessage实现跨域。
+1. 通过html5新增 postMessage 实现跨域。
 
-2. **设置document.domain属性不能实现跨域。**
+2. **设置 document.domain 属性不能实现跨域。**
 
-## 10. localSorage存储满了，怎么办？
+## 10. localSorage 存储满了，怎么办？
 
 1. 跨域请求其他域下的存储空间。
 
