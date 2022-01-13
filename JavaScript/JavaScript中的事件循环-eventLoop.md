@@ -264,26 +264,226 @@
       11
       10
       12
-
    ```
+3. 开始执行代码，所以输出 `1`。
 
-3. 解释：
+4. 代码继续执行，遇到 setTimeout，因为定时时间为 0，表示主线程有空闲就立即执行 setTimeout 中的回调，而 setTimeout 是宏任务，所以将其回调函数放入宏任务队列。
 
+5. 代码继续执行，遇到 process.nextTick，这是一个微任务，将其推入微任务队列。现在宏任务队列和微任务队列中的任务如下所示：
+   
+   宏任务|微任务
+   :---:|:---:
+   setTimeout1|nextTick1
+
+6. 代码继续执行，遇到了 Promise，由于 Promise 的构造函数是同步执行，executor 函数会被同步执行，所以输出 `7`，且调用了 resolve 函数，因此 Promise 变为 resolved 状态，将 then 推入微任务队列。
+
+   宏任务|微任务
+   :---:|:---:
+   setTimeout1|nextTick1
+           暂无|then1
+
+7. 代码继续执行，又遇到一个 setTimeout，与第一个情况一样，因此将这个 setTimeout 的回调推入宏任务队列。
+   宏任务|微任务
+   :---:|:---:
+   setTimeout1|nextTick1
+   setTimeout2|then1
+
+8. 整体代码作为宏任务执行完成，从微任务队列中取出微任务开始执行，即执行 nextTick1 的回调，因此输出 `6`。
+
+9. 微任务队列没有空，因此继续微任务队列中取出微任务开始执行，即执行 then1 的第一个回调，因此输出 `8`。
+
+10. 微任务队列为空，第一轮事件循环结束，开始执行下一个宏任务。从宏任务队列中取出 setTimeout1 的回调开始执行，执行过程如下：
+    - 输出 `2`。
+    - 遇到 process.nextTick，这是一个微任务，将其回调推入微任务队列。
+    
+       宏任务|微任务
+       :---:|:---:
+       setTimeout2|nextTick2
+    - 遇到 Promise，同步执行 executor 函数，输出 `4`，并将 then 推入微任务队列。
+
+      宏任务|微任务
+      :---:|:---:
+      setTimeout2|nextTick2
+      暂无|then2
+    - setTimeout1 的回调执行完成。
+
+11. setTimeout 这个宏任务执行完成。从微任务队列中取出 nextTick2 执行，因此输出 `3`。
+
+12. 微任务队列未空，继续从微任务队列中取出微任务执行，即执行 then2 的第一个回调，因此输出 `5`。
+
+13. 微任务队列为空。执行下个宏任务，因此执行 setTimeout2 的回调。执行过程如下：
+    - 输出 `9`。
+    - 遇到 process.nextTick，这是一个微任务，推入微任务队列。
+    - 
+      宏任务|微任务
+      :---:|:---:
+      暂无|nextTick3
+    - 遇到 Promise，执行 executor 函数，输出 `11`，将 then 的回调推入微任务队列。
+      宏任务|微任务
+      :---:|:---:
+      暂无|nextTick3
+      暂无|then3
+    - setTimeout2 回调执行完成。
+
+14. setTimeout2 这个宏任务执行完成。从微任务队列中取出 nextTick3 执行，因此输出 `10`。
+
+15. 微任务队列未空，继续从微任务队列中取出微任务执行，即执行 then3 的第一个回调，因此输出 `12`。
+
+16. 微任务队列为空。本轮事件循环结束。
+
+17. 最终的输出就是：`1 7 6 8 2 4 3 5 9 11 10 12`
 ##### 2. 宏任务中嵌套微任务 - 浏览器环境下执行
 
 1. 浏览器下没有 process.nextTick，因此需要去掉 process.nextTick，示例代码如下：
    ```js
+      console.log('script start');
 
+      setTimeout(() => {
+          console.log('timeout-1');
+          new Promise((resolve, reject) => {
+              console.log('promise-1');
+              resolve();
+          }).then(() => {
+              console.log('then-1');
+          }).then(() => {
+              console.log('then-2');
+          })
+      }, 0)
+
+      new Promise((resolve, reject) => {
+          console.log('promise-2');
+          resolve();
+      }).then(() => {
+          console.log('then-3');
+      }).then(() => {
+          console.log('then-4');
+      })
+
+      console.log('script end');
    ```
 2. 输出结果：
    ```text
-
+      script start
+      promise-2
+      script end
+      then-3
+      then-4
+      timeout-1
+      promise-1
+      then-1
+      then-2
    ```
-3. 解释：
+3. 开始执行代码，所以输出 `script start`。
+
+4. 代码继续执行，遇到 setTimeout，因为定时时间为 0，表示主线程有空闲就立即执行 setTimeout 中的回调，而 setTimeout 是宏任务，所以将其回调函数放入宏任务队列。
+
+5. 代码继续执行，遇到 Promise，同步执行 executor 函数，输出 `promise-2`，同时 promise 变成 resolved 状态。将 then 的第一个回调推入微任务队列。现在宏任务队列和微任务队列中的任务如下所示：
+
+   宏任务|微任务
+   :---:|:---:
+   setTimeout1|then1
+
+6. 代码继续执行，输出 `script end`。
+
+7. 整体代码作为宏任务执行完成，去微任务队列中取出微任务，所以主线程执行 then1 的回调函数，输出 `then-3`。这个回调执行完成以后，回调函数没有返回值，那么 then1 会返回一个 resolved 状态的 promise，因为 then1 后面还有一个 then 函数，因此将这个 then 的回调推入微任务队列。
+
+   宏任务|微任务
+   :---:|:---:
+   setTimeout1|then2
+
+8. 微任务队列没有空，那么继续从微任务队列中取出微任务，即执行 then2 的回调，输出 `then-4`。此时微任务队列已经空了，本轮事件循环结束。
+
+9. 代码继续执行，去宏任务队列中取出宏任务放到主线程执行，即执行 setTimeout1 的回调。执行过程如下：
+   - 输出 `timeout-1`。
+   - 遇到 Promise，输出 `promise-1`，接着 promise 变成 resolved 状态，将 then 的回调推入微任务队列。
+     宏任务|微任务
+     :---:|:---:
+     暂无|then3
+   - setTimeout 回调执行结束。
+
+10. 去微任务队列中取出微任务，所以主线程执行 then3 的回调函数，输出 `then-1`。同理，将 then3 后面的回调推入微任务队列：
+
+    宏任务|微任务
+    :---:|:---:
+    暂无|then4
+
+11. 微任务队列没有空，那么继续从微任务队列中取出微任务，即执行 then4 的回调，输出 `then-2`。
+
+12. 微任务队列已经空了，本轮事件循环结束。
 
 ##### 3. 微任务中嵌套宏任务
 
+1. 示例代码：
+   ```js
+      console.log('script start');
+
+      setTimeout(() => {
+          console.log('timeout-1');
+      })
+
+      new Promise((resolve, reject) => {
+          setTimeout(() => {
+             console.log('timeout-2');
+             resolve();
+          }, 0)
+      }).then(() => {
+          console.log('then-1');
+      setTimeout(() => {
+          console.log('timeout-3');
+      })
+      })
+
+      console.log('script end');
+   ```
+2. 输出：
+   ```text
+      script start
+      script end
+      timeout-1
+      timeout-2
+      then-1
+      timeout-3
+   ```
+3. 开始执行，输出：script start。
+
+4. 将 setTimeout 回调推入宏任务队列。
+
+5. 执行 Promise 中的 executor 函数，将 setTimeout 的回调推入宏任务队列：
+
+   宏任务|微任务
+   :---:|:---:
+   setTimeout1|暂无
+   setTimeout2|暂无
+
+6. 输出：script end。
+
+7. 整体代码作为宏任务执行完成。因为微任务队列为空，所以本轮事件循环结束。
+
+8. 从宏任务队列中取出 setTimeout1 的回调并执行，输出 timeout-1。
+
+9. 微任务队列为空，本轮事件循环结束。
+
+10. 从宏任务队列中取出 setTimeout2 的回调并执行，输出 timeout-2，同时 调用了 resolve 函数，Promise 变成 resolve 状态，将 then 推入微任务队列。
+
+    宏任务|微任务
+    :---:|:---:
+    暂无|then1
+
+11. 微任务队列不为空，取出微任务放到主线程执行，因此执行 then1 的回调，输出 then-1。将 setTimeout 的回调推入宏任务队列：
+
+    宏任务|微任务
+    :---:|:---:
+    setTimeout3|暂无
+
+12. 微任务队列为空，本轮事件循环结束。
+
+13. 从宏任务队列中取出 setTimeout3 的回调并执行，输出 timeout-3。
+
+14. 微任务队列为空，本轮事件循环结束。
+
 #### 4. Promise 与 async / await
+
+##### 1. await 后面接 async 函数（Promise）
 
 1. 虽然 Promise 与 async / await 都是微任务，但是放到一起，执行顺序还是有区别的，下面用代码说明。
 
@@ -300,16 +500,197 @@
       }
 
       console.log('script start')
-          setTimeout(function() {
+      setTimeout(function() {
           console.log('setTimeout')
       }, 0)
 
       async1();
 
       new Promise( function( resolve ) {
-      console.log('promise1')
+          console.log('promise1')
           resolve();
       }).then( function() {
          console.log('promise2')
       })
    ```
+3. 输出如下：
+   ```text
+      script start
+      async1 start
+      async2
+      promise1
+      async1 end
+      promise2
+
+      setTimeout
+   ```
+
+4. 代码开始执行，输出 `script start`。
+
+5. 遇到 setTimeout，将其回调推入宏任务队列。
+
+6. 遇到 async1 函数，则开始执行其内部的代码，前面说过，async 函数内部的代码在遇到 await 之前也是按照同步的方式执行的，所以首先输出 `async1 start`。
+
+7. 遇到 await 表达式，执行过程被阻塞，因为 await 表达式及其后面的语句等同于：
+   ```
+      Promise.resolve(async2()).then(() => {
+          console.log('async1 end')
+      })
+   ```
+8. 所以 await 后面的 async2 函数立即执行。同理，async2 内部的代码在遇到 await 之前还是同步执行，所以输出 `async2`。
+
+9. async2 函数执行完成，没有返回值。因为 async 函数会返回一个 Promise，所以 async2 返回一个 resolved 状态的 Promise。
+
+10. 由于 async2 函数 返回一个 resolved 状态的 Promise，根据 Promise.resolve 函数的规则：如果其参数是 Promise，那么 Promise.resolve 就返回这个参数。所以下面的代码：
+    ```js
+      Promise.resolve(async2()).then(() => {
+           console.log('async1 end')
+      })
+    ```
+    等同于：
+    ```js
+       async2().then(() => {
+           console.log('async1 end')
+      })
+    ```
+    而 async2 函数返回的 Promise 是 resolve 状态，所以，then 的回调会被推入微任务队列。
+
+    宏任务|微任务
+    :---:|:---:
+    setTimeout1|then1
+
+11. 调用 async 函数会立即返回一个 Promise，async 函数内部的异步操作被封装在 Promise 中。因此，即使调用了 async 函数，也不会阻塞 async 函数外面的代码。当执行到 async1 函数中 await 表达式的时候，await 表达式后面的内容被阻塞。而 async2 函数也是立即执行，执行完 async 函数后，就立即跳出 async1 函数。（这个就是 generator 函数的机制，await 相当于 yield，函数执行到 yield 处就停止，跳出 generator 函数外，同时会立即执行 yield 右边的表达式。此时就可以执行 generator 函数外的代码，如果想恢复 generator 函数的执行，只能手动调用 next 函数。而 async 函数能自动恢复执行的原因是内置了自动执行器）
+
+12. 代码继续执行，遇到 Promise，同步执行 executor 函数，所以输出 `promise1`，然后 Promise 变成 resolved 状态，将 then 的回调推入微任务队列：
+
+    宏任务|微任务
+    :---:|:---:
+    setTimeout1|then1
+    暂无|then2
+
+13. 整体代码作为宏任务执行结束，从微任务队列中取出 then1 的回调执行，因此输出 `async1 end`。
+
+14. 微任务队列未空，继续从微任务队列中取出 then2 的回调执行，因此输出 `promise2`。
+
+15. 微任务队列为空，本轮事件循环结束。
+
+16. 任务循环继续，去宏任务队列中取出 setTimeout1 并执行，所以输出 `setTimeout`。
+
+17. 总结：
+    - async 函数在执行到 await 语句时，阻塞 await 语句下面的代码，并不会阻塞 async 函数外的代码。
+    - await 语句等同于：Promise.resolve().then()
+
+##### 2. await 后面接普通表达式
+
+1. 代码示例：
+   ```js
+      async function async1() {
+          console.log('async1 start');
+          await console.log('await1');
+          console.log('async1 end');
+      }
+
+      console.log('script start')
+      setTimeout(function() {
+           console.log('setTimeout');
+      }, 0)
+
+      async1();
+
+      new Promise( function( resolve ) {
+          console.log('promise1');
+          resolve();
+      }).then( function() {
+          console.log('promise2');
+      })
+   ```
+2. 输出：
+   ```text
+       script start
+       async1 start
+       await1
+       promise1
+       async1 end
+       promise2
+       setTimeout
+   ```
+
+3. 分析过程这里不再详说，着重说明的是，async1 函数中 await 后面跟的是普通的表达式，那么等同于：
+   ```js
+      function async1() {
+          Promise.resolove(console.log('await1')).then(() => {
+              console.log('async1 end')
+          
+          })
+      }
+   ```
+4. 从上面的分析中，可以看出，async1 函数中的 then 会比外面的 then 更早的添加到微任务队列中。
+
+##### 3. 多个 await 表达式
+
+1. 代码示例：
+      ```js
+      async function async1() {
+         console.log('async1 start')
+         await async2();
+         await console.log('await1');
+         console.log('async1 end');
+     }
+
+      async function async2() {
+          console.log('async2');
+      }
+
+      console.log('script start');
+      setTimeout(function() {
+          console.log('setTimeout');
+      }, 0);
+
+      async1();
+
+      new Promise(function(resolve) {
+          console.log('promise1');
+          resolve();
+      }).then(function() {
+          console.log('promise2');
+      })
+   ```
+   
+2. 输出：
+   ```text
+      script start
+      async1 start
+      async2
+      promise1
+      await1
+      promise2
+      async1 end
+      setTimeout
+   ```
+   
+3. 详细的过程这里不再详说，着重说明的是，async1 函数中 多个 await 表达式，等同于：
+   ```js
+      function async1() {
+          Promise.resolve(async2())
+             .then(() => {
+                 Promise.resolve(console.log('await1'))
+                     .then(() => {
+                         console.log('async1 end');
+                      })
+             })
+      }
+   ```
+   因为 async2 函数依旧 async 函数，返回值是 Promise，因此还可以简化：
+   ```js
+      async2().then(() => {
+           Promise.resolve(console.log('await1'))
+                 .then(() => {
+                      console.log('async1 end');
+                  })
+      })
+   ```
+4. 所以，这几个微任务的输出顺序是：
+   1. async2 函数输出：`async2`
+   2. 第二个 await 后面的 console.log 语句输出：`await1`
+   3. async1 函数外面的 Promise 的 then 的回调输出：`promise2`
+   4. async1 函数中最后一个 console.log 语句输出：`async1 end`
