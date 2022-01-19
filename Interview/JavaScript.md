@@ -559,7 +559,7 @@ requestAnimationFrame 和 requestIdleCallback了解吗
 
 算法题2:属性获取
 ```js
-   {
+   const obj = {
     a:{
       b:{
         c:{f:"aa"}
