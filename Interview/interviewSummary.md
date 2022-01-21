@@ -61,3 +61,67 @@
 6. 页面性能。
 
 7. 移动端适配。
+
+# 22.01.21
+
+## 1. Moka
+
+1. 介绍工作
+
+2. toB 与 toC 的区别
+
+3. toB 具备的能力
+
+4. 编程题目
+   - 将下面的嵌套路由扁平化：
+     ```js
+        // input
+        const originRoutes = [
+            {
+                path: '/a',
+                routes: [
+                    {
+                         path: 'b',
+                         routes: [
+                             {
+                                 path: 'c'
+                             }    
+                         ]
+                    },
+                    {
+                        path: 'd',
+                    },
+                    {
+                        path: 'f',
+                        routes: [
+                            {
+                                path: 'd'
+                            },
+                            {
+                                path: ['e', 'f']
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+        
+        // output
+        const newRoutes = [
+            'a/b/c',
+            'a/b/c',
+            'a/d',
+            'a/f/d',
+            'a/f/e',
+            'a/f/f'
+        ]
+     ```
+
+5. 编程题目
+   - 输出非空数组中，出现次数最多的元素，数组的元素是基本类型
+     ```js
+        // input: [1, '2', '2', 3]
+        // output: ['2']
+        // input: [1, '2', '3', 1, '2', null, null]
+        // output: [1, '2', null]
+     ```
