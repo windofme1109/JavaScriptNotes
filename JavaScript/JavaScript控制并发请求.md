@@ -112,3 +112,71 @@
           })
        }
    ```
+
+
+#### 2. Promise.all + 递归
+
+1. 基本要求：
+   - 传入一个由 Promise 对象组成的数组
+   - 限制并发次数
+   - 传入回调函数，回调函数接收最后的结果数组
+   - 使用 Promise.all 限制并发数量
+
+2. 代码实现：
+   ```js
+      /**
+        *
+        * @param originTasks 元素是 Promise 对象的数组
+        * @param max 最大的并发数量
+        * @param callback 回调
+        */
+         function startRequestLimitPool(originTasks, max, callback) {
+             const result = [];
+             const tasks = [...originTasks];
+             const length = originTasks.length;
+
+             // 使用 Promise.all 限制并发请求的数量
+             // 首先新建一个指定长度的数组，长度与最大并发数一致
+             // 这个数组的每个元素都是 Promise
+             let taskArr = Array.from({length: max}).map(() => {
+                return new Promise(resolve => {
+
+                    // 在 Promise 内部，定义一个函数，主要作用是递归执行任务队列中的任务
+                    function runTask() {
+
+                       if (tasks.length <= 0) {
+                           // 任务队列为空，将最外层的 Promise 置为 resolve 状态
+                           resolve();
+                           return;
+                       }
+
+                       // 从任务队列中取出第一个任务
+                       const task = tasks.shift();
+
+                       const currentLength = tasks.length;
+
+                       console.log(`第 ${length - currentLength} 个请求开始，时间是：${new Date().toLocaleString()}`);
+
+                       // task 是一个 Promise 对象，当其状态变为 resolve 状态，会调用 then 的第一个回调
+                       task.then(res => {
+
+                           console.log(`第 ${length - currentLength} 个请求结束，时间是：${new Date().toLocaleString()}`);
+                           // 将结果数组放到 results 数组中
+                           result.push(res);
+                           // 递归调用 runTask，开启下一个任务
+                           runTask();
+                       }).catch(err => {
+                           result.push(err);
+                           runTask();
+                       });
+                   }
+
+                      runTask();
+                  })
+             });
+
+             // 调用 Promise.all() 方法，当 taskArr 中的 Promise 状态全部变为 resolve 状态，其返回的 Promise 才会变成 resolve 状态
+             // taskArr 中的 Promise 对象只有 tasks 中的任务全部完成，才能变成 resolve 状态
+             Promise.all(taskArr).then(res => callback(result));
+      }
+   ```
