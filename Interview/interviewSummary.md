@@ -303,16 +303,78 @@
    - 宏任务和微任务
    - 变量提升 - 函数和变量
 
-2. 算法题目 - 链表相加
+2. 示例：
+   ```js
+      (function (a) {
+            async function async1() {
+                console.Log("111", a); // 2 111 function
+                await async2();
+                console.Log("222", a); // 5 222 A
+            }
+          async function async2() {
+              console.Log("333", a); // 3 333 function
+          }
+          console.Log("444", a); // 1 444 function
+          setTimeout(() => {
+              console.Log("555", a); // 7 555 A
+          }, 0);
+          async1();
+          var a = "A";
+          new Promise((resolve) => {
+              console.Log("666", a); // 4. 666 A
+              resolve();
+          }).then(() => {
+              console.Log("777", a); // 6 777 A
+          });
+          function a() { }
+      })("B");
+   ```
 
-3. for in、for of、forEach 的区别
+4. 算法题目 - 链表相加
+   
+5. for in、for of、forEach 的区别
 
-4. 实现深拷贝 - 破解循环引用
+6. 实现深拷贝 - 破解循环引用
 
-5. 数组去重
+7. 数组去重
 
-6. Set 存储数据不能重复的原因
+8. Set 存储数据不能重复的原因
 
+9. this 指向问题
+    ```js
+       var obj = {
+           test: "123",
+           f1: () => {
+               console.log(this.test);
+           },
+           f2: function () {
+        console.log(this.test);
+           },
+       };
+       var obj2 = {
+           test: "456"
+       };
+       obj.f1();
+        obj.f2();
+       obj.f1.call(obj2);
+       obj.f2.call(obj2);
+       new obj.f1();
+       new obj.f2();
+
+
+       function test() {
+           var a = {
+           name: 'zz',
+           foo: () => console.log(this.name),
+           bar() {
+              console.log(this.name);
+           }
+       };
+       a.foo();
+       a.bar();
+       }
+       test.bind({ name: 'test' })();
+    ```
 ## 3. 字节 - 二面
 
 1. 数字加千分位
@@ -386,7 +448,7 @@
 
 2. 跨域
 
-3. 解析 url 参数
+3. 解析 url 参数 - 特别注意，使用 decodeURIComponent 方法进行解码
 
 4. http 和 https 
 
@@ -403,3 +465,39 @@
 10. 事件冒泡如何找到公共的父元素
 
 11. 编程题
+
+# 22.02.11
+
+## 1. 搜狐 - 二面
+
+1. 场景题目 - 一个页面有多个 iframe，使用 postMessage 向父 iframe 通信，如何区分是哪个 iframe 发送的消息。这个题目的来源是我介绍了我的工作内容：将设计器集成到我们的平台上，使用的是 iframe 的方式，所以引出了几个问题：
+   - 权限问题
+   - 通信问题
+
+2. postMessage 机制有什么缺点
+
+3. vue-cli 了解吗
+
+4. create-react-app 用过吗，可以指定模板，这个生成不同的模板是怎么实现的
+
+5. 有没有开发过这种模板
+
+6. 编码题目 - 要求
+   - 使用 es5 的方式实现一个类，并能实现链式调用
+   - 设置私有属性，只能通过 getter 方法获得，通过 setter 方法设置。
+
+7. 示例：
+   ```js
+       People
+       const peter = new People('peter');
+       peter.gotoSleep().hasWakeUp();
+       // peter go to sleep;
+       // peter has wake up;
+       peter.setFirstName('zhu');
+       peter.getTotalName() => 'zhu peter';
+       // 只能通过setFirstName设置姓氏；
+       // 只能通过getFirstName获取与姓氏有关的内容
+   ```
+8. 为什么考虑新的机会
+
+9. 未来的职业规划是什么
