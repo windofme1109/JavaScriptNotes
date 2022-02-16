@@ -1,4 +1,49 @@
 
+
+## es5 的方式实现私有变量
+
+1. 在函数内部定义一个变量，然后使用闭包的方式，访问这个变量。
+
+2. 示例代码：
+   ```js
+      function Person(name, age) {
+           this.name = name;
+
+           // _age 是 Person 内部的变量，外部无法访问
+           let _age = age;
+
+           // 使用闭包来模拟实现私有变量
+           this.getAge = function () {
+               // 定义一个函数，由于作用域的关系，这个函数内部可以访问外层函数的变量，所以 getAge 内部可以访问 _age
+               // 通过调用 getAge，可以访问到构造函数内部的 _age
+               return _age;
+           }
+
+           this.setAge = function (value) {
+               _age = value;
+           }
+       }
+
+
+      const p1 = new Person('jack', 20);
+
+      20
+      console.log(p1.getAge());
+
+      // undefined
+      console.log(p1.age);
+
+      console.log(p1.setAge(25));
+
+      // 25
+      console.log(p1.getAge());
+   ```
+   1. `_age` 是 `Person` 内部的变量，外部无法访问。
+   2. 定义一个函数，由于作用域的关系，这个函数内部可以访问外层函数的变量，所以 `getAge` 内部可以访问 `_age`。
+   3. 将 `getAge` 函数赋值给实例属性 `getAge`，那么这个实例属性也是一个方法，通过调用这个方法，就能拿到 `Person` 构造函数内部的 `_age`。
+   4. 在外部，直接访问 `_age` 是 `undefined`。
+   5. setAge 同理。
+
 ## 说一下 js 中如何实现函数重载
 
 1. 函数重载指的是函数名相同，但是参数不同（个数、类型）的几个函数。调用时根据参数来决定调用哪个函数。
