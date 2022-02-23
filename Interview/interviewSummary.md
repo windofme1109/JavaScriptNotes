@@ -639,4 +639,6 @@
 
 17. 数组的 slice 和 splice 的区别
 
+18. http 请求默认携带 cookie 吗，withCredentials 这个属性用过吗
+
 
