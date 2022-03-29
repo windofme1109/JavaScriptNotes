@@ -842,7 +842,7 @@
 
            console.log(a); 
 
-           var a=123;
+           var a = 123;
 
            console.log(a); 
 
@@ -890,4 +890,43 @@
 18. v8 引擎有了解吗，js 中的垃圾回收机制有了解吗
 
 19. useCallback、useMemo 有用过吗
+
+# 22.03.28
+
+## 微软 - - content ecosystem - 二面
+
+1. react hooks ：是否写过自定义的 hooks。
+
+2. webpack：打包原理。
+
+3. webpack 怎么处理 import 的部分。
+
+4. react router 原理，最新的 react router 的版本有了解过吗。
+
+5. Es6 用到了哪些特性。
+
+6. Promise 的实现原理，链式调用的实现方法。
+
+7. 实现 promise 方法，数组里面都是域名，传入这个数组，返回 ping 的最快的域名。和 promise.all 的原理差不多。边界情况，测试用例。
+
+8. leetcode 402。
+
+## 微软 - - content ecosystem - 三面
+1. 一个 800 × 800 的画布，点击这个区域的任何一点画一个圆圈，直径是 10 px。要求：
+   - 考虑边界条件，圆圈不能画到画布的外面。
+   - 带撤销功能，ctrl + z 或者是有一个撤销的按钮。
+   - 不使用 canvas。
+2. leetcode 40。
+## 微软 - - content ecosystem - 四面
+
+1. 最有技术亮点的功能。
+
+2. 平时如何学习前端。
+
+3. 只有一个用户首屏加载时间长，如何排查。
+
+4. 计算两个日期相差的时间。要求（出的题目要写的快，要注意时间）：
+   - 不使用 Date 对象。
+   - 除了 js 部门，还要写好 html 内容。即有输入也有输出。
+
 
