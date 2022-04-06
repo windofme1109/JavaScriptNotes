@@ -129,8 +129,7 @@
    ```js
       
       const fs = require('fs');
-      
-   
+
       /**
         * readFileThunk() 是一个函数，是 fs.readFile() 经过 Thunk 函数的包装后的结果
         * readFileThunk() 接收的参数是 fs.readFile() 的回调函数前面的参数
@@ -192,7 +191,6 @@
       };
    ```
 5. 它的源码主要多了一个检查机制，变量 `called` 确保回调函数只运行一次。
-
 
 ## 6. `Thunk` 函数与 `Curried` 函数的区别
 
