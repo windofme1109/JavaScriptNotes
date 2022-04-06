@@ -276,11 +276,15 @@
 
 1. `.ssh` 目录是用来存放同 ssh 加密相关的内容，如生成的公钥、私钥等。
 
-2. config 是一个配置文件，配置项用来管理多个公钥私钥对、ssh 账号密码等。我们使用 git 时，可能有多个账号，每个账号对应着公钥和私钥，也可能同时使用 github、gitlab 等，这样就需配置文件  config 统一管理这些信息。
+2. 参考文档
+   - [使用 SSH config 文件](https://blog.csdn.net/weixin_34273046/article/details/92211773)
+   - [使用ssh config配置文件来管理ssh连接](https://www.cnblogs.com/piperck/p/6188984.html)
 
-2. git 在本地提交到 github 或 gitlab 上时，会读取 `.ssh` 目录下的公钥秘钥信息。如果在 `~/.ssh/` 目录下有 config 文件，则会优先读取 config 的配置信息，否则直接读取 `id_rsa` 和 `id_rsa.pub`。
+3. config 是一个配置文件，配置项用来管理多个公钥私钥对、ssh 账号密码等。我们使用 git 时，可能有多个账号，每个账号对应着公钥和私钥，也可能同时使用 github、gitlab 等，这样就需配置文件  config 统一管理这些信息。
 
-3. config 中的配置项说明如下：
+4. git 在本地提交到 github 或 gitlab 上时，会读取 `.ssh` 目录下的公钥秘钥信息。如果在 `~/.ssh/` 目录下有 config 文件，则会优先读取 config 的配置信息，否则直接读取 `id_rsa` 和 `id_rsa.pub`。
+
+5. config 中的配置项说明如下：
    配置项|说明
    :---:|:---:
    Host | 别名
@@ -291,13 +295,13 @@
    IdentitiesOnly | 只接受 SSH key 登录
    PreferredAuthentications | 强制使用 Public Key验证
 
-4. 可以通过 `man ssh_config` 这个命令，查看 `~/.ssh/config` 的语法。
+6. 可以通过 `man ssh_config` 这个命令，查看 `~/.ssh/config` 的语法。
 
-5. 注意：配置了 `User`，`git push` 时就一定要配置相同的用户名
+7. 注意：配置了 `User`，`git push` 时就一定要配置相同的用户名
 如果不设置 `User`，随意一个 `user.name` 都可以提交 `git push`
 如果设置了`User`，`user.name` 必须匹配到 config 中的 `User` 才能提交。
 
-5. config 文件示例：
+8. config 文件示例：
    ```
       Host github.com
       User windofme1109
