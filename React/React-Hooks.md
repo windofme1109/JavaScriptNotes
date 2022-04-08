@@ -139,7 +139,7 @@
 
 1. state hook 提供了一种可以在 function component 中添加状态的方式。通过 state hook，可以抽取状态逻辑，使组件变得可测试，可重用。开发者可以在不改变组件层次结构的情况下，去重用状态逻辑。更好的实现关注点分离。  
 
-2. state hook 的主要作用就是获取需要的 state 和 更新 state 的方法。
+2. state hook 的主要作用就是获取需要的 state 和更新 state 的方法。
 
 3. useState 用来替换类组件的 state。
 
@@ -198,7 +198,7 @@
    3. Unmount 之前
    
 3. useEffect 调用时机  
-   - useEffect 在 **render** 之后调用，在不同的 **render** 时刻，就相当于使用 componentDidMount、componentDidUpdate 这些回调函数。  
+   - useEffect 在 **render** 之后调用，在不同的 **render** 时刻，就相当于使用 componentDidMount、componentDidUpdate 这些生命周期函数。  
    - useEffect 还会返回一个回调函数，这个回调函数的执行时机很重要。同 useEffect 的调用时机是挂钩的。这个回调函数在组件渲染前调用。严格来说，在前一次的渲染视图被清除之前。相当于 componentWillUnmount。
 
 4. 用法
@@ -259,17 +259,17 @@
      ```
      通过 count 来控制 useEffect() 的调用时机。
 
-6. react 首次渲染和之后的每次渲染都会调用一遍传给 useEffect 的函数。而之前我们要用两个声明周期函数来分别表示首次渲染（componentDidMount()），和之后的更新导致的重新渲染（componentDidUpdate()）。
+6. react 首次渲染和之后的每次渲染都会调用一遍传给 useEffect 的函数。而之前我们要用两个生命周期函数来分别表示首次渲染（componentDidMount()），和之后的更新导致的重新渲染（componentDidUpdate()）。
 7. useEffect() 中定义的副作用函数的执行不会阻碍浏览器更新视图，也就是说这些函数是异步执行的，而之前的 componentDidMount() 或 componentDidUpdate() 中的代码则是同步执行的。这种安排对大多数副作用说都是合理的，但有的情况除外，比如我们有时候需要先根据 DOM 计算出某个元素的尺寸再重新渲染，这时候我们希望这次重新渲染是同步发生的，也就是说它会在浏览器真的去绘制这个页面前发生。
 
 
 ### 8. 自定义hooks
 
-1. 自定义的hooks以`use`开头。
+1. 自定义的 hooks 以 `use` 开头。
 
 2. 两个组件中使用相同的自定义 hooks，不会共享 state 和 effect，所有的 state 和 effect 都是相互隔离的，不会相互影响。
 
-3. 自定义 hooks 主要是用来复用组件的状态。也就是说，定义一个公共的函数组件，其他的组件可以引用这个公共组件。使用方式比较简洁。在 hooks 出现之前，我们想复用一个组件，只能通过 HOC 或者 `render props` 的方式。HOC（Higher Order Component）高阶组件，这是 React 提出的一个概念，并不是一个真正的API。高阶组件是一个函数，接收一个组件作为参数，返回一个新的组件。HOC 难于理解，且会引入额外的嵌套结构。
+3. 自定义 hooks 主要是用来复用组件的状态。也就是说，定义一个公共的函数组件，其他的组件可以引用这个公共组件。使用方式比较简洁。在 hooks 出现之前，我们想复用一个组件，只能通过 HOC 或者 `render props` 的方式。HOC（Higher Order Component）高阶组件，这是 React 提出的一个概念，并不是一个真正的 API。高阶组件是一个函数，接收一个组件作为参数，返回一个新的组件。HOC 难于理解，且会引入额外的嵌套结构。
 
 4. 自定义一个hooks：
    ```tsx
@@ -365,13 +365,13 @@
    }
    ```
    第一个 button 用于计数，第二个 button，绑定了一个点击事件，点击后，延迟3s，弹窗提示点击按钮时的 count 值。  
-   我们首先点击第一个按钮，点击两次，然后点击第二个按钮，然后再点击第一个按钮，点击多次，比如说到 `10，3s` 后，弹窗出现，显示的 count 时点击第二个按钮时的2次。由此，可以看出，handleAlertClick() 处理函数保留了点击时刻的 count 值，并形成了一个闭包。图示：
+   我们首先点击第一个按钮，点击两次，然后点击第二个按钮，然后再点击第一个按钮，点击多次，比如说到 `10，3s` 后，弹窗出现，显示的 count 时点击第二个按钮时的2次。由此，可以看出，`handleAlertClick()` 处理函数保留了点击时刻的 count 值，并形成了一个闭包。图示：
    
    ![](./img/useRef-1.jpg) 
     
    从这个例子中可以看出，组件在每一次渲染过程中的 state 和 props 都是独立的。
 
-2. useRef() 主要是可以在渲染过程中保持状态。也就是说，始终保持着同一个引用。
+2. `useRef()` 主要是可以在渲染过程中保持状态。也就是说，始终保持着同一个引用。
 
 3. 用法
    - 语法  
@@ -401,23 +401,23 @@
      ```
      `inputRef` 中的 `current` 属性指向了 `input` 元素，并且在整个组件的生命周期内，无论该节点如何改变，`React` 都会将 `inputRef` 对象的`current` 属性设置为相应的 input 元素。
      
-4. useRef()比 `ref` 属性更有用。它可以很方便地保存任何可变值，其类似于在 `class` 中使用实例字段的方式。 
+4. useRef() 比 `ref` 属性更有用。它可以很方便地保存任何可变值，其类似于在 `class` 中使用实例字段的方式。 
  
-   这是因为它创建的是一个普通 `Javascript` 对象。而 useRef() 和自建一个 `{current: ...}` 对象的唯一区别是，useRef() 会在每次渲染时返回同一个 `ref` 对象。
+5. 这是因为它创建的是一个普通 `Javascript` 对象。而 useRef() 和自建一个 `{current: ...}` 对象的唯一区别是，`useRef()` 会在每次渲染时返回同一个 `ref` 对象。
    
-5. **注意**：当 `ref` 对象内容发生变化时，useRef() 并不会通知你。current 属性值的更新不会引发组件重新渲染。
+6. **注意**：当 `ref` 对象内容发生变化时，`useRef()` 并不会通知你。current 属性值的更新不会引发组件重新渲染。
 
-6. 以上内容来自React中文文档：[useRef](https://react.docschina.org/docs/hooks-reference.html#useref)
+7. 以上内容来自React中文文档：[useRef](https://react.docschina.org/docs/hooks-reference.html#useref)
 
 ### 10. useContext
 
 1. 这个 hooks 用来简化 Context 的使用。
 
-2. React组件之间传递数据，传统方式只能是单向单层传递，不能跨组件传递。为了解决这个问题，React 提供了 Context，使得跨组件传递数据成为可能。
+2. React 组件之间传递数据，传统方式只能是单向单层传递，不能跨组件传递。为了解决这个问题，React 提供了 Context，使得跨组件传递数据成为可能。
 
-3. Context 有两个核心的组件：Provider 和 Consumer。这两个组件通过 React.createContext() 生成。
+3. Context 有两个核心的组件：Provider 和 Consumer。这两个组件通过 `React.createContext()` 生成。
 
-4. createContext() 接收一个初始值，返回值是一个对象，这个对象包含了两个属性：Provider 和 Consumer，也就是上面所说的核心组件。可以使用解构的方式进行接收。示例代码如下：
+4. `createContext()` 接收一个初始值，返回值是一个对象，这个对象包含了两个属性：Provider 和 Consumer，也就是上面所说的核心组件。可以使用解构的方式进行接收。示例代码如下：
    ```tsx
       const {Provider, Consumer} = React.createContext(initialValue);
    ```
@@ -480,7 +480,11 @@
       const Leaf: React.FC = () => {
           return (
               <React.Fragment>
-                  <Consumer>{value => <h1>battery: {value}</h1>}</Consumer>
+                  <Consumer>
+                       {
+                           value => <h1>battery: {value}</h1>
+                       }
+                  </Consumer>
               </React.Fragment>
           );
       };   
@@ -494,7 +498,7 @@
    - [React系列——React Context](https://segmentfault.com/a/1190000017758300)
    - [React的Context的使用方法简介](https://www.cnblogs.com/littleSpill/p/11221538.html)
    
-8. 从上面的 Context 的用法可以看出，后代组件想使用 Consumer 组件比较麻烦。使用 useContext() 可以简化这一步。
+8. 从上面的 Context 的用法可以看出，后代组件想使用 Consumer 组件比较麻烦。使用 `useContext()` 可以简化这一步。
 
 9. 用法
    - 语法  
@@ -506,7 +510,7 @@
 
 11. `useContext(MyContext)` 只是让我们能获取 Context 的值以及订阅  Context 的变化。我们仍然需要在上层组件树中使用 `<MyContext.Provider>` 来为下层组件提供 Context。
 
-12. 下面的代码展示了 useContext() 的用法：
+12. 下面的代码展示了 `useContext()` 的用法：
     ```tsx
        // App.tsx
        import React from 'react';
@@ -560,4 +564,4 @@
        };
        export default Hello;
     ```
-    需要使用哪个组件中的 Context 对象，我们就从哪个组件中导入这个 Context 对象，然后作为参数传入 useContext() 中。
+    需要使用哪个组件中的 Context 对象，我们就从哪个组件中导入这个 Context 对象，然后作为参数传入 `useContext()` 中。
