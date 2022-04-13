@@ -2030,3 +2030,133 @@
       }; 
 
    ```
+
+### 12. 属性挑选 —— `Pick`
+
+1. 语法：`Pick<Type, Keys>`
+
+2. 从一个给定的类型（Type）中，挑出一系列的属性（Keys）组成新的的类型。
+
+3. 这也是一个工具类，可以全局使用。
+
+4. 用法示例 - 1：
+   ```typescript
+      interface Todo {
+         title: string;
+         description: string;
+         completed: boolean;
+      }
+      // 从 Todo 中挑选出了 title 和 completed 中两个属性组成新的类型 todoPreview
+      type TodoPreview = Pick<Todo, 'title' | 'completed'>
+      const todo: TodoPreview = {
+          title: 'clean room',
+          completed: false
+      }
+   ```
+5. 用法示例 - 2：
+   ```typescript
+       // Pick 操作符
+
+        interface Worker {
+            name: string;
+            age: number;
+            id: string;
+            school: string;
+            location: string;
+        }
+
+        // Pick 操作符，从一个类型中，挑选出几个属性，组成一个新的类型
+        // 当我们只需要一个类型中的几个属性的时候， Pick 比较好用
+        // MineWorker 就等同于下面的定义：
+        // interface MineWorker {
+        //     name: string;
+        //     age: number;
+        //     location: string;
+        // }
+        type MineWorker = Pick<Worker, 'name' | 'age' | 'location'>
+
+       // bjMineWorker 有且只能有 name、age 和 location 属性
+       let bjMineWorker: MineWorker = {
+           name: 'curry',
+           age: 25,
+           location: 'Beijing'
+       }
+
+      // { name: 'curry', age: 25, location: 'Beijing' }
+      console.log(bjMineWorker)
+   ```
+### 13. 类型操作符 - `keyof`
+
+1. `keyof` 操作符，是将一个类型映射为它所有成员名称的联合类型。
+
+2. 基本用法：
+   ```typescript
+      interface Person {
+          name: string;
+          age: number;
+          gender: string;
+      }
+      
+      // keyof 操作符，将一个类型映射为它所有成员名称的联合类型
+      // P 就相当于 'name' | 'age' | 'gender' 的联合类型
+      // 即将 key 组合成联合类型
+      type P = keyof Person; // "name" | "age" | "gender"
+
+      /**
+       *
+       * @param person
+       * @param prop props 被约束为 P，其值只能是 name、age 和 gender 三者之一
+       */
+      function print(person: Person, prop: P) {
+          console.log(`打印 person 的属性 ${prop}: ${person[prop]}`);
+      }
+
+      const person = {
+          name: 'kevin',
+          age: 25,
+          gender: 'male'
+      }
+
+      // 打印 person 的属性 age: 25
+      print(person, 'age');
+      // 打印 person 的属性 name: kevin
+      print(person, 'name');
+      // 打印 person 的属性 gender: male
+      print(person, 'gender')
+
+      // Error:(33, 15) TS2345: Argument of type '"location"' is not assignable to parameter of type '"name" | "age" | "gender"'.
+     // print(person, 'location')
+
+   ```
+
+3. 可以看到，`keyof` 将 Person 这个对象类型中定义的属性映射成了一个联合类型。因此我们可以更方便的操作这个联合类型。
+
+4. `keyof` 还可以与索引签名一起使用，以提取索引的类型。也就是提取对象的键值（key）的类型。示例如下：
+   ```typescript
+      // 也可不显式的制定类型中的属性的名称
+      type MyPerson = {
+          [props: string]: any
+      }
+
+       // 通过 keyof 操作符，动态提取 key 的类型
+       // 那么 MP 就是 string 和 number 的联合类型
+       // 因为 js 中，数字形式的索引最终会被转换成字符串，即 obj[1] 和 obj['1'] 是相同的
+       // 所以，我们提取索引的类型就是 string 和 number 的联合类型
+       type MP = keyof MyPerson;
+
+      /**
+       *
+       * @param prop 被约束为 MP，其类型只能是 string 或者 number
+       * @param val
+        */
+        function getObj(prop: MP, val: string) {
+            return {
+               [prop]: val
+            }
+        }
+
+      let res = getObj('name', 'lcd');
+
+      // { name: 'lcd' }
+      console.log(res)
+   ```
