@@ -52,7 +52,6 @@
 
 ### 3. ReactDOM.createPortal
 
-
 1. 参考资料：
    - [react portal](https://www.jianshu.com/p/0771f1643aa3)
    - [react 插槽(Portals)](https://www.cnblogs.com/yadiblogs/p/10121538.html)
@@ -97,4 +96,36 @@
           }
       }
    ```
+
+### 4. ReactDOM.forwardRef
+
+1. 参考资料
+   - [React forwardRef的使用方法](https://blog.csdn.net/weixin_44240581/article/details/117755748)
+   - [React forwardRef相关总结](https://blog.csdn.net/wdz512/article/details/114668941)
+   - [React.forwardRef](https://reactjs.org/docs/react-api.html#reactforwardref)
+
+2. 基本用法：`React.forwardRef((props, ref) => React.Node)`
+
+3. `React.forwardRef` 接收一个函数组件作为参数，那么 `forwardRef` 会将 props 和 ref 作为参数，传入函数组件中。
+
+4. React 使用 `forwardRef` 完成 ref 的转发。
+
+5. 正常情况下，ref 属性不会作为 props 的参数向下传递。所以在子组件的 props 中拿不到 ref 属性，即 ref 始终指向当前的元素。
+
+6. 借助 `forwardRef`，我们就可以在组件之间传递  ref 属性。
+
+7. 示例：
+   ```tsx
+      const FancyButton = React.forwardRef((props, ref) => (
+        <button ref={ref} className="FancyButton">
+          {props.children}
+        </button>
+      ));
+
+      // You can now get a ref directly to the DOM button:
+      const ref = React.createRef();
+      <FancyButton ref={ref}>Click me!</FancyButton>;
+   ```
+   给 FancyButton 传递了一个 ref 属性，这个 ref 会作为渲染函数的第二个参数，借助 React.forwardRef 函数传递进去，这样，渲染函数内部的 button 元素的 ref 属性，就是这个外面传入的 ref。
+   在 React 将 button 元素和 ref 连接以后，最外层的 ref 属性中的 current 指向的就是内部的 button 这个 DOM 实例。
 
