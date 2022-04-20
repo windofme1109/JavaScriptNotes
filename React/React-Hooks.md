@@ -498,19 +498,19 @@
    - [React系列——React Context](https://segmentfault.com/a/1190000017758300)
    - [React的Context的使用方法简介](https://www.cnblogs.com/littleSpill/p/11221538.html)
    
-8. 从上面的 Context 的用法可以看出，后代组件想使用 Consumer 组件比较麻烦。使用 `useContext()` 可以简化这一步。
+9. 从上面的 Context 的用法可以看出，后代组件想使用 Consumer 组件比较麻烦。使用 `useContext()` 可以简化这一步。
 
-9. 用法
-   - 语法  
-     `const value = useContext(MyContext);`
-   - 说明：`MyContext`是 Context 对象，也就是直接由 `React.createContext()` 生成的那个对象。value是当前 Context 的值。**注意**：当前的 Context 值由上层组件中距离当前组件最近的 `<MyContext.Provider>` 的 `value` 决定。
-   - 当组件上层最近的 `<MyContext.Provider>` 更新时，该 Hook 会触发重渲染，并使用最新传递给 `<MyContext.Provider>` 的value的值。
+10. 用法
+    - 语法  
+      `const value = useContext(MyContext);`
+    - 说明：`MyContext`是 Context 对象，也就是直接由 `React.createContext()` 生成的那个对象。value是当前 Context 的值。**注意**：当前的 Context 值由上层组件中距离当前组件最近的 `<MyContext.Provider>` 的 `value` 决定。
+    - 当组件上层最近的 `<MyContext.Provider>` 更新时，该 Hook 会触发重渲染，并使用最新传递给 `<MyContext.Provider>` 的value的值。
 
-10. **注意**：useContext() 接收的一定是 Context 对象，也就是直接由 `React.createContext()` 生成的那个对象。不是 Provider 也不是 Consumer。
+11. **注意**：useContext() 接收的一定是 Context 对象，也就是直接由 `React.createContext()` 生成的那个对象。不是 Provider 也不是 Consumer。
 
-11. `useContext(MyContext)` 只是让我们能获取 Context 的值以及订阅  Context 的变化。我们仍然需要在上层组件树中使用 `<MyContext.Provider>` 来为下层组件提供 Context。
+12. `useContext(MyContext)` 只是让我们能获取 Context 的值以及订阅  Context 的变化。我们仍然需要在上层组件树中使用 `<MyContext.Provider>` 来为下层组件提供 Context。
 
-12. 下面的代码展示了 `useContext()` 的用法：
+13. 下面的代码展示了 `useContext()` 的用法：
     ```tsx
        // App.tsx
        import React from 'react';
@@ -565,3 +565,40 @@
        export default Hello;
     ```
     需要使用哪个组件中的 Context 对象，我们就从哪个组件中导入这个 Context 对象，然后作为参数传入 `useContext()` 中。
+
+### 11. useMemo
+
+#### 1. 参考资料
+
+1. [react简单入门--常用hook中useMemo的使用（详细版）](https://blog.csdn.net/m0_46694056/article/details/122189832)
+
+2. [详解 React useCallback & useMemo](https://juejin.cn/post/6844904101445124110)
+
+3. [useCallback/useMemo 的使用误区](https://juejin.cn/post/6847902217261809671)
+
+4. [react Hook之useMemo、useCallback及memo](https://juejin.cn/post/6844903954539626510)
+
+5. [useCallback、useMemo 分析 & 差别](https://juejin.cn/post/6844904001998176263)
+
+6. [【React】 useCallback&useMemo 你真的会用吗](https://juejin.cn/post/7082690665352134663)
+
+7. [官方文档 - useMemo](https://reactjs.org/docs/hooks-reference.html#usememo)
+
+#### 2. 基本说明
+
+1. `useMemo` 这个 hook 函数是用来做缓存的，只有当一个依赖项改变的时候才会发生变化，否则拿缓存的值，这样不用在每次渲染的时候再做计算。
+
+2. 使用形式：
+   ```typescript
+      const memoizedValue = useMemo(() => computeExpensiveValue(a, b), [a, b]);
+   ```
+3. 参数说明：
+   - 第一个参数是一个函数，用来进行计算的，需要返回一个值。
+   - 第二个参数是一个数组，里面是依赖项，依赖项变化时，会重新调用第一个参数指定的函数，并返回一个新值。
+   - 返回值是第一个参数指定的函数的返回值。
+
+4. `useMemo`，简单来说就是传递一个创建函数和依赖项，创建函数会需要返回一个值，只有在依赖项发生改变的时候，才会重新调用此函数，返回一个新的值。
+
+5. `useMemo` 的主要用途是通过 memoize 来将一些复杂的计算逻辑进行缓存，如果没有变化就不需要重新计算，能节约 cpu 资源，提升性能。
+
+### 12. useCallback
