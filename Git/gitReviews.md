@@ -316,3 +316,10 @@
       IdentityFile ~/.ssh/id_rsa
       Port 49622
    ```
+   
+### 2.14 同一台电脑上配置两个 github 账号，并相互不影响
+
+参考资料：
+1. [git使用中遇到的remote：Permission to xxx denied to xxx问题如何解决](https://blog.csdn.net/lwc863481702/article/details/78542727?locationNum=5&fps=1)
+
+2. [Git 最著名报错 “ERROR: Permission to XXX.git denied to user”终极解决方案](https://www.jianshu.com/p/12badb7e6c10)
