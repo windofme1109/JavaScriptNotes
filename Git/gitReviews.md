@@ -269,7 +269,7 @@
 
 2. 合并步骤（以将 develop 某个提交合并到 master 分支为例）：
    1. 切换到 `develop` 分支，输入 `git log`，查找需要合并的 commit 记录，即 hash 值，如：7fcb3defff。
-   2. 切换到 `master` 分支，使用 `git cherry-pick 7fcb3defff`  命令，就把该条提交记录合并到了 `master` 分支，这只是在本地合并到了 `master` 分支。
+   2. 切换到 `master` 分支，使用 `git cherry-pick 7fcb3defff` 命令，就把该条提交记录合并到了 `master` 分支，这只是在本地合并到了 `master` 分支。
    3. 使用 `git push` 命令，推送到远端仓库。
 
 ### 2.13 `.ssh` 目录下的 `config` 文件的配置项
@@ -285,6 +285,7 @@
 4. git 在本地提交到 github 或 gitlab 上时，会读取 `.ssh` 目录下的公钥秘钥信息。如果在 `~/.ssh/` 目录下有 config 文件，则会优先读取 config 的配置信息，否则直接读取 `id_rsa` 和 `id_rsa.pub`。
 
 5. config 中的配置项说明如下：
+
    配置项|说明
    :---:|:---:
    Host | 别名
@@ -319,7 +320,123 @@
    
 ### 2.14 同一台电脑上配置两个 github 账号，并相互不影响
 
-参考资料：
+#### 1. 参考资料
+
 1. [git使用中遇到的remote：Permission to xxx denied to xxx问题如何解决](https://blog.csdn.net/lwc863481702/article/details/78542727?locationNum=5&fps=1)
 
 2. [Git 最著名报错 “ERROR: Permission to XXX.git denied to user”终极解决方案](https://www.jianshu.com/p/12badb7e6c10)
+
+3. [一台电脑上的git同时使用两个github账户](https://www.dandelioncloud.cn/article/details/1501140694386421762)
+
+4. [如何在一台电脑上同时使用两个 github 帐号](https://www.jianshu.com/p/0be98d91d294)
+
+5. [同一台电脑上使用两个 github 账号](https://blog.csdn.net/sihai12345/article/details/118858582)
+
+#### 2. 具体步骤
+
+##### 1. 配置 SSH Key
+1. 假设说，在一台电脑上，要同时使用 one 和 two 两个 github 账号，注意，两个账号都是 github 账号。在同一台设备上，假设只有账号 one 的 ssh key，即使把账号 one 的 ssh key 配置到 two 的 github 上面，在使用账号 two 进行 git push 操作时，由于 ssh key 的不匹配（同一台设备的不同账号生成的 ssh key 也不同），推送会失败。 所以首先要根据两个不同的账号生成生成不同的 ssh key。
+```shell
+ssh-keygen -t rsa -f ~/.ssh/id_rsa.one -C "one@xxx.com"
+ssh-keygen -t rsa -f ~/.ssh/id_rsa.two -C "two@xxx.com"
+```
+
+2. 在 `.ssh` 下生成 4 个文件：
+```shell
+   id_rsa.one  // 账号 one 的私钥
+   id_rsa.two  // 账号 two 的私钥
+   id_rsa.one.pub  // 账号 one 的公钥
+   id_rsa.two.pub  // 账号 two 的公钥
+```
+
+##### 2. 配置 .config
+
+3. 在 `.ssh` 创建一个 `.config` 文件，内容如下：
+```shell
+      # one 
+      Host one.github.com
+      HostName github.com
+      User one
+      IdentityFile ~/.ssh/id_rsa.one
+
+      Host two.github.com
+      HostName github.com
+      User two
+      IdentityFile ~/.ssh/id_rsa.two
+
+```
+
+4. `.config` 文件的配置中，`Host` 参数是主机别名，这个是用来区分当前仓库的 git 地址是属于哪个账号的。User 参数用来匹配当前提交的用户名，IdentityFile 是指定 ssh key 的位置。
+
+5. 就是说，为每个 github 账号单独配置一组配置项，包括：Host、HostName、User、和 IndentityFile。
+
+6. `.config` 文件的配置中，每个账号下的 `Host` 参数会影响 git 的相关命令，主要是仓库 git 地址的问题，如账号 one 配置的 Host 是 `one.github.com`，使用 git clone 命令，克隆的地址是：`git@github.com:one/JavaScriptNotes.git`，那么此时的克隆的地址就要变成：`git@one.github.com:one/JavaScriptNotes.git`。
+
+##### 在 github 上添加 SSH Key
+
+7. 在 `github` 上，添加我们刚刚生成的 ssh key。注意，要分别配置账号 one 和账号 two 的 ssh key。步骤如下：
+   - 登陆 github 账号
+   - 进入Settings –> SSH and GPG keys
+   - 点击 new SSH key 
+   - 把 .ssh 下的公钥（.pub文件）的内容添进去，其中 Title 为自定义的名字，Key 为.pub 文件的内容
+   - 最后点击 Add SSH key 即可。
+![img.png](./img/addSSHKey.png)
+
+##### 测试
+
+8. 输入以下命令进行测试
+```shell
+ssh -T git@one.github.com
+ssh -T git@two.github.com
+```
+9. 此处 `one.github.com` 和 `two.github.com` 为 `.config` 文件中配置的 `Host`。
+
+10. 运行命令后如果出现 `Hi xxxx! You’ve successfully authenticated, but GitHub does not provide shell access.`，其中 `xxxx` 为 `.config` 文件中配置的User 名字，这种情况下，表示我们已经配置成功了。
+
+
+##### 应用
+
+
+1. 远端仓库的地址需要进行修改。原来的写法为：`git@github.com:one的用户名/learngit.git`
+2. 现在的写法为：`git@one.github.com:one的用户名/learngit.git`
+
+3. 即将原来的 `github.com` 替换为 `.config` 配置文件中的 `Host` 配置项（与用户名对应的 `Host`）。
+
+4. 以 git clone 命令为例：
+   - 原来的写法：
+   ```
+      git clone git@github.com:two的用户名/learningGit.git
+      git clone git@github.com:two的用户名/learningVue.git
+   ```
+   - 现在的写法：
+   ```
+      git clone git@one.github.com:one的用户名/learningGit.git
+      git clone git@one.github.com:one的用户名/learningVue.git
+
+   ```
+5. 还需要同步修改本地仓库中配置的远端仓库的地址：
+   - 查看远端仓库的地址：`git remote -v`
+   - 删除远端仓库的地址：`git remote rm origin`
+   - 添加新的远端仓库的地址：`git remote add origin git@one.github.com:one的用户名/learningGit.git`
+
+6. 为每个本地仓库设置局部的用户名和邮箱：
+    - 设置账号 one 的用户名和 email：
+      ```shell
+         git config user.name "one_name" 
+         git config user.email "one_email"
+      ```
+    - 设置账号 two 的用户名和 email：
+      ```shell
+         git config user.name "two_name" ; 
+         git config user.email "two_email"
+      ```
+
+7. 取消全局配置的用户名和邮箱
+```shell
+   git config --global --unset user.name
+   git config --global --unset user.email
+```
+
+
+
+
