@@ -31,24 +31,29 @@
 
 ### 2. 多行文本
 
-1. 参考资料：[CSS单行、多行文本溢出显示省略号](https://segmentfault.com/a/1190000009262433)
+1. 参考资料：
+   - [CSS单行、多行文本溢出显示省略号](https://segmentfault.com/a/1190000009262433)
+   - [多行文本省略近完美方案](https://www.jianshu.com/p/07bcb00aa0ee)
+   - [多行文本的省略](https://www.jianshu.com/p/b50eba93394b)
 
 2. css 样式：
    ```css
-      overflow:hidden;
-      text-overflow:ellipsis;
-      display:-webkit-box;
-      -webkit-line-clamp:2; (两行文字)
-      -webkit-box-orient:vertical;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+     // 几行省略
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
    ```
-3. 在webkit浏览器或移动端（绝大部分是webkit内核的浏览器）可以直接使用webkit 的 css 扩展属性（webkit是私有属性）`-webkit-line-clamp`。
+3. 在 webkit 浏览器或移动端（绝大部分是 webkit 内核的浏览器）可以直接使用 webkit 的 css 扩展属性（ webkit 是私有属性）`-webkit-line-clamp`。
 
 4. 注意：这是一个不规范的属性，它没有在CSS的规范草案中。
-5. `-webkit-line-clamp` 用来限制在一个块元素显示的文本行数，为了实现效果，他要与其他的 webkit 属性结合使用：
+5. 
+6. `-webkit-line-clamp` 用来限制在一个块元素显示的文本行数，为了实现效果，他要与其他的 webkit 属性结合使用：
     - `display:-webkit-box;`：必须结合的属性，将对象作为弹性伸缩盒子模型展示
     - `ebkit-box-orient`：必须结合的属性，设置或检索伸缩盒对象的子元素的排列方式
 
-6. 更通用的方式：
+7. 更通用的方式（兼容其他浏览器的方案）：
    ```css
       p {
            position:relative;
@@ -67,9 +72,13 @@
            background:#fff;
        }
    ```
-7. 设置相对定位的容器高度，用包含省略号（...）的元素模拟实现
+8. 设置相对定位的容器高度，用包含省略号（...）的元素模拟实现。
 
-8. 还可以通过 js 的方式实现。
+9. 还可以通过 js 的方式实现：
+   - 通过line-height * 行数，得到文本高度
+   - 创建 dom 模拟渲染，得到截断处的文本坐标
+   - 追加省略符号
+
 
    
 ## 2. span 鼠标悬浮显示省略文字
