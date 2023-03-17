@@ -65,7 +65,12 @@
 
 5. 关于基线（baseline）、`inline` 元素的基线和 `inline-block` 元素的基线，请看博客：[关于inline-block对齐的问题](https://www.jianshu.com/p/9e0274e0f9bd)
 
-### 3. 一个块元素中，`margin-right` 的计算问题
+6. 参考资料：
+   - [一次内联元素错位引发对line-height的思考](https://juejin.cn/post/6844903709730668552)
+   - [line-height 属相详解](https://zzlbt.github.io/2019/05/06/line-height-%E4%B8%8E-vertial-align-%E5%B1%9E%E7%9B%B8%E8%AF%A6%E8%A7%A3/)
+   - [深入理解-CSS内联元素之line-height](https://segmentfault.com/a/1190000014515126)
+
+## 3. 一个块元素中，`margin-right` 的计算问题
 
 1. 对于块元素，有一些情况下，我们没有设置 margin-right，或者 设置了 margin-right，但是经过浏览器渲染以后，我们发现实际的 margin-right 值并不是我们设置值，这个是怎么回事呢？示例如下：
 ```html
@@ -95,3 +100,86 @@
    > 'margin-left' + 'border-left-width' + 'padding-left' + 'width' + 'padding-right' + 'border-right-width' +'margin-right' = width of containing block
 
 6. 上面的这个公式是用来计算某个属性如果设置为 `auto` 或者没有设置这个属性时，这个属性实际的值应该是多少。所以，在从左向右（ltr）布局中，优先使用 margin-left、width，同时为了满足这个公式，如果 `'margin-left' + 'border-left-width' + 'padding-left' + 'width' + 'padding-right' + 'border-right-width' +'margin-right'` 小于 `containing block`，即使我们设置了 `margin-right`，浏浏览器也不会采用，而是设置 `margin-right` 为剩余的宽度。
+
+
+
+## 4. div 的实际渲染高度比其内部的 img 元素的高度要多几 px（有空白）的解决方法
+
+1. 如果一个 img 元素或者 svg 元素放在 div内，且 div 没有指定高度，完全由子元素撑开高度，那么 div 的实际高度。会比 img 或者 svg 元素多几px，具体是多少根据浏览器确定。
+
+2. 示例：
+```html
+    <div class="test-img">
+        <img src="/test.png" alt="">
+    </div>
+    <div class="test-svg">
+        <svg width="18" height="16" viewBox="0 0 18 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M8.6156 3.07706V0L11.4875 1.84624L8.6156 3.07706Z" fill="url(#paint0_linear_10056_21593)"/>
+            <path d="M8.6156 3.07706V0L5.74367 1.84624L8.6156 3.07706Z" fill="url(#paint1_linear_10056_21593)"/>
+            <path d="M12.6363 2.46216L8.6156 4.3084V6.77005L14.3595 3.69298L12.6363 2.46216Z" fill="url(#paint2_linear_10056_21593)"/>
+            <path d="M4.5949 2.46216L8.6156 4.3084V6.77005L2.87175 3.69298L4.5949 2.46216Z" fill="url(#paint3_linear_10056_21593)"/>
+            <path d="M8.61578 8.00009L1.72316 4.30762L0 5.53844L8.61578 10.4617V8.00009Z" fill="url(#paint4_linear_10056_21593)"/>
+            <path d="M8.61542 8.00009L15.508 4.30762L17.2312 5.53844L8.61542 10.4617V8.00009Z" fill="url(#paint5_linear_10056_21593)"/>
+            <path d="M8.61578 16.0001V10.4614L0 5.53809L8.61578 16.0001Z" fill="url(#paint6_linear_10056_21593)"/>
+            <path d="M8.61542 16.0001V10.4614L17.2312 5.53809L8.61542 16.0001Z" fill="url(#paint7_linear_10056_21593)"/>
+            <defs>
+                <linearGradient id="paint0_linear_10056_21593" x1="8.18481" y1="2.58473" x2="10.5302" y2="0.957309" gradientUnits="userSpaceOnUse">
+                    <stop stop-color="#B265FF"/>
+                    <stop offset="1" stop-color="#E5C4FF"/>
+                </linearGradient>
+                <linearGradient id="paint1_linear_10056_21593" x1="8.6156" y1="1.43596" x2="6.70098" y2="0.957309" gradientUnits="userSpaceOnUse">
+                    <stop stop-color="#C984FF"/>
+                    <stop offset="1" stop-color="#E8CBFF"/>
+                </linearGradient>
+                <linearGradient id="paint2_linear_10056_21593" x1="8.6156" y1="5.2649" x2="13.4021" y2="2.87163" gradientUnits="userSpaceOnUse">
+                    <stop stop-color="#9948FF"/>
+                    <stop offset="1" stop-color="#CA86FF"/>
+                </linearGradient>
+                <linearGradient id="paint3_linear_10056_21593" x1="3.82906" y1="2.87163" x2="8.6156" y2="5.26491" gradientUnits="userSpaceOnUse">
+                    <stop stop-color="#D49EFF"/>
+                    <stop offset="1" stop-color="#B77EFF"/>
+                </linearGradient>
+                <linearGradient id="paint4_linear_10056_21593" x1="0.957309" y1="5.26493" x2="8.61578" y2="9.09416" gradientUnits="userSpaceOnUse">
+                    <stop stop-color="#CA86FF"/>
+                    <stop offset="1" stop-color="#B469FF"/>
+                </linearGradient>
+                <linearGradient id="paint5_linear_10056_21593" x1="8.61542" y1="9.09416" x2="16.2739" y2="4.78627" gradientUnits="userSpaceOnUse">
+                    <stop stop-color="#9122FF"/>
+                    <stop offset="1" stop-color="#E5C5FF"/>
+                </linearGradient>
+                <linearGradient id="paint6_linear_10056_21593" x1="5.74385" y1="8.97514" x2="8.61578" y2="15.078" gradientUnits="userSpaceOnUse">
+                    <stop stop-color="#9420EF"/>
+                    <stop offset="1" stop-color="#DBBFFF"/>
+                </linearGradient>
+                <linearGradient id="paint7_linear_10056_21593" x1="11.966" y1="11.9663" x2="9.90779" y2="9.90824" gradientUnits="userSpaceOnUse">
+                    <stop stop-color="#D2B7FF"/>
+                    <stop offset="1" stop-color="#9D2FF2"/>
+                </linearGradient>
+            </defs>
+        </svg>
+
+    </div>
+```
+3. 没有给 div 添加任何样式，实际的渲染效果如下：
+![img.png](img/div-img-blank.png)
+![img_1.png](img/div-svg-blank.png)
+
+4. 图片的高度是 123px，svg 的高度是 16px。因此，父元素的高度均比子元素的实际高度高，即下方存在空白。
+
+5. 这种现象产生的原因是：img 和 svg 在渲染时，浏览器会将其作为行内（inline）元素渲染。而行内元素的默认对齐方式是沿着基线（baseline）对齐，所以是图片底边与容器基线对齐了，留出了基线与底线的空白。
+
+6. > 这其实是一个很古老的BUG， 标记是一个内联元素。这意味着它被视为文本。当文本被放置在页面上时，就会为下降器留出空间。换句话说，你在图片下方看到的空白是由于浏览器假设在图片之前或之后的文本中可能有一个下标，因此为它腾出了空间。比如你在页面写上字母 a, c, e, m, n, o, r, s, u, v, w, x, z，或者æ、ø符号。你会发现这些字母在我们学习英语时，在英文本（四线本）的四条横线上高度一致，并且都没有超出上下，但是其他字母有上升部分(b, d, f, h, k, l, t)或下降部分(g, j, p, q, y)，也就是超出四条线的第2、3条横线，这时就要给文本加上三个px的多余像素，避免文本的显示问题，这个问题一直保留着。所以把 设置为块级元素就可以消除其附属的文本元素属性。
+
+7. 以上摘自：[img内嵌div元素的高度问题](https://blog.csdn.net/qq_37495762/article/details/119103824)，道理其实都是一样的，就是将 img 当做行内元素渲染，而行内元素默认是沿着基线对齐的。
+
+8. 解决方法：
+   - 将 img、svg 等元素变成块级元素。即：`{dispaly: block}`。
+   - 设置父元素的 font-size 为 0。即：`.test-img {font-size: 0;}`。
+   - 设置 img 的垂直对齐方式为除 baseline 以外的值，如：`{vertical-align: top;}`。
+
+9. 参考资料：
+   - [div 或 span 的高度比 img 的高度要多3px。如何解决？](https://blog.csdn.net/yangyangkl123/article/details/111405192)
+   - [如何解决div里面img图片下方有空白的问题？](https://www.cnblogs.com/liuna/p/6678404.html)
+   - [解决div里面img图片下方有空白的问题](https://blog.csdn.net/Liu_yunzhao/article/details/104622845)
+   - [多余的空白--img](https://juejin.cn/post/7173874357469610014)
+   - [inline-block元素因基线对齐而造成上浮的问题](https://www.cnblogs.com/geek1116/p/10036650.html)
