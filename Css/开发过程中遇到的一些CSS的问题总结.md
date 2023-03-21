@@ -2,12 +2,19 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
-- [使用 CSS 时遇到的一些坑](#%E4%BD%BF%E7%94%A8-css-%E6%97%B6%E9%81%87%E5%88%B0%E7%9A%84%E4%B8%80%E4%BA%9B%E5%9D%91)
+- [使用 CSS 时遇到的一些问题总结](#%E4%BD%BF%E7%94%A8-css-%E6%97%B6%E9%81%87%E5%88%B0%E7%9A%84%E4%B8%80%E4%BA%9B%E9%97%AE%E9%A2%98%E6%80%BB%E7%BB%93)
   - [1. `transform` 与 `position: fixed`](#1-transform-%E4%B8%8E-position-fixed)
+  - [2. 元素设置 `inline` 属性和 `inline-box` 的一些注意事项](#2-%E5%85%83%E7%B4%A0%E8%AE%BE%E7%BD%AE-inline-%E5%B1%9E%E6%80%A7%E5%92%8C-inline-box-%E7%9A%84%E4%B8%80%E4%BA%9B%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9)
+    - [1. `inline` 属性需要注意的地方](#1-inline-%E5%B1%9E%E6%80%A7%E9%9C%80%E8%A6%81%E6%B3%A8%E6%84%8F%E7%9A%84%E5%9C%B0%E6%96%B9)
+    - [2. `inline-block` 属性需要注意的地方](#2-inline-block-%E5%B1%9E%E6%80%A7%E9%9C%80%E8%A6%81%E6%B3%A8%E6%84%8F%E7%9A%84%E5%9C%B0%E6%96%B9)
+  - [3. 一个块元素中，`margin-right` 的计算问题](#3-%E4%B8%80%E4%B8%AA%E5%9D%97%E5%85%83%E7%B4%A0%E4%B8%ADmargin-right-%E7%9A%84%E8%AE%A1%E7%AE%97%E9%97%AE%E9%A2%98)
+  - [4. div 的实际渲染高度比其内部的 img 元素的高度要多几 px（有空白）的解决方法](#4-div-%E7%9A%84%E5%AE%9E%E9%99%85%E6%B8%B2%E6%9F%93%E9%AB%98%E5%BA%A6%E6%AF%94%E5%85%B6%E5%86%85%E9%83%A8%E7%9A%84-img-%E5%85%83%E7%B4%A0%E7%9A%84%E9%AB%98%E5%BA%A6%E8%A6%81%E5%A4%9A%E5%87%A0-px%E6%9C%89%E7%A9%BA%E7%99%BD%E7%9A%84%E8%A7%A3%E5%86%B3%E6%96%B9%E6%B3%95)
+  - [5. 绝对定位的元素的宽度问题](#5-%E7%BB%9D%E5%AF%B9%E5%AE%9A%E4%BD%8D%E7%9A%84%E5%85%83%E7%B4%A0%E7%9A%84%E5%AE%BD%E5%BA%A6%E9%97%AE%E9%A2%98)
+  - [6. 父元素的第一个子元素设置 margin-top 没有起作用，而是成为了父元素的 margin-top](#6-%E7%88%B6%E5%85%83%E7%B4%A0%E7%9A%84%E7%AC%AC%E4%B8%80%E4%B8%AA%E5%AD%90%E5%85%83%E7%B4%A0%E8%AE%BE%E7%BD%AE-margin-top-%E6%B2%A1%E6%9C%89%E8%B5%B7%E4%BD%9C%E7%94%A8%E8%80%8C%E6%98%AF%E6%88%90%E4%B8%BA%E4%BA%86%E7%88%B6%E5%85%83%E7%B4%A0%E7%9A%84-margin-top)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# 使用 CSS 时遇到的一些坑
+# 使用 CSS 时遇到的一些问题总结
 
 ## 1. `transform` 与 `position: fixed`
 
@@ -183,3 +190,246 @@
    - [解决div里面img图片下方有空白的问题](https://blog.csdn.net/Liu_yunzhao/article/details/104622845)
    - [多余的空白--img](https://juejin.cn/post/7173874357469610014)
    - [inline-block元素因基线对齐而造成上浮的问题](https://www.cnblogs.com/geek1116/p/10036650.html)
+
+
+## 5. 绝对定位的元素的宽度问题
+
+1. div 默认是块级元素，默认情况下会继承父元素的宽度。
+
+2. 如果 div 设置了绝对定位，那么它会脱离正常的文档流。此时如果没有给 div 显示设置宽度，那么它的宽度则是由其的内容来决定的，内容来把它撑大。
+
+3. 即使这个 div 的宽度设置了 100%，也不一定会保持不变，如果 div 的父元素设置了相对定位（relative），那么这个 100% 是想对于父元素的，如果父元素没有设置相对定位，它会一级一级往上找，直到找到离它最近的非 static 定位的父元素或者是 body 元素。
+
+4. 即使这个 div 没有设置宽度，如果其定位为非 static 的父元素有宽度，那么这个 div 会继承这个宽度的。
+
+5. 示例：设置父元素为相对定位，子元素为绝对定位，父元素没有宽度：
+   ```html
+      <style>
+        .outer-container {
+            position: relative;
+            /*width: 80px;*/
+            background: yellow;
+        }
+
+        .container {
+            width: auto;
+        }
+
+
+        .outer-container .first {
+            background: gray;
+            /*width: 75px;*/
+        }
+        .outer-container .position-absolute {
+            position: absolute;
+            background: greenyellow;
+            top: 35px;
+        }
+        .text {
+            width: 55px;
+            height: 20px;
+        }
+       </style>
+      <div class="outer-container">
+
+        <div class="second position-absolute">绝对定位的元素默认会继承父元素的宽度绝对定位的元素默认会继承父元素的宽度绝对定位的元素默认会继承父元素的宽度绝对定位的元素默认会继承父元素的宽度</div>
+        <div class="first">绝对定位1绝对定位1绝对定位1</div>
+        <div class="text"></div>
+    </div>
+   ```
+   结果：
+   ![img.png](img/absolute-width.png)
+   first 继承了父元素的宽度，second 没有继承父元素的宽度，而是由内容撑开的宽度。
+
+6. 示例：设置父元素为相对定位，子元素为绝对定位，父元素指定宽度：
+```html
+    <style>
+    .outer-container {
+        position: relative;
+        width: 100px;
+        background: yellow;
+    }
+
+    .container {
+        width: auto;
+    }
+
+
+    .outer-container .first {
+        background: gray;
+        /*width: 75px;*/
+    }
+    .outer-container .position-absolute {
+        position: absolute;
+        background: greenyellow;
+        top: 35px;
+    }
+    .text {
+        width: 55px;
+        height: 20px;
+    }
+   </style>
+   <div class="outer-container">
+
+    <div class="second position-absolute">绝对定位的元素默认会继承父元素的宽度绝对定位的元素默认会继承父元素的宽度绝对定位的元素默认会继承父元素的宽度绝对定位的元素默认会继承父元素的宽度</div>
+    <div class="first">绝对定位1绝对定位1绝对定位1</div>
+    <div class="text"></div>
+   </div>
+```
+   结果：
+   ![img.png](img/absolute-width-2.png)
+   绝对定位的宽度继承了父元素的宽度，是 `100px`。此时文字出现了换行。
+
+8. 示例：设置父元素为 static 定位，子元素为绝对定位，父元素指定宽度，同时指定子元素宽度为 100%：
+```html
+   <style>
+    .outer-container {
+        /*position: relative;*/
+        width: 100px;
+        background: yellow;
+    }
+
+    .container {
+        width: auto;
+    }
+
+
+    .outer-container .first {
+        background: gray;
+        /*width: 75px;*/
+    }
+    .outer-container .position-absolute {
+        position: absolute;
+        background: greenyellow;
+        width: 100%;
+        top: 35px;
+    }
+    .text {
+        width: 55px;
+        height: 20px;
+    }
+   </style>
+   <div class="outer-container">
+
+    <div class="second position-absolute">绝对定位的元素默认会继承父元素的宽度绝对定位的元素默认会继承父元素的宽度绝对定位的元素默认会继承父元素的宽度绝对定位的元素默认会继承父元素的宽度</div>
+    <div class="first">绝对定位1绝对定位1绝对定位1</div>
+    <div class="text"></div>
+   </div>
+```
+   结果：
+   ![img.png](img/absolute-width-3.png)
+   绝对定位的子元素的宽度为100%，其相对的是 body 元素，而不是其父元素，所以其宽度和body 的宽度相同。
+
+9. 总结：
+   - 绝对定位的元素，如果其父元素的定位是非 static 属性，且设置了宽度，那么绝对定位的元素会继承这个宽度。
+   - 绝对定位的元素，如果设置其宽度为 100%，那么这个相对的基准是其父级元素中，第一个定位为非 static 属性的元素。
+   - 绝对定位的元素，如果其父元素的定位是非 static 属性，且没有设置宽度，则由内容撑开宽度。
+
+10. 我的理解是，无论如何，绝对定位的元素都会继承定位属性为非 static 的父级元素的宽度，只不过如果父元素没有显式宽度，或者是宽度大于子元素，那么子元素的宽度就是内容的宽度，且其宽度不会大于父元素宽度。如果父级元素有指定的宽度，那么子元素就会继承这个宽度。
+
+11. 解决绝对定位子元素继承父元素宽度导致折行的解决方法：
+    - 不让绝对定位的元素内容折行：`white-space: nowrap;`。`white-space` 就是空格的意思，这个 css 属性的作用是，浏览器如何处理空格。设置为 `nowrap` 即可保证内容不换行，因此可以撑开元素的宽度。
+    - 给绝对定位的元素设置一个具体的宽度。
+
+12. 参考资料
+     - [为什么white-space:nowrap可以让文字一行显示？](https://www.zhangxinxu.com/wordpress/2021/07/css-white-space-nowrap/)
+     - [white-space MDN](https://developer.mozilla.org/en-US/docs/Web/CSS/white-space)
+     - [absolute定位宽高尺寸继承](https://blog.csdn.net/weixin_43926275/article/details/117758479)
+     - [在绝对定位时，div的宽度是不是自适应的？](https://segmentfault.com/q/1010000006644913)
+
+## 6. 父元素的第一个子元素设置 margin-top 没有起作用，而是成为了父元素的 margin-top
+
+1. 在一个嵌套的盒子中，给第一个子元素设置 `margin-top`，这个 `margin-top` 会影响父元素的 `margin-top`。换句话说，就是第一个子元素的 `margin-top`，会成为父元素的 `margin-top`。
+
+2. 示例：
+```html
+   <style>
+    .test {
+        height: 100px;
+        background: greenyellow;
+    }
+    .outer {
+        background: red;
+        height: 300px;
+    }
+    .inner-first {
+        margin-top: 100px;
+    }
+   </style>
+
+
+   <body>
+   <div class="test"></div>
+   <div class="outer">
+       <div class="inner-first">第一个子元素</div>
+       <div class="inner-second">第二个子元素</div>
+   </div>
+   </body>
+```
+   结果：
+   ![img.png](img/first-child-margin-top.png)
+   显然，第一个元素的 margin-top 并没有在 outer 元素内生效，而是在 outer 元素外生效了，表现就是成为了 outer 元素的 margin-top。
+
+3. 出现这种现象的原因是什么呢？原来这是 CSS 2.1 中，盒模型的规定：
+    >  所有毗邻的两个或更多盒元素的margin将会合并为一个margin共享之。毗邻的定义为：同级或者嵌套的盒元素，并且它们之间没有非空内容、Padding或Border分隔。
+
+4. 那么原因就很明显了，outer 和 inner-first 是嵌套的元素，它们之间没有其他内容，outer 或 inner-first 也没有 padding 和 border，那么会发生 margin-top 合并问题。
+
+5. 本质上还是 margin 的垂直塌陷问题。
+
+6. 解决方法方法也是从非空内容、Padding 或 Border 分隔这几方面下手：
+   - 给 outer 设置 padding 属性，但是会增加 outer 元素的高度。
+     ```css
+        .outer {
+          background: red;
+          height: 300px;
+          padding-top: 1px;
+        }
+     ```
+     结果：
+   ![img.png](img/first-child-margin-top-padding.png)
+   - 给 outer 设置 border 属性，但是会增加 outer 元素的高度。
+     ```css
+        .outer {
+          background: red;
+          height: 300px;
+          border-top: 1px solid black;
+          
+        }
+     ```
+     结果：
+     ![img.png](img/first-child-margin-top-border.png)
+   - 设置非空内容，为了不添加额外的 dom 节点，通常是插入一个伪元素：
+     ```css
+        .outer:before {
+                content: '';
+                display: block;
+        }
+        
+        /*或者是 */
+        /*.inner-first:before {*/
+        /*    content: '';*/
+        /*    display: block;*/
+        /*}*/
+
+     ```
+    结果：
+    ![img.png](img/first-child-margin-top-before.png)
+   - 指定 outer 的 overflow 属性为 hidden，使其成为一个 BFC，缺点是超出父元素高度的内容会被隐藏。
+     ```css
+        .outer {
+          background: red;
+          height: 300px;
+          overflow: hidden;
+          
+        }
+     ```
+     结果：
+     ![img.png](img/first-child-margin-top-overflow.png)
+
+7. 对父元素影响最小的方案还是插入伪元素的方案。
+
+8. 参考资料：
+   - [子元素的margin-top属性为什么会影响父元素的margin-top?](https://www.jianshu.com/p/1772f60e8f4c)
+   - [前端黑科技-解决父元素的第一个子元素的margin-top越界问题 ](https://blog.51cto.com/u_9869701/3697823)
+   - [子元素 margin 超出父元素的bug(垂直塌陷) ](https://blog.csdn.net/Ray_20160915/article/details/100144088)
