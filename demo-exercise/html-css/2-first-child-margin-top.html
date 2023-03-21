@@ -1,10 +1,42 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
+    <meta charset="UTF-8">
+    <title>第一个子元素的margin-top与父元素的margin-top的问题</title>
+    <style>
+        .test {
+            height: 100px;
+            background: greenyellow;
+        }
+        .outer {
+            background: red;
+            height: 300px;
+
+            /*解决方法*/
+            /*padding-top: 10px;*/
+
+            /*onverflow: hidden;*/
+        }
+        /*.outer:before {*/
+        /*        content: '';*/
+        /*        display: block;*/
+        /*}*/
+        .inner-first {
+            margin-top: 100px;
+            padding: 1px;
+        }
+        /*.inner-first:before {*/
+        /*    content: '';*/
+        /*    display: block;*/
+        /*}*/
+    </style>
+
 </head>
 <body>
-$END$
+    <div class="test"></div>
+    <div class="outer">
+        <div class="inner-first">第一个子元素</div>
+        <div class="inner-second">第二个子元素</div>
+    </div>
 </body>
 </html>

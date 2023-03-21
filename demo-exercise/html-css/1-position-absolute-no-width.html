@@ -1,10 +1,51 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
+    <meta charset="UTF-8">
+    <title>绝对定位的元素默认会继承父元素的宽度</title>
+    <style>
+        .outer-container {
+            /*position: relative;*/
+            width: 100px;
+            background: yellow;
+        }
+
+        .container {
+            width: auto;
+        }
+
+
+        .outer-container .first {
+            background: gray;
+            /*width: 75px;*/
+        }
+        .outer-container .position-absolute {
+            position: absolute;
+            background: greenyellow;
+            width: 100%;
+            top: 35px;
+        }
+
+        .outer-container .third {
+            position: absolute;
+            background: purple;
+        }
+        .text {
+            width: 55px;
+            height: 20px;
+        }
+    </style>
 </head>
 <body>
-$END$
+<!--<div class="container">-->
+    <div class="outer-container">
+
+        <div class="second position-absolute">绝对定位的元素默认会继承父元素的宽度绝对定位的元素默认会继承父元素的宽度绝对定位的元素默认会继承父元素的宽度绝对定位的元素默认会继承父元素的宽度</div>
+        <div class="first">绝对定位1绝对定位1绝对定位1</div>
+        <div class="text"></div>
+        <!--        <div class="third">绝对定位2</div>-->
+    </div>
+<!--</div>-->
+
 </body>
 </html>
