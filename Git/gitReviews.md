@@ -438,5 +438,72 @@ ssh -T git@two.github.com
 ```
 
 
+### 2.15 kex_exchange_identification: Connection closed by remote host
 
+1. 使用 git 从 github 上拉取代码的时候，拉取失败，出现下面的信息：
+```bash
+kex_exchange_identification: Connection closed by remote host
+Connection closed by 20.205.243.166 port 22
+fatal: Could not read from remote repository.
+
+Please make sure you have the correct access rights 
+```
+2. 大意是被远程主机关闭了连接。
+
+3. 回忆最近都干了啥：
+   - 很久没有用这台电脑拉取代码了
+   - 使用了代理
+
+4. 尝试删除原来的 ssh key，生成一个新的 ssh key，然后添加到 github，但是依旧报错。
+
+5. 上网查询，有人说可能是代理的问题，就是代理禁掉了 github 的 ssh 连接（可能和 22 端口有关）。所以，关掉代理试一试，结果可以正常拉取代码。
+
+6. 在关掉代理的同时，我还删除了 `~\.ssh` 目录下的 known_hosts 文件，我看网上有人说删掉这个文件，然后重启终端，也能正常拉取代码。
+
+7. 出现下面的内容：
+```
+The authenticity of host 'github.com (20.205.243.166)' can't be established.
+ECDSA key fingerprint is SHA256:p2QAMXNIC1TJYWeIOttrVc98/R1BUFWu3/LiyKgUfQM.
+Are you sure you want to continue connecting (yes/no/[fingerprint])? y
+Please type 'yes', 'no' or the fingerprint: yes
+Warning: Permanently added 'github.com,20.205.243.166' (ECDSA) to the list of known hosts.
+
+```
+
+8. 也就是说，确认了 fingerprint 以后，将 github 的一个 host 地址添加到 known_hosts 文件中了。
+
+9. 目前不太知道是哪种方式起了作用。
+
+10. 因为关了代理，访问 github 成了问题，所以，代理还是得开启，那么可能又出现前面的报错，那么此时应该怎么办呢，答案就是在 `~\.ssh` 下增加一个 `config` 文件，添加如下内容：
+```
+# windofme1109 - github
+Host github.com
+HostName github.com
+# vpn
+port 443
+
+```
+
+9. 这样既可以使用代理，又可以从 github 上拉取代码。
+
+10. 然而，我按照上面的方式进行配置，发现又报错了：
+```
+   kex_exchange_identification: Connection closed by remote host
+Connection closed by 20.205.243.166 port 443
+fatal: Could not read from remote repository.
+
+Please make sure you have the correct access rights
+and the repository exists.
+
+```
+
+11. 去掉这个端口的配置，就能正常拉取代码了。
+
+12. 看来应该是删掉 known_hosts 文件起了作用。
+
+13. 总结出现 `kex_exchange_identification: Connection closed by remote host` 的解决方法： 
+    - 删除原来的 ssh key，新建一个 ssh key，并添加到 github。
+    - 删掉 known_hosts 试一试。
+    - 如果使用了代理，那么先关掉代理试一试，然后在 `~\.ssh` 下的 `config` 文件中添加端口为 443。
+    
 
