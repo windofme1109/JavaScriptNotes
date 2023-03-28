@@ -18,6 +18,15 @@
   - [2.11 删除暂存区的文件](#211-%E5%88%A0%E9%99%A4%E6%9A%82%E5%AD%98%E5%8C%BA%E7%9A%84%E6%96%87%E4%BB%B6)
   - [2.12 合并某次提交到另外一个分支上](#212-%E5%90%88%E5%B9%B6%E6%9F%90%E6%AC%A1%E6%8F%90%E4%BA%A4%E5%88%B0%E5%8F%A6%E5%A4%96%E4%B8%80%E4%B8%AA%E5%88%86%E6%94%AF%E4%B8%8A)
   - [2.13 `.ssh` 目录下的 `config` 文件的配置项](#213-ssh-%E7%9B%AE%E5%BD%95%E4%B8%8B%E7%9A%84-config-%E6%96%87%E4%BB%B6%E7%9A%84%E9%85%8D%E7%BD%AE%E9%A1%B9)
+  - [2.14 同一台电脑上配置两个 github 账号，并相互不影响](#214-%E5%90%8C%E4%B8%80%E5%8F%B0%E7%94%B5%E8%84%91%E4%B8%8A%E9%85%8D%E7%BD%AE%E4%B8%A4%E4%B8%AA-github-%E8%B4%A6%E5%8F%B7%E5%B9%B6%E7%9B%B8%E4%BA%92%E4%B8%8D%E5%BD%B1%E5%93%8D)
+    - [1. 参考资料](#1-%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99)
+    - [2. 具体步骤](#2-%E5%85%B7%E4%BD%93%E6%AD%A5%E9%AA%A4)
+      - [1. 配置 SSH Key](#1-%E9%85%8D%E7%BD%AE-ssh-key)
+      - [2. 配置 .config](#2-%E9%85%8D%E7%BD%AE-config)
+      - [在 github 上添加 SSH Key](#%E5%9C%A8-github-%E4%B8%8A%E6%B7%BB%E5%8A%A0-ssh-key)
+      - [测试](#%E6%B5%8B%E8%AF%95)
+      - [应用](#%E5%BA%94%E7%94%A8)
+  - [2.15 kex_exchange_identification: Connection closed by remote host](#215-kex_exchange_identification-connection-closed-by-remote-host)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -40,7 +49,9 @@
 - 使用第二种方法，在使用之前，先将本地写好的代码备份，然后直接从远端的仓库拉过来，将本地代码覆盖，然后再将备份的代码写到文件中去。
      
 ## 2. git知识积累
+
 ### 2.1 git fetch和git pull的用法以及区别
+
 1. 参考资料：[git fetch & pull详解](https://www.cnblogs.com/runnerjack/p/9342362.html)
 2. 一张图展示git fetch和git pull的概念：
    - 图示：
@@ -54,9 +65,6 @@
    - 命令的基本格式2：` git fetch <remote>`，这个命令将某个远程主机的更新全部取回本地，例如：`git fetch origin`。
    - 作用：git fetch将远端分支的最新内容拉到本地，用户再检查了内容以后，在决定是否与本地分支进行合并。
    - 取回更新后，会返回一个FETCH_HEAD，指的是某个branch在服务器上的最新状态，我们可以在本地通过它查看刚取回的更新信息：`git log -p FETCH_HEAD`，如图所示：
-   
-     ![git-log-p](https://github.com/windofme1109/JavaScriptNotes/blob/master/img/git-log-p.png)
-     
       ![](img/git-log-p.png)
    - 返回的信息包括更新的文件名，更新的作者和时间，以及更新的代码（**红色**部分表示删除，**绿色**部分表示新增）。通过这些信息来判断是否产生冲突，以确定是否将更新merge到当前分支。 
 4. `git pull`
