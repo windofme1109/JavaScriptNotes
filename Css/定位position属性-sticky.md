@@ -18,6 +18,7 @@
 
 8. [深入理解position sticky粘性定位的计算规则](https://www.zhangxinxu.com/wordpress/2020/03/position-sticky-rules/)
 
+9. [position:sticky 粘性定位的几种巧妙应用](https://segmentfault.com/a/1190000039858711)
 ## 2. 基本背景
 
 1. position 设置为 sticky，实现的是粘性定位。粘性定位实际上是相对定位和固定定位的结合。
@@ -235,7 +236,7 @@
     - 如果 position: sticky 元素的任意父节点定位设置为 overflow: hidden，则父容器无法进行滚动，所以 position:sticky 元素也不会有滚动然后固定的情况。
     在满足上述情况下，设定了 position: sticky 的元素的父容器的高度必须大于当前元素，否则也会失效。（当然，此时，sticky 吸附的基准元素就会变成父元素）。
     - 合理的 html 结构很中烟重要，要合理的设置父容器和滚动容器。详情可见：[杀了个回马枪，还是说说position:sticky吧](https://www.zhangxinxu.com/wordpress/2018/12/css-position-sticky/)
-    - 同一个父容器中的sticky元素，如果定位值相等，则会重叠；如果属于不同父元素，且这些父元素正好紧密相连，则会鸠占鹊巢，挤开原来的元素，形成依次占位的效果。至于原因需要理解粘性定位的计算规则，原因可见：[深入理解position sticky粘性定位的计算规则](https://www.zhangxinxu.com/wordpress/2020/03/position-sticky-rules/)
+    - 同一个父容器中的 sticky 元素，如果定位值相等，则会重叠；如果属于不同父元素，且这些父元素正好紧密相连，则会鸠占鹊巢，挤开原来的元素，形成依次占位的效果。至于原因需要理解粘性定位的计算规则，原因可见：[深入理解position sticky粘性定位的计算规则](https://www.zhangxinxu.com/wordpress/2020/03/position-sticky-rules/)
 
 12. 富有层次感的依次替换的 sticky 元素的交互示例：
 ```html
