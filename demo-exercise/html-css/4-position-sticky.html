@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>scroll 模拟粘性定位（sticky）</title>
+    <style>
+        .article-outer-container {
+
+            height: 750px;
+            width: 500px;
+
+            margin: 0 auto;
+            background: #666;
+            overflow: auto;
+            /*margin-top: 100px;*/
+        }
+
+        .content-container {
+            height: 3000px;
+
+        }
+
+        .article-header {
+            position: sticky;
+            top: 0;
+        }
+        .content-container .title {
+            width: 500px;
+            margin: 0 auto;
+            padding: 25px;
+            box-sizing: border-box;
+            text-align: center;
+            background: yellowgreen;
+        }
+
+        .top-content {
+
+            height: 75px;
+            width: 100%;
+            background: purple;
+
+        }
+
+        .article-paragraph {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="article-outer-container">
+        <div class="top-content">
+            顶部占位元素
+        </div>
+        <div class="content-container">
+            <header class="article-header">
+                <div class="title">
+                    定位 - sticky 定位
+                </div>
+            </header>
+            <div class="article-content">
+                <p class="article-paragraph">sticky 定位</p>
+                <p class="article-paragraph">sticky 定位</p>
+                <p class="article-paragraph">sticky 定位</p>
+                <p class="article-paragraph">sticky 定位</p>
+                <p class="article-paragraph">sticky 定位</p>
+                <p class="article-paragraph">sticky 定位</p>
+                <p class="article-paragraph">sticky 定位</p>
+                <p class="article-paragraph">sticky 定位</p>
+                <p class="article-paragraph">sticky 定位</p>
+                <p class="article-paragraph">sticky 定位</p>
+
+            </div>
+        </div>
+
+    </div>
+</body>
+</html>

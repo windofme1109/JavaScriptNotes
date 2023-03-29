@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>scroll 模拟粘性定位（sticky）</title>
+    <style>
+        .article-outer-container {
+
+            height: 750px;
+            width: 500px;
+
+            margin: 0 auto;
+            background: #666;
+            overflow: auto;
+            /*margin-top: 100px;*/
+        }
+
+        .content-container {
+            height: 3000px;
+
+        }
+        .content-container .title {
+            width: 500px;
+            margin: 0 auto;
+            padding: 25px;
+            box-sizing: border-box;
+            text-align: center;
+            background: yellowgreen;
+        }
+
+        .top-content {
+
+            height: 75px;
+            width: 100%;
+            background: purple;
+            /*margin-bottom: 15px;*/
+        }
+
+        .article-paragraph {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="article-outer-container">
+        <div class="top-content">
+            顶部占位元素
+        </div>
+        <div class="content-container">
+            <header class="article-header">
+                <div class="title">
+                    定位 - js + 模拟粘性定位
+                </div>
+            </header>
+            <div class="article-content">
+                <p class="article-paragraph">javascript 加 css 模拟 sticky</p>
+                <p class="article-paragraph">javascript 加 css 模拟 sticky</p>
+                <p class="article-paragraph">javascript 加 css 模拟 sticky</p>
+                <p class="article-paragraph">javascript 加 css 模拟 sticky</p>
+                <p class="article-paragraph">javascript 加 css 模拟 sticky</p>
+                <p class="article-paragraph">javascript 加 css 模拟 sticky</p>
+                <p class="article-paragraph">javascript 加 css 模拟 sticky</p>
+                <p class="article-paragraph">javascript 加 css 模拟 sticky</p>
+                <p class="article-paragraph">javascript 加 css 模拟 sticky</p>
+                <p class="article-paragraph">javascript 加 css 模拟 sticky</p>
+
+            </div>
+        </div>
+
+    </div>
+</body>
+<script>
+    const scrollContainer = document.querySelector('.article-outer-container');
+    const articleHeader = document.querySelector('.article-header');
+    const articleHeaderOffsetLeft = articleHeader.offsetLeft;
+    
+    function debounceFn(fn, delay = 10) {
+        let timer = null;
+
+        return function() {
+            const args = arguments;
+            const that = this;
+
+            if (timer) {
+                clearTimeout(timer);
+            }
+
+            timer = setTimeout(function () {
+
+                timer = null;
+                fn.call(that, ...args);
+            }, delay);
+        }
+    }
+
+    // const debounceScrollFn = debounceFn(scrollFn, 20);
+    function scrollFn(e) {
+        console.log('1111111')
+        // this 指向当前的触发滚动事件的元素
+        const scrollTop = this.scrollTop;
+
+        if (scrollTop >= 75) {
+            // 滚动元素滚动到指定位置，将需要固定的元素设置为固定定位，同时指定 top 和 left
+            articleHeader.style.position = 'fixed';
+            articleHeader.style.top = '8px';
+            articleHeader.style.left = `${articleHeaderOffsetLeft}px`;
+
+            // console.log(articleHeader.offsetTop)
+            // console.log(articleHeader.offsetParent)
+        } else {
+            articleHeader.style.position = 'static';
+        }
+
+        // this.scrollTop
+        // console.log('scrollHeight', this.scrollHeight);
+        // console.log('offsetHeight', this.offsetHeight);
+        // console.log(this.scrollTop + this.offsetHeight);
+    }
+    // scrollContainer.addEventListener('scroll', debounceScrollFn);
+    scrollContainer.addEventListener('scroll', scrollFn);
+
+</script>
+</html>
