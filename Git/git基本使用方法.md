@@ -20,7 +20,7 @@
 
 3. 这个命令，会在 `~/.gitconfig` 中以如下形式输出设置文件。这个文件的在 `C:\Users\Administrator.USER-20181123NM` 目录下。
 
-### 2. 设置SSH Key
+### 2. 设置 SSH Key
 
 1. GitHub 上连接已有仓库时的认证，是通过使用了 SSH 的公开密钥认证方式进行的。现在让我们来创建公开密钥认证所需的 SSH Key，并将其添加至 GitHub。
 
@@ -63,4 +63,56 @@ Enter file in which to save the key (/c/Users/Administrator.USER-20181123NM/.ssh
 7. 添加公开秘钥。在 GitHub 中添加公开密钥，今后就可以用私有密钥进行认证了。
 
 
+### 3. 配置 HTTPS 连接
 
+1. github 也可以通过 https 的方式拉取上传代码。
+
+2. 第一步是将仓库的远端地址配置为 https，例如：https://github.com/windofme1109/learningKoa2.git
+
+3. 如果仓库没有配置远端地址，可以使用下面的命令进行配置：
+```shell
+   git remote add origin https://github.com/windofme1109/learningKoa2.git
+```
+
+4. 如果仓库已经配置了 ssh 地址，那么可以使用下面的命令进行更换：
+```shell
+git remote set-url origin https://github.com/OWNER/REPOSITORY.git
+```
+
+5. 查看更换后的远端仓库地址：
+```shell
+git remote -v
+```
+
+6. 更换完远端仓库地址以后，可以使用 `git push`、`git pull` 等命令推送和拉取代码。
+
+7. 在命令行使用 git 命令推送代码时，需要我们输入 github 的用户名和密码进行鉴权。
+
+8. 需要注意的是，从 21 年 8 月 13 日起，github 移除了对密码鉴权的支持。因此我们不能在使用密码的方式实现鉴权。
+![img.png](img/no-password.png)
+
+9. Github 提供了两种方式实现鉴权：
+   - Personal Access Token
+   - [Git Credential Manager](https://github.com/git-ecosystem/git-credential-manager/blob/main/README.md)
+
+#### 1. Personal Access Token
+
+1. 详细配置方法可见：[github的token使用方法](https://blog.csdn.net/chengwenyang/article/details/120060010)
+
+#### 2. Git Credential Manager
+
+1. 详细使用方法可见：[Git Credential Manager](https://github.com/git-ecosystem/git-credential-manager/blob/main/README.md)
+
+2. Git Credential Manager 是一个命令行帮助工具，在我们使用 git 命令的时候，会打开一个窗口提示我们要进行授权操作，我们按照提示进行操作即可完成授权。
+
+#### 3. 参考资料
+
+1. [Managing your personal access tokens](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens)
+
+2. [Managing remote repositories](https://docs.github.com/en/get-started/getting-started-with-git/managing-remote-repositories)
+
+3. [Caching your GitHub credentials in Git](https://docs.github.com/en/get-started/getting-started-with-git/caching-your-github-credentials-in-git)
+
+4. [github-cli](https://github.com/cli/cli#installation)
+
+5. [github的token使用方法](https://blog.csdn.net/chengwenyang/article/details/120060010)
