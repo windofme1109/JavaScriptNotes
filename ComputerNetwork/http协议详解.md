@@ -284,15 +284,15 @@
 
 ### 1. JSONP
 
-1. 原理是利用浏览器请求js脚本不受跨域限制实现的。
+1. 原理是利用浏览器请求 js 脚本不受跨域限制实现的。
 
 ### 2. CORS
 
-1. 浏览器端，在请求头中加入一个origin字段，表示源信息，例如：`Origin: http://localhost:8888`。
+1. 浏览器端，在请求头中加入一个 origin 字段，表示源信息，例如：`Origin: http://localhost:8888`。
 
-2. 服务器端，在响应头中添加Access-Control-Allow-Origin字段，值或者为*，或者一个源信息。例如：`Access-Control-Allow-Origin: '*'` 或者`Access-Control-Allow-Origin: 'http://localhost:8888'`
+2. 服务器端，在响应头中添加 Access-Control-Allow-Origin 字段，值或者为 *，或者一个源信息。例如：`Access-Control-Allow-Origin: '*'` 或者`Access-Control-Allow-Origin: 'http://localhost:8888'`
 
-3. 浏览器会根据响应头中的Access-Control-Allow-Origin这个字段来决定是否禁止这次请求：
+3. 浏览器会根据响应头中的 Access-Control-Allow-Origin 这个字段来决定是否禁止这次请求：
    - 如果是*或者和请求头中Origin字段的源信息相同，则接收这个响应。
    - 如果没有这个字段，或者是其他源信息，则禁止这次响应。
 
