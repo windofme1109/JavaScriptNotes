@@ -161,9 +161,6 @@
          }
      ```
 
-
-
-
 ### 2. React 组件化方式实现
 
 #### 1. 预备知识
@@ -359,7 +356,7 @@
 
 1. 因为是匹配 url 中的 hash 部分，而 url 中的 hash 发生变化，就会触发 hashchange 事件。因此 HashRouter 组件的主要作用是监听 hashchange 事件，获得地址栏中最新的 hash，然后传递个子组件。
 
-2. 使用 Context 完成夸组件通信。
+2. 使用 Context 完成跨组件通信。
 
 3. 代码：
    ```jsx

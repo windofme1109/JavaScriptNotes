@@ -9,11 +9,11 @@
     - [1. `window.innerHeight` 与 `window.outerHeight`](#1-windowinnerheight-%E4%B8%8E-windowouterheight)
     - [2. `element.clientHeight` 与 `element.clientWidth`](#2-elementclientheight-%E4%B8%8E-elementclientwidth)
     - [3. `element.offsetHeight` 和 `element.offsetWidth`](#3-elementoffsetheight-%E5%92%8C-elementoffsetwidth)
+    - [4. `element.scrollWidth` 和 `element.scrollHeight`](#4-elementscrollwidth-%E5%92%8C-elementscrollheight)
     - [4. `element.scrollTop` 与 `element.scrollLeft`](#4-elementscrolltop-%E4%B8%8E-elementscrollleft)
       - [1. `element.scrollTop`](#1-elementscrolltop)
       - [2. `element.scrollLeft`](#2-elementscrollleft)
     - [5.  `element.offsetTop` 与 `element.offsetLeft`](#5--elementoffsettop-%E4%B8%8E-elementoffsetleft)
-    - [6. `element.scrollWidth` 和 `element.scrollHeight`](#6-elementscrollwidth-%E5%92%8C-elementscrollheight)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -34,6 +34,26 @@
 6. [小结clientHeight，innerHeight，offsetHeight，scrollHeight](https://juejin.cn/post/7014115502712684557)
 
 7. [scrollHeight, clientHeight, offsetHeight的区别](https://segmentfault.com/a/1190000016554851)
+
+8. [还算有点用的scrollTo和scrollBy两个JS API](https://www.zhangxinxu.com/wordpress/2019/07/js-scrollto-scrollby/)
+
+8. MDN 上关于一个元素的各种宽度、高度距离的解释：
+    - [Element: scrollTop property](https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollTop)
+   
+    - [Element: scrollHeight property](https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollHeight)
+   
+    - [HTMLElement: offsetTop property](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/offsetTop)
+   
+    - [Element: offsetLeft property](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/offsetLeft)
+   
+    - [Element: clientWidth property](https://developer.mozilla.org/en-US/docs/Web/API/Element/clientWidth)
+   
+    - [Element: clientHeight property](https://developer.mozilla.org/en-US/docs/Web/API/Element/clientHeight)
+   
+    - [HTMLElement: offsetWidth property](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/offsetWidth)
+   
+    - [HTMLElement: offsetHeight property](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/offsetHeight)
+ 
 
 ## 2. 图示
 
@@ -56,20 +76,20 @@
 
 ### 2. `element.clientHeight` 与 `element.clientWidth`
 
-1. `clientHeight` 指的是元素可见区域的高度，即内容区域的高度，包括内边距，用公式来表达就是：`content-height + padding-top + padding-bottom - 横向滚动条的高度`
+1. `clientHeight` 指的是元素可见区域的高度，即内容区域的高度，包括内边距，用公式来表达就是：`content-height + padding-top + padding-bottom`
 
-2. `clientWidth` 就表示一个元素的内容的宽度，包含元素内容以及内边距，用公式表达就是：`content + padding-left + padding-right - 纵向滚动条的宽度`
+2. `clientWidth` 就表示一个元素的内容的宽度，包含元素内容以及内边距，用公式表达就是：`content + padding-left + padding-right`
+
+3. 不包含 `border`、`margin` 和滚动条。
 
 3. 如果你只想要获取显示内容区域的大小，就是用 `clientWidth` 和 `clientHeight`。
 
 4. 图示如下：
    ![](./img/clientHeight.png)
 
-
-
 ### 3. `element.offsetHeight` 和 `element.offsetWidth`
 
-1. `offsetHeight` 和`offsetWidth` 指一个元素的 CSS 标准宽高，它包含了边框（border）、内边距（padding）、元素内容（content）以及滚动条（如果存在的话）。
+1. `offsetHeight` 和`offsetWidth` 指一个元素的 CSS 标准宽高，它包含了边框（border）、内边距（padding）、元素内容（content）以及滚动条（如果存在的话），但是不包含像是 `::before` 或者 `::after` 一类的伪元素的宽度或者高度。
 
 2. 公式表达：
    - `offsetWidth` = `content + padding-left + padding-right + border-left + border-right + 纵向滚动条的宽度`
@@ -77,6 +97,81 @@
   
 3. 图示：
    ![](./img/offsetHeight.png)
+
+### 4. `element.scrollWidth` 和 `element.scrollHeight`
+
+1. `scrollWidth` 和 `scrollHeight` 表示一个元素内容区域的实际大小，包括不在页面中的可滚动部分（内容和内边距）。
+
+2. `scrollHeight` 这个只读属性是一个元素内容高度的度量，包括由于溢出导致的视图中不可见内容。
+
+3. `scrollHeight` 的值等于该元素在不使用滚动条的情况下为了适应视口中所用内容所需的最小高度。没有垂直滚动条的情况下，`scrollHeight` 值与元素视图填充所有内容所需要的最小值`clientHeight` 相同。包括元素的 `padding`，但不包括元素的 `border` 和 `margin`。`scrollHeight` 也包括 `::before` 和 `::after` 这样的伪元素。
+
+4. `scrollHeight` 图示如下：
+   ![](./img/scrollHeight-1.png)
+
+5. 代码示例：
+    - html 结构：
+      ```html
+         <div class="moon-body-container">
+ 
+             <div class="content-wrapper">
+                 <div class="main-content">
+                 </div>
+             </div>
+         </div>
+      ```
+    - css 样式如下：
+      ```css
+         .moon-body-container {
+ 
+             width: 400px;
+             height: 600px;
+             margin: 0 auto;
+             border: 1px solid black;
+             background-color: #666;
+             border-radius: 6px;
+ 
+         }
+         .content-wrapper {
+             width: 200px;
+             height: 300px;
+             margin: 30px auto;
+             border: 1px solid green;
+             background-color: rebeccapurple;
+             position: relative;
+             padding: 30px 0px;
+             overflow-y: scroll;
+         }
+         .main-content {
+             margin: 10px 0;
+             border: 1px solid gray;
+             padding: 20px 0;
+             height: 500px;
+             background-color: goldenrod;
+             
+         }
+      ```
+    - js 代码如下：
+      ```js
+         const wrapper = document.querySelector('.content-wrapper');
+          const scrollHeight = wrapper.scrollHeight;
+         const clientHeight = wrapper.clientHeight;
+         console.log(`mainContent 的 scrollHeight 是: ${scrollHeight}`);
+         console.log(`mainContent 的 clientHeight 是: ${clientHeight}`);
+      ```
+    - 输出结果如下：
+      ![](./img/scrollHeight-3.png)
+    - `scrollHeight` 就是 `wrapper` 内部的总高度。其内部只有一个元素 `main-content`，`main-content` 占据的空间的高度是：`content-height + padding-top + padding-bottom + border-top + border-bottom + margin-top + margin-bottom` = 500 + 20 + 20 + 1 + 1 + 10 + 10 = 562，然后加上 `wrapper` 内部的 `padding-top` 和 `padding-bottom`，不包括 `border-top` 和 `border-bottom`，所以总的高度是 562 + 30 + 30 = 622。所以 `wrapper` 元素的` scrollHeight` 是 622。
+    - `clientHeight` 就是 `wrapper` 内容区高度 + 自身`padding`。 wrapper 内容区高度高度为 300 （没有横向滚动条），`padding-top` 和 `padding-bottom` 均为 30，因此一共是 300 + 30 + 30 = 360。
+
+6. 只有一个元素出现纵向的滚动条的时候，`scrollHeight` 和 `clientHeight` 是不一样的，如果没有出现滚动条，那么二者的值相同。
+
+7. 只有当一个元素出现纵向滚动条时，获取 `scrollHeight` 和 `scrollTop` 才有意义。即我们要获取包裹滚动元素的父元素的 `scrollHeight` 和 `scrollTop`。
+
+8. `scrollWidth` 等于元素在不使用水平滚动条的情况下适合视口中的所有内容所需的最小宽度。 宽度的测量方式与 `clientWidth` 相同：它包含元素的内边距，但不包括 border，`margin` 或垂直滚动条（如果存在）。 它还可以包括伪元素的宽度，例如 `::before` 或 `::after`。 如果元素的内容可以适合而不需要水平滚动条，则其 `scrollWidth` 等于 `clientWidth`。
+
+9. `scrollWidth` 其他方面与 `scrollHeight` 类似，这里不再详说。
+
 
 ### 4. `element.scrollTop` 与 `element.scrollLeft`
 
@@ -425,76 +520,3 @@
 
 8. `offsetLeft` 的计算方式与 `offsetTop` 类似，这里就不再详述。
 
-### 6. `element.scrollWidth` 和 `element.scrollHeight`
-
-1. `scrollWidth` 和 `scrollHeight` 表示一个元素内容区域的实际大小，包括不在页面中的可滚动部分（内容和内边距）。
-
-2. `scrollHeight` 这个只读属性是一个元素内容高度的度量，包括由于溢出导致的视图中不可见内容。
-
-3. `scrollHeight` 的值等于该元素在不使用滚动条的情况下为了适应视口中所用内容所需的最小高度。没有垂直滚动条的情况下，`scrollHeight` 值与元素视图填充所有内容所需要的最小值`clientHeight` 相同。包括元素的 `padding`，但不包括元素的 `border` 和 `margin`。`scrollHeight` 也包括 `::before` 和 `::after` 这样的伪元素。
-
-4. `scrollHeight` 图示如下：
-   ![](./img/scrollHeight-1.png)
-
-5. 代码示例：
-   - html 结构：
-     ```html
-        <div class="moon-body-container">
-
-            <div class="content-wrapper">
-                <div class="main-content">
-                </div>
-            </div>
-        </div>
-     ```
-   - css 样式如下：
-     ```css
-        .moon-body-container {
-
-            width: 400px;
-            height: 600px;
-            margin: 0 auto;
-            border: 1px solid black;
-            background-color: #666;
-            border-radius: 6px;
-
-        }
-        .content-wrapper {
-            width: 200px;
-            height: 300px;
-            margin: 30px auto;
-            border: 1px solid green;
-            background-color: rebeccapurple;
-            position: relative;
-            padding: 30px 0px;
-            overflow-y: scroll;
-        }
-        .main-content {
-            margin: 10px 0;
-            border: 1px solid gray;
-            padding: 20px 0;
-            height: 500px;
-            background-color: goldenrod;
-            
-        }
-     ```
-   - js 代码如下：
-     ```js
-        const wrapper = document.querySelector('.content-wrapper');
-         const scrollHeight = wrapper.scrollHeight;
-        const clientHeight = wrapper.clientHeight;
-        console.log(`mainContent 的 scrollHeight 是: ${scrollHeight}`);
-        console.log(`mainContent 的 clientHeight 是: ${clientHeight}`);
-     ```
-   - 输出结果如下：
-   ![](./img/scrollHeight-3.png)
-   - `scrollHeight` 就是 `wrapper` 内部的总高度。其内部只有一个元素 `main-content`，`main-content` 占据的空间的高度是：`content-height + padding-top + padding-bottom + border-top + border-bottom + margin-top + margin-bottom` = 500 + 20 + 20 + 1 + 1 + 10 + 10 = 562，然后加上 `wrapper` 内部的 `padding-top` 和 `padding-bottom`，不包括 `border-top` 和 `border-bottom`，所以总的高度是 562 + 30 + 30 = 622。所以 `wrapper` 元素的` scrollHeight` 是 622。
-   - `clientHeight` 就是 `wrapper` 内容区高度 + 自身`padding`。 wrapper 内容区高度高度为 300 （没有横向滚动条），`padding-top` 和 `padding-bottom` 均为 30，因此一共是 300 + 30 + 30 = 360。
-
-6. 只有一个元素出现纵向的滚动条的时候，`scrollHeight` 和 `clientHeight` 是不一样的，如果没有出现滚动条，那么二者的值相同。
-
-7. 只有当一个元素出现纵向滚动条时，获取 `scrollHeight` 和 `scrollTop` 才有意义。即我们要获取包裹滚动元素的父元素的 `scrollHeight` 和 `scrollTop`。
-
-8. `scrollWidth` 等于元素在不使用水平滚动条的情况下适合视口中的所有内容所需的最小宽度。 宽度的测量方式与 `clientWidth` 相同：它包含元素的内边距，但不包括 border，`margin` 或垂直滚动条（如果存在）。 它还可以包括伪元素的宽度，例如 `::before` 或 `::after`。 如果元素的内容可以适合而不需要水平滚动条，则其 `scrollWidth` 等于 `clientWidth`。
-
-9. `scrollWidth` 其他方面与 `scrollHeight` 类似，这里不再详说。
