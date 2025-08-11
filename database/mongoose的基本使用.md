@@ -6,6 +6,10 @@
 
 2. [mongoose学习教程](https://huxinmin.github.io/post/mongoose-xue-xi-jiao-cheng/)
 
+3. 操作符参考文档 - 1：[Query and Projection Operators](https://www.mongodb.com/docs/manual/reference/operator/query/)
+
+4. [Mongodb--操作符](https://www.cnblogs.com/Xinenhui/p/15853207.html)
+
 ## 2. 安装 Mongodb
 
 1. 请参考：
@@ -111,4 +115,5 @@ main().then(err => {console.log(err)})
 ## 8. 删除数据
 
 ## 9. Mongodb 操作符
+
 
