@@ -26,7 +26,7 @@
 
 ### 1. 高级筛选表格
 
-1. 响应式布局ResizeObserver / useLayoutEffect
+1. 响应式布局 ResizeObserver / useLayoutEffect
 
 2. 基于事件订阅/发布机制的数据传动体系
 
